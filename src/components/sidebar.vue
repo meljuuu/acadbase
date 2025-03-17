@@ -8,24 +8,32 @@
 
     <div class="sidebar">
       <div class="profile-section">
-        <img src="../assets/school-logo.png" alt="Profile" class="profile-icon"/>
+        <img src="../assets/school-logo.png" alt="Profile" class="profile-icon" />
         <p>Admin</p>
         <hr />
       </div>
 
       <ul class="menu">
-        <li class="menu-item active">
-          <i class="fas fa-th-large"></i>
-          <span>Dashboard</span>
-        </li>
-        <li class="menu-item">
-          <i class="fas fa-clipboard-list"></i>
-          <span>Masterlist</span>
-        </li>
-        <li class="menu-item">
-          <i class="fas fa-history"></i>
-          <span>History</span>
-        </li>
+        <router-link to="/dashboard" custom v-slot="{ navigate, isActive }">
+          <li :class="['menu-item', { active: isActive }]" @click="navigate">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+          </li>
+        </router-link>
+
+        <router-link to="/masterlist" custom v-slot="{ navigate, isActive }">
+          <li :class="['menu-item', { active: isActive }]" @click="navigate">
+            <i class="fas fa-clipboard-list"></i>
+            <span>Masterlist</span>
+          </li>
+        </router-link>
+
+        <router-link to="/history" custom v-slot="{ navigate, isActive }">
+          <li :class="['menu-item', { active: isActive }]" @click="navigate">
+            <i class="fas fa-history"></i>
+            <span>History</span>
+          </li>
+        </router-link>
       </ul>
 
       <button class="logout-btn">
@@ -113,6 +121,10 @@ hr {
   width: 100%;
 }
 
+a {
+  text-decoration: none;
+}
+
 .menu-item {
   display: flex;
   align-items: center;
@@ -122,6 +134,7 @@ hr {
   cursor: pointer;
   border-radius: 5px;
   transition: 0.3s;
+  list-style: none;
 }
 
 .menu-item:hover,

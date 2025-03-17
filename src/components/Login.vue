@@ -212,7 +212,7 @@ input {
 
 .input-group input,
 .password-field input {
-  width: 100%; /* Ensures the input fields take the full width */
+  width: 100%; 
   padding: 15px;
   border: 1px solid #295f98;
   border-radius: 5px;

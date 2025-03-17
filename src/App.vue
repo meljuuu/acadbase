@@ -1,12 +1,16 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import Login from './components/Login.vue'
-import Sidebar from './components/sidebar.vue';
+import Sidebar from './components/Sidebar.vue';
 </script>
 
 <template>
-  <Sidebar/>
+  <div class="container">
+    <Sidebar /> 
+    <div class="content">
+      <router-view />
+    </div>
+  </div>
 </template>
+
 
 <style scoped>
 .logo {
