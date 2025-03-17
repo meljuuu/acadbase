@@ -77,7 +77,7 @@ export default {
       password: "",
       showPassword: false,
       rememberMe: false,
-      errorMessage: "", // Added error message state
+      errorMessage: "",
     };
   },
   methods: {
@@ -85,7 +85,7 @@ export default {
       this.showPassword = !this.showPassword;
     },
     login() {
-      this.errorMessage = ""; // Reset error message
+      this.errorMessage = "";
 
       if (!this.email.includes("@")) {
         this.errorMessage = "Invalid email format. Please enter a valid email.";
@@ -98,7 +98,6 @@ export default {
       }
 
       console.log("Logging in with:", this.email, this.password);
-      // Implement actual authentication logic here
     },
   },
 };
