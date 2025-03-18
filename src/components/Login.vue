@@ -69,6 +69,8 @@
 </template>
 
 <script>
+import { useToast } from "vue-toastification";
+
 export default {
   name: "Login",
   data() {
@@ -80,12 +82,20 @@ export default {
       errorMessage: "",
     };
   },
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
   methods: {
     togglePassword() {
       this.showPassword = !this.showPassword;
     },
     login() {
       this.errorMessage = "";
+
+      
+      const staticEmail = "admin@school.com";
+      const staticPassword = "TrustedAdmin";
 
       if (!this.email.includes("@")) {
         this.errorMessage = "Invalid email format. Please enter a valid email.";
@@ -97,7 +107,19 @@ export default {
         return;
       }
 
-      console.log("Logging in with:", this.email, this.password);
+      
+      if (this.email === staticEmail && this.password === staticPassword) {
+        console.log("Login successful!");
+        localStorage.setItem("userToken", "your_token_here");
+        this.toast.success("Login successful! Welcome back.", {
+          position: "top-center",
+          timeout: 3000,
+        });
+
+        this.$router.push("/dashboard");
+      } else {
+        this.errorMessage = "Invalid email or password. Please try again.";
+      }
     },
   },
 };

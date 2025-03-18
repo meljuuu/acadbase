@@ -1,11 +1,11 @@
 <template>
   <div class="container">
+    <Sidebar />
     <div class="nav-title">
       <h1>Dashboard</h1>
     </div>
 
     <div class="dashboard-content">
-      <!-- Student Section (First Row) -->
       <div class="student-container">
         <div class="buttons">
           <div class="academic-year">
@@ -27,9 +27,7 @@
         </div>
       </div>
 
-      <!-- Student Lists (Second Row) -->
       <div class="student-list-container">
-        <!-- Total Students -->
         <div class="total-students">
           <div class="container-title">
             <div class="content-title">
@@ -43,7 +41,6 @@
           <BarChart :chart-data="chartData" :chart-options="chartOptions" />
         </div>
 
-        <!-- Recent Added -->
         <div class="recent-added">
           <div class="container-title">
             <div class="content-title">
@@ -66,7 +63,6 @@
         </div>
       </div>
 
-      <!-- Recent Released (Third Row) -->
       <div class="document-list-container">
         <div class="recent-released">
           <div class="container-title">
@@ -91,7 +87,6 @@
           </ul>
         </div>
 
-        <!-- Released Docs -->
         <div class="released-docs">
           <div class="container-title">
             <div class="content-title">
@@ -108,8 +103,13 @@
 </template>
 
 <script>
+import Sidebar from "@/components/Sidebar.vue";
+
 export default {
   name: "Dashboard",
+  components: {
+    Sidebar,
+  },
 };
 </script>
 
@@ -117,7 +117,7 @@ export default {
 .container {
   margin-top: 80px;
   margin-left: 270px;
-  width: 129%;
+  width: 127%;
   padding: 10px;
   box-sizing: border-box;
 }

@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <Sidebar />
     <div class="nav-title">
       <h1>Transaction History Report</h1>
     </div>
@@ -89,8 +90,13 @@
 </template>
 
 <script>
+import Sidebar from "@/components/Sidebar.vue";
+
 export default {
   name: "History",
+  components: {
+    Sidebar,
+  },
   data() {
     return {
       selectedBatch: "",
@@ -110,7 +116,7 @@ export default {
 .container {
   margin-top: 80px;
   margin-left: 270px;
-  width: 129%;
+  width: 128%;
   padding: 10px;
   box-sizing: border-box;
 }

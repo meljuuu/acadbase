@@ -2,21 +2,30 @@
   <div>
     <nav class="navbar">
       <div class="navbar-content">
-        <img src="../assets/school-logo.png" alt="School Logo" class="navbar-logo" />
+        <img
+          src="../assets/school-logo.png"
+          alt="School Logo"
+          class="navbar-logo"
+        />
       </div>
     </nav>
 
     <div class="sidebar">
       <div class="profile-section">
-        <img src="../assets/school-logo.png" alt="Profile" class="profile-icon" />
-        <p>Admin</p>
-        <hr />
+        <img
+          src="../assets/school-logo.png"
+          alt="Profile"
+          class="profile-icon"
+        />
+        <p>Admin Panel</p>
       </div>
+
+      <hr />
 
       <ul class="menu">
         <router-link to="/dashboard" custom v-slot="{ navigate, isActive }">
           <li :class="['menu-item', { active: isActive }]" @click="navigate">
-            <i class="fas fa-th-large"></i>
+            <i class="fas fa-chart-pie"></i>
             <span>Dashboard</span>
           </li>
         </router-link>
@@ -30,13 +39,14 @@
 
         <router-link to="/history" custom v-slot="{ navigate, isActive }">
           <li :class="['menu-item', { active: isActive }]" @click="navigate">
-            <i class="fas fa-history"></i>
+            <i class="fas fa-clock"></i>
+            <!-- Changed to clock icon -->
             <span>History</span>
           </li>
         </router-link>
       </ul>
 
-      <button class="logout-btn">
+      <button class="logout-btn" @click="logout">
         <i class="fas fa-sign-out-alt"></i> Logout
       </button>
     </div>
@@ -44,8 +54,21 @@
 </template>
 
 <script>
+import { useRouter } from "vue-router";
+
 export default {
   name: "Sidebar",
+  setup() {
+    const router = useRouter();
+
+    const logout = () => {
+      localStorage.removeItem("userToken");
+
+      router.push("/login");
+    };
+
+    return { logout };
+  },
 };
 </script>
 
@@ -53,7 +76,7 @@ export default {
 .navbar {
   width: 100%;
   height: 80px;
-  background-color: #295F98;
+  background-color: #295f98;
   color: white;
   display: flex;
   align-items: center;
@@ -91,7 +114,7 @@ export default {
 
 .profile-section {
   text-align: center;
-  margin-bottom: 20px;
+  color: #fff;
 }
 
 .profile-icon {
@@ -135,11 +158,13 @@ a {
   border-radius: 5px;
   transition: 0.3s;
   list-style: none;
+  margin: 5px;
 }
 
 .menu-item:hover,
 .menu-item.active {
   background-color: rgba(255, 255, 255, 0.2);
+  border-left: 5px solid #fff;
 }
 
 .logout-btn {
@@ -147,7 +172,7 @@ a {
   margin-bottom: 50px;
   width: 100%;
   padding: 12px;
-  background-color: #0a3d62;
+  background-color: #295f98;
   color: white;
   border: none;
   border-radius: 5px;
@@ -160,6 +185,6 @@ a {
 }
 
 .logout-btn:hover {
-  background-color: #092c47;
+  background-color: #1c3a6e;
 }
 </style>

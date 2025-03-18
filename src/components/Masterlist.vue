@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <Sidebar />
     <div class="nav-title">
       <h1>Master List</h1>
     </div>
@@ -84,8 +85,13 @@
 </template>
 
 <script>
+import Sidebar from "@/components/Sidebar.vue";
+
 export default {
   name: "Masterlist",
+  components: {
+    Sidebar,
+  },
   data() {
     return {
       selectedBatch: "",
@@ -105,7 +111,7 @@ export default {
 .container {
   margin-top: 80px;
   margin-left: 270px;
-  width: 129%;
+  width: 127%;
   padding: 10px;
   box-sizing: border-box;
 }
