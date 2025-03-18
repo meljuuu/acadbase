@@ -15,14 +15,9 @@ import Sidebar from "@/components/Sidebar.vue";
 .app-container {
   width: 100%;
   height: 100vh;
-  display: flex;
 }
 
 .content {
-  flex: 1;
-  height: 100%;
-  width: 100%;
   padding: 20px;
-  overflow: auto;
 }
 </style>
