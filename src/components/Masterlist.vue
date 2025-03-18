@@ -12,7 +12,7 @@
           @focus="activeDropdown = 'batch'"
           @blur="activeDropdown = ''"
         >
-          <option disabled value="">Select Batch</option>
+          <option disabled value="">Batch</option>
           <option v-for="batch in batches" :key="batch">{{ batch }}</option>
         </select>
 
@@ -22,7 +22,7 @@
           @focus="activeDropdown = 'curriculum'"
           @blur="activeDropdown = ''"
         >
-          <option disabled value="">Select Curriculum</option>
+          <option disabled value="">Curriculum</option>
           <option v-for="curriculum in curriculums" :key="curriculum">
             {{ curriculum }}
           </option>
@@ -34,7 +34,7 @@
           @focus="activeDropdown = 'track'"
           @blur="activeDropdown = ''"
         >
-          <option disabled value="">Select Academic Track</option>
+          <option disabled value="">Academic Track</option>
           <option v-for="track in tracks" :key="track">{{ track }}</option>
         </select>
       </div>
@@ -50,7 +50,7 @@
         <thead>
           <tr>
             <th>LRN</th>
-            <th>NAME OF STUDENT</th>
+            <th>STUDENT NAME</th>
             <th>ACADEMIC TRACK</th>
             <th>CURRICULUM</th>
             <th>S.Y. BATCH</th>
@@ -58,7 +58,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(student, index) in 10" :key="index">
+          <tr v-for="(student, index) in 11" :key="index">
             <td>202110048</td>
             <td>Bueno, Ryan Joshua E.</td>
             <td>TVL - IEM</td>
@@ -69,6 +69,9 @@
         </tbody>
       </table>
     </div>
+    
+    <p class="note">*Note: Only 11 students are displayed in the table. Other students Name are on the next page.*</p>
+
 
     <div class="pagination">
       <button class="prev">← Previous</button>
@@ -89,9 +92,9 @@ export default {
       selectedCurriculum: "",
       selectedTrack: "",
       searchQuery: "",
-      batches: ["Batch 2023 - 2024", "Batch 2024 - 2025", "Batch 2025 - 2026"],
-      curriculums: ["SHS", "JHS", "College"],
-      tracks: ["STEM", "HUMSS", "ABM", "TVL"],
+      batches: ["All", "Batch 2023 - 2024", "Batch 2024 - 2025", "Batch 2025 - 2026"],
+      curriculums: ["All", "SHS", "JHS", "College"],
+      tracks: ["All", "STEM", "HUMSS", "ABM", "TVL"],
       activeDropdown: "",
     };
   },
@@ -124,7 +127,7 @@ export default {
 }
 .filter-dropdown {
   padding: 8px;
-  width: 185px;
+  width: 150px;
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 14px;
@@ -183,6 +186,7 @@ td {
   padding: 15px;
   text-align: center;
   border-bottom: 1px solid #ddd;
+  font-size: 12px;
 }
 
 th {
@@ -203,6 +207,12 @@ tr:hover {
   padding: 5px 20px;
   border-radius: 5px;
   font-size: 12px;
+}
+
+.note{
+  font-size:10px;
+  text-align: center;
+  color: red;
 }
 
 .pagination {
