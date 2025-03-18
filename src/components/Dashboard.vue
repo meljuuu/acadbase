@@ -101,14 +101,6 @@
               <p>2023 - 2024 (Filter)</p>
             </div>
           </div>
-
-          <ul>
-            <li v-for="(doc, index) in 7" :key="index">
-              <span class="list-number">{{ index + 1 }}.</span>
-              <span class="doc-name">Transcript #{{ index + 1 }}</span>
-              <span class="doc-date">March 2025</span>
-            </li>
-          </ul>
         </div>
       </div>
     </div>
@@ -116,52 +108,10 @@
 </template>
 
 <script>
-import { Bar } from 'vue-chartjs';
-import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-} from "chart.js";
-
-ChartJS.register(
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  CategoryScale,
-  LinearScale
-);
-
 export default {
   name: "Dashboard",
-  components: {
-    BarChart: Bar,
-  },
-  data() {
-    return {
-      chartData: {
-        labels: ["1st Year", "2nd Year", "3rd Year", "4th Year"],
-        datasets: [
-          {
-            label: "Total Students",
-            data: [120, 150, 110, 130],
-            backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0"],
-          },
-        ],
-      },
-      chartOptions: {
-        responsive: true,
-        maintainAspectRatio: false,
-      },
-    };
-  },
 };
 </script>
-
 
 <style scoped>
 .container {
@@ -172,11 +122,10 @@ export default {
   box-sizing: border-box;
 }
 
-.nav-title {
+.nav-title h1 {
   color: #295f98;
   font-weight: bold;
-  font-size: 22px;
-  margin-bottom: 10px;
+  padding: 0;
 }
 
 .dashboard-content {
@@ -298,6 +247,7 @@ export default {
   font-size: 12px;
   background-color: #f5f5f5;
 }
+
 .list-number {
   font-weight: bold;
   margin-right: 8px;
@@ -311,6 +261,14 @@ export default {
 .document-list-container {
   display: flex;
   gap: 20px;
+  align-items: stretch;
+}
+
+.recent-released {
+  height: 600px;
+}
+.released-docs {
+  height: 535px;
 }
 
 .recent-released {
