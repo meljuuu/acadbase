@@ -42,7 +42,7 @@
 
       <div class="search-bar">
         <input type="text" v-model="searchQuery" placeholder="Search..." />
-        <button class="add-student" @click="openModal">Add Student</button>
+        <button class="add-student" @click="openaddModal">Add Student</button>
       </div>
     </div>
 
@@ -59,7 +59,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(student, index) in 11" :key="index">
+          <tr v-for="(student, index) in 11" :key="index" @click="showUnReleasedModal">
             <td>202110048</td>
             <td>Bueno, Ryan Joshua E.</td>
             <td>TVL - IEM</td>
@@ -85,6 +85,7 @@
     </div>
   </div>
 
+  <!-- Add Student -->
   <div v-if="showModal" class="modal-overlay">
     <div class="modal-content">
       <div class="student-file-upload" @click="triggerFileInput">
@@ -190,7 +191,262 @@
 
         <div class="modal-buttons">
           <button @click="closeModal" class="cancel">Cancel</button>
-          <button @click="saveStudent" class="add">Add Student</button>
+          <button @click="saveStudent" class="add">Released Documents</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- released Modal -->
+  <div v-if="showreleasedModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="student-file-upload-released" @click="triggerFileInput">
+        <label for="fileInput" class="upload-box">
+          <!-- <p><i class="fas fa-upload"></i></p> -->
+          <p v-if="!uploadedFile"></p>
+          <p v-else>{{ uploadedFile.name }}</p>
+        </label>
+        <input
+          type="file"
+          id="fileInput"
+          accept=".pdf"
+          ref="fileInput"
+          @change="handleFileUpload"
+          hidden
+        />
+
+        <div v-if="pdfUrl" class="pdf-preview">
+          <object
+            :data="pdfUrl"
+            type="application/pdf"
+            width="100%"
+            height="500px"
+          >
+            <p>
+              Your browser does not support PDFs.
+              <a :href="pdfUrl" target="_blank">Download PDF</a>
+            </p>
+          </object>
+          <button @click.stop="removeFile" class="remove-btn">Remove</button>
+        </div>
+      </div>
+
+      <div class="student-processor-information">
+        <h5>Student Information</h5>
+        <div class="input-group">
+          <label>Student Name</label>
+          <input
+            type="text"
+            v-model="Name"
+            placeholder=""
+            readonly
+          />
+        </div>
+        <div class="input-group">
+          <label>LRN</label>
+          <input
+            type="text"
+            v-model="lrn"
+            placeholder=""
+            maxlength="12"
+            @input="validateLRN"
+            readonly
+          />
+        </div>
+        <div class="input-group">
+          <label>Birthdate</label>
+          <input
+          type="date"
+          v-model="birthdate"
+          readonly />
+        </div>
+        <div class="input-group">
+          <label>S.Y Batch</label>
+          <input
+            type="number"
+            v-model="syBatch"
+            placeholder=""
+            @input="syBatch = syBatch < 0 ? '' : syBatch"
+            onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+            readonly
+          />
+        </div>
+        <div class="input-group">
+          <label>Curriculum</label>
+          <input
+            type="text"
+            v-model="Curriculum"
+            placeholder=""
+            readonly
+          />
+        </div>
+        <div class="input-group">
+          <label>Academic Track</label>
+          <input
+            type="text"
+            v-model="AcademicTrack"
+            placeholder=""
+            readonly
+          />
+        </div>
+        <h5>Processor Information</h5>
+        <div class="input-group">
+          <label>Faculty Name</label>
+          <input
+            type="text"
+            v-model="FacultyName"
+            placeholder=""
+            readonly
+          />
+        </div>
+        <div class="input-group">
+          <label>Document Released</label>
+          <input
+            type="text"
+            v-model="FacultyName"
+            placeholder=""
+            readonly
+          />
+        </div>
+        <div class="input-group">
+          <label>Date of Released</label>
+          <input type="text" v-model="DateAdded" placeholder="" readonly />
+        </div>
+
+        <div class="modal-buttons">
+          <button @click="closeReleasedModal" class="cancel">Back</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- Unreleased Modal -->
+    <div v-if="showunreleasedModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="student-file-upload-released" @click="triggerFileInput">
+        <label for="fileInput" class="upload-box">
+          <!-- <p><i class="fas fa-upload"></i></p> -->
+          <p v-if="!uploadedFile"></p>
+          <p v-else>{{ uploadedFile.name }}</p>
+        </label>
+        <input
+          type="file"
+          id="fileInput"
+          accept=".pdf"
+          ref="fileInput"
+          @change="handleFileUpload"
+          hidden
+        />
+
+        <div v-if="pdfUrl" class="pdf-preview">
+          <object
+            :data="pdfUrl"
+            type="application/pdf"
+            width="100%"
+            height="500px"
+          >
+            <p>
+              Your browser does not support PDFs.
+              <a :href="pdfUrl" target="_blank">Download PDF</a>
+            </p>
+          </object>
+          <button @click.stop="removeFile" class="remove-btn">Remove</button>
+        </div>
+      </div>
+
+      <div class="student-processor-information">
+        <h5>Student Information</h5>
+        <div class="input-group">
+          <label>Student Name</label>
+          <input
+            type="text"
+            v-model="Name"
+            placeholder=""
+            readonly
+          />
+        </div>
+        <div class="input-group">
+          <label>LRN</label>
+          <input
+            type="text"
+            v-model="lrn"
+            placeholder=""
+            maxlength="12"
+            @input="validateLRN"
+            readonly
+          />
+        </div>
+        <div class="input-group">
+          <label>Birthdate</label>
+          <input
+          type="date"
+          v-model="birthdate"
+          readonly />
+        </div>
+        <div class="input-group">
+          <label>S.Y Batch</label>
+          <input
+            type="number"
+            v-model="syBatch"
+            placeholder=""
+            @input="syBatch = syBatch < 0 ? '' : syBatch"
+            onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+            readonly
+          />
+        </div>
+        <div class="input-group">
+          <label>Curriculum</label>
+          <input
+            type="text"
+            v-model="Curriculum"
+            placeholder=""
+            readonly
+          />
+        </div>
+        <div class="input-group">
+          <label>Academic Track</label>
+          <input
+            type="text"
+            v-model="AcademicTrack"
+            placeholder=""
+            readonly
+          />
+        </div>
+        <h5>Processor Information</h5>
+        <div class="input-group">
+          <label>Faculty Name</label>
+          <input
+            type="text"
+            v-model="FacultyName"
+            placeholder=""
+            readonly
+          />
+        </div>
+        <div class="input-group">
+          <label>Document Released</label>
+          <input
+            type="text"
+            v-model="FacultyName"
+            placeholder=""
+            readonly
+          />
+        </div>
+        <div class="input-group">
+          <label>Date of Released</label>
+          <input type="text" v-model="DateAdded" placeholder="" readonly />
+        </div>
+        <div class="furnished">
+          <div class="apply-button">
+            <p>Apply Copy Furnished</p>
+          </div>
+          <div class="status-apply">
+            <p>Copy Furnished Applied</p>
+          </div>
+        </div>
+
+        <div class="modal-buttons">
+          <button @click="closeUnReleasedModal  " class="cancel">Back</button>
+          <button class="add">Released Documents</button>
         </div>
       </div>
     </div>
@@ -223,11 +479,25 @@ export default {
       curriculums: ["All", "JHS Grade 10", "SHS Grade 11", "SHS Grade 12"],
       tracks: ["All", "SPJ", "BEC", "SPA", "HUMSS", "TVL - IEM"],
       showModal: false,
+      showreleasedModal: false,
+      showunreleasedModal: false,
       newStudent: { name: "", lrn: "" },
     };
   },
   methods: {
-    openModal() {
+    showUnReleasedModal() {
+      this.showunreleasedModal = true;
+    },
+    closeUnReleasedModal() {
+      this.showunreleasedModal = false;
+    },
+    showReleasedModal() {
+      this.showreleasedModal = true;
+    },
+    closeReleasedModal() {
+      this.showreleasedModal = false;
+    },
+    openaddModal() {
       this.showModal = true;
     },
     closeModal() {
@@ -256,7 +526,7 @@ export default {
       this.uploadedFile = null;
       this.pdfUrl = "";
       if (this.$refs.fileInput) {
-        this.$refs.fileInput.value = ""; // Reset file input
+        this.$refs.fileInput.value = "";
       }
     },
   },
@@ -400,6 +670,7 @@ tr:hover {
 
 .modal-overlay {
   position: fixed;
+  z-index: 2;
   top: 0;
   left: 0;
   width: 100%;
@@ -410,6 +681,7 @@ tr:hover {
   align-items: center;
 }
 .modal-content {
+  margin-top: 50px;
   display: flex;
   background: white;
   padding: 20px 0;
@@ -424,12 +696,26 @@ tr:hover {
   text-align: center;
   color: #295f98;
   margin-bottom: 10px;
-  margin-top: 0;
+  margin-top: 5px;
 }
 .student-file-upload {
   background-color: #ebf1fa;
   width: 50%;
   height: 575px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border-radius: 5px;
+  padding: 20px;
+  cursor: pointer;
+  border: 2px dashed #295f98;
+}
+.student-file-upload-released {
+  background-color: #ebf1fa;
+  width: 50%;
+  height: 620px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -520,5 +806,31 @@ tr:hover {
   color: white;
   border: none;
   cursor: pointer;
+}
+.furnished{
+  display: flex;
+  font-size: 8px;
+  justify-content: space-between;
+  text-align: center;
+  align-items: center;
+  margin-top: 15px;
+  gap: 10px;
+  
+}
+.apply-button{
+  background: #0C5A48;
+  color: #fff;
+  border: none;
+  padding: 3px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 50%;
+}
+.status-apply{
+  border: 1px solid #0C5A48;
+  padding: 3px 20px;
+  border-radius: 5px;
+  color: #0C5A48;
+  width: 50%;
 }
 </style>
