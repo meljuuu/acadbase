@@ -46,11 +46,21 @@
         </router-link>
       </ul>
 
-      <button class="logout-btn" @click="logout">
+      <button class="logout-btn" @click="openaddModal">
         <i class="fas fa-sign-out-alt"></i> Logout
       </button>
     </div>
   </div>
+
+  <div v-if="showModal" class="modal-overlay">
+  <div class="modal-content">
+    <p class="modal-text">Are you sure you want to logout?</p>
+    <div class="modal-buttons">
+      <button @click="logout" class="confirm-btn">Yes</button>
+      <button @click="closeModal" class="cancel-btn">No</button>
+    </div>
+  </div>
+</div>
 </template>
 
 <script>
@@ -58,6 +68,19 @@ import { useRouter } from "vue-router";
 
 export default {
   name: "Sidebar",
+  data() {
+    return {
+      showModal: false,
+    };
+  },
+  methods: {
+    openaddModal() {
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+    },
+  },
   setup() {
     const router = useRouter();
 
@@ -186,5 +209,53 @@ a {
 
 .logout-btn:hover {
   background-color: #1c3a6e;
+}
+
+.modal-overlay {
+  position: fixed;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 270px;
+  text-align: center;
+}
+.modal-text {
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.confirm-btn {
+  background: #d9534f;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background: #8b8b8b;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 </style>

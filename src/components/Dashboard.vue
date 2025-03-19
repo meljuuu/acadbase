@@ -19,11 +19,22 @@
               <option v-for="curriculum in curriculums" :key="curriculum">
                 {{ curriculum }}
               </option>
+
             </select>
           </div>
 
           <div class="year-filter">
-            <p>S.Y 2023 - 2024</p>
+            <select
+              v-model="selectedYear"
+              class="filter-dropdown"
+              @focus="activeDropdown = ''"
+              @blur="activeDropdown = ''"
+            >
+              <option disabled value="">School Year</option>
+              <option v-for="year in years" :key="year">
+                {{ year }}
+              </option>
+            </select>
           </div>
         </div>
 
@@ -92,9 +103,6 @@
             <div class="content-title">
               <h3>Total Students</h3>
             </div>
-            <div class="year-text">
-              <p>S.Y 2023 - 2024</p>
-            </div>
           </div>
 
           <BarChart :chart-data="chartData" :chart-options="chartOptions" />
@@ -104,9 +112,6 @@
           <div class="container-title">
             <div class="content-title">
               <h3>Recent Added</h3>
-            </div>
-            <div class="year-text">
-              <p>S.Y 2023 - 2024</p>
             </div>
           </div>
 
@@ -127,9 +132,6 @@
           <div class="container-title">
             <div class="content-title">
               <h3>Recent Released</h3>
-            </div>
-            <div class="year-text">
-              <p>S.Y 2023 - 2024</p>
             </div>
           </div>
 
@@ -152,9 +154,6 @@
             <div class="content-title">
               <h3>Released Docs</h3>
             </div>
-            <div class="year-text">
-              <p>2023 - 2024</p>
-            </div>
           </div>
         </div>
       </div>
@@ -172,8 +171,10 @@ export default {
   },
   data() {
     return {
+      selectedYear: "",
       selectedCurriculum: "Junior High School",
       curriculums: [ "Junior High School", "G11 Senior High School", "G12 Senior High School"],
+      years: ["2022", "2023", "2024", "2025", "2026"],
       activeDropdown: "",
     };
   },
@@ -198,6 +199,11 @@ export default {
   display: flex;
   flex-direction: column;
   width: 100%;
+}
+
+.dropdown-container{
+  display: flex;
+  gap: 10px;
 }
 
 .filter-dropdown {
