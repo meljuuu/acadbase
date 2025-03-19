@@ -8,20 +8,79 @@
     <div class="dashboard-content">
       <div class="student-container">
         <div class="buttons">
-          <div class="academic-year">
-            <p>High School</p>
+          <div class="dropdown-container">
+            <select
+              v-model="selectedCurriculum"
+              class="filter-dropdown"
+              @focus="activeDropdown = ''"
+              @blur="activeDropdown = ''"
+            >
+              <option disabled value="">Curriculum</option>
+              <option v-for="curriculum in curriculums" :key="curriculum">
+                {{ curriculum }}
+              </option>
+            </select>
           </div>
+
           <div class="year-filter">
-            <p>2023 - 2024 (Filter)</p>
+            <p>S.Y 2023 - 2024</p>
           </div>
         </div>
 
-        <div class="stats-container">
-          <div class="stat-card" v-for="(item, index) in 3" :key="index">
+        <div class="stats-container" v-if="selectedCurriculum === 'Junior High School'">
+          <div class="stat-card">
+            <div class="stat-icon">📖</div>
+            <div class="stat-info">
+              <h3>300</h3>
+              <p>SPJ Students</p>
+            </div>
+          </div>
+          <div class="stat-card">
             <div class="stat-icon">📖</div>
             <div class="stat-info">
               <h3>300</h3>
               <p>BEC Students</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📖</div>
+            <div class="stat-info">
+              <h3>300</h3>
+              <p>SPA Students</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-container" v-if="selectedCurriculum === 'G11 Senior High School'">
+          <div class="stat-card">
+            <div class="stat-icon">📖</div>
+            <div class="stat-info">
+              <h3>300</h3>
+              <p>HUMSS Grade 11 Students</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📖</div>
+            <div class="stat-info">
+              <h3>300</h3>
+              <p>TVL - IEM Grade 11 Students</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-container" v-if="selectedCurriculum === 'G12 Senior High School'">
+          <div class="stat-card">
+            <div class="stat-icon">📖</div>
+            <div class="stat-info">
+              <h3>300</h3>
+              <p>HUMSS Grade 12 Students</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📖</div>
+            <div class="stat-info">
+              <h3>300</h3>
+              <p>TVL - IEM Grade 12 Students</p>
             </div>
           </div>
         </div>
@@ -34,7 +93,7 @@
               <h3>Total Students</h3>
             </div>
             <div class="year-text">
-              <p>2023 - 2024 (Filter)</p>
+              <p>S.Y 2023 - 2024</p>
             </div>
           </div>
 
@@ -47,7 +106,7 @@
               <h3>Recent Added</h3>
             </div>
             <div class="year-text">
-              <p>2023 - 2024 (Filter)</p>
+              <p>S.Y 2023 - 2024</p>
             </div>
           </div>
 
@@ -70,7 +129,7 @@
               <h3>Recent Released</h3>
             </div>
             <div class="year-text">
-              <p>2023 - 2024 (Filter)</p>
+              <p>S.Y 2023 - 2024</p>
             </div>
           </div>
 
@@ -83,6 +142,7 @@
               <span>TVL - IEM</span>
               <span>2023 - 2024</span>
               <span>03 / 10 / 2025</span>
+              <span>Galileo Galilei</span>
             </li>
           </ul>
         </div>
@@ -93,7 +153,7 @@
               <h3>Released Docs</h3>
             </div>
             <div class="year-text">
-              <p>2023 - 2024 (Filter)</p>
+              <p>2023 - 2024</p>
             </div>
           </div>
         </div>
@@ -110,6 +170,13 @@ export default {
   components: {
     Sidebar,
   },
+  data() {
+    return {
+      selectedCurriculum: "Junior High School",
+      curriculums: [ "Junior High School", "G11 Senior High School", "G12 Senior High School"],
+      activeDropdown: "",
+    };
+  },
 };
 </script>
 
@@ -125,7 +192,6 @@ export default {
 .nav-title h1 {
   color: #295f98;
   font-weight: bold;
-  padding: 0;
 }
 
 .dashboard-content {
@@ -133,6 +199,31 @@ export default {
   flex-direction: column;
   width: 100%;
 }
+
+.filter-dropdown {
+  padding: 15px 20px;
+  width: 210px;
+  border: 1px solid #295f98;
+  border-radius: 5px;
+  font-size: 14px;
+  margin: 20px 0;
+  background: #fff;
+  font-weight: bold;
+  color: #295f98;
+  cursor: pointer;
+  appearance: none;
+  position: relative;
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+  transition: all 0.3s ease-in-out;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='%23295f98'><path d='M14 7l-5 5 5 5V7z'/></svg>");
+}
+
+.filter-dropdown:focus {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='%23295f98'><path d='M7 10l5 5 5-5H7z'/></svg>");
+}
+
 
 .student-container {
   background-color: #ffffff;
@@ -151,10 +242,18 @@ export default {
   gap: 10px;
 }
 
+.status.released {
+  background: #0c5a48;
+  color: white;
+  padding: 5px 20px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
 .academic-year p,
 .year-filter p {
   background-color: #295f98;
-  padding: 10px;
+  padding: 15px 20px;
   border-radius: 3px;
   cursor: pointer;
   flex: 1;

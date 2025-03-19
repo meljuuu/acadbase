@@ -7,7 +7,6 @@
 
     <div class="filtering-section">
       <div class="filters">
-
         <select
           v-model="selectedTrack"
           class="filter-dropdown"
@@ -42,7 +41,15 @@
       </div>
 
       <div class="search-bar">
-        <button class="donwload-report">Download History Report</button>
+        <select
+          v-model="selectedfile"
+          class="filter-dropdown donwload-report"
+          @focus="activeDropdown = 'file'"
+          @blur="activeDropdown = ''"
+        >
+          <option disabled value="">Download Report</option>
+          <option v-for="file in files" :key="file">{{ file }}</option>
+        </select>
       </div>
     </div>
 
@@ -77,7 +84,10 @@
       </table>
     </div>
 
-    <p class="note">*Note: Only the most recent 200 students are displayed in the table. Students beyond 200 are available in the CSV file.*</p>
+    <p class="note">
+      *Note: Only the most recent 200 students are displayed in the table.
+      Students beyond 200 are available in the CSV file.*
+    </p>
 
     <div class="pagination">
       <button class="prev">← Previous</button>
@@ -102,10 +112,12 @@ export default {
       selectedBatch: "",
       selectedCurriculum: "",
       selectedTrack: "",
+      selectedfile: "",
       searchQuery: "",
       batches: ["All", "2024", "2025", "2026"],
-      curriculums: ["All", "SHS", "JHS", "College"],
-      tracks: ["All", "STEM", "HUMSS", "ABM", "TVL"],
+      curriculums: ["All", "JHS Grade 10", "SHS Grade 11", "SHS Grade 12"],
+      tracks: ["All", "SPJ", "BEC", "SPA", "HUMSS", "TVL - IEM"],
+      files: [".CSV", ".PDF"],
       activeDropdown: "",
     };
   },
@@ -116,7 +128,7 @@ export default {
 .container {
   margin-top: 80px;
   margin-left: 270px;
-  width: 128%;
+  width: 127%;
   padding: 10px;
   box-sizing: border-box;
 }
@@ -137,12 +149,14 @@ export default {
   gap: 10px;
 }
 .filter-dropdown {
-  padding: 8px;
-  width: 150px;
-  border: 1px solid #ccc;
+  padding: 15px 20px;
+  width: 160px;
+  border: 1px solid #295f98;
   border-radius: 5px;
   font-size: 14px;
-  background: white;
+  background: #fff;
+  font-weight: bold;
+  color: #295f98;
   cursor: pointer;
   appearance: none;
   position: relative;
@@ -162,21 +176,9 @@ export default {
   gap: 10px;
 }
 
-.search-bar input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  width: 500px;
-}
-
 .donwload-report {
-  background: #0C5A48;
-  color: #fff;
-  border: none;
-  padding: 15px 20px;
-  border-radius: 3px;
   cursor: pointer;
-  font-size: 16px;
+  width: 180px;
 }
 
 .table-container {
@@ -220,8 +222,8 @@ tr:hover {
   font-size: 12px;
 }
 
-.note{
-  font-size:10px;
+.note {
+  font-size: 10px;
   text-align: center;
   color: red;
 }
@@ -245,4 +247,3 @@ tr:hover {
   font-weight: bold;
 }
 </style>
-

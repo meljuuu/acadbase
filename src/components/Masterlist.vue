@@ -42,7 +42,7 @@
 
       <div class="search-bar">
         <input type="text" v-model="searchQuery" placeholder="Search..." />
-        <button class="add-student">Add Student</button>
+        <button class="add-student" @click="openModal">Add Student</button>
       </div>
     </div>
 
@@ -70,9 +70,11 @@
         </tbody>
       </table>
     </div>
-    
-    <p class="note">*Note: Only 11 students are displayed in the table. Other students Name are on the next page.*</p>
 
+    <p class="note">
+      *Note: Only 11 students are displayed in the table. Other students Name
+      are on the next page.*
+    </p>
 
     <div class="pagination">
       <button class="prev">← Previous</button>
@@ -82,6 +84,117 @@
       <button class="next">Next →</button>
     </div>
   </div>
+
+  <div v-if="showModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="student-file-upload" @click="triggerFileInput">
+        <label for="fileInput" class="upload-box">
+          <p><i class="fas fa-upload"></i></p>
+          <p v-if="!uploadedFile">Upload Student File (One PDF Only)</p>
+          <p v-else>{{ uploadedFile.name }}</p>
+        </label>
+        <input
+          type="file"
+          id="fileInput"
+          accept=".pdf"
+          ref="fileInput"
+          @change="handleFileUpload"
+          hidden
+        />
+
+        <div v-if="pdfUrl" class="pdf-preview">
+          <object
+            :data="pdfUrl"
+            type="application/pdf"
+            width="100%"
+            height="500px"
+          >
+            <p>
+              Your browser does not support PDFs.
+              <a :href="pdfUrl" target="_blank">Download PDF</a>
+            </p>
+          </object>
+          <button @click.stop="removeFile" class="remove-btn">Remove</button>
+        </div>
+      </div>
+
+      <div class="student-processor-information">
+        <h5>Student Information</h5>
+        <div class="input-group">
+          <label>Student Name</label>
+          <input
+            type="text"
+            v-model="Name"
+            placeholder="Enter Student Name"
+            required
+          />
+        </div>
+        <div class="input-group">
+          <label>LRN</label>
+          <input
+            type="text"
+            v-model="lrn"
+            placeholder="Enter LRN"
+            maxlength="12"
+            @input="validateLRN"
+            required
+          />
+        </div>
+        <div class="input-group">
+          <label>Birthdate</label>
+          <input type="date" v-model="birthdate" required />
+        </div>
+        <div class="input-group">
+          <label>S.Y Batch</label>
+          <input
+            type="number"
+            v-model="syBatch"
+            placeholder="Enter S.Y Batch"
+            @input="syBatch = syBatch < 0 ? '' : syBatch"
+            onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+            required
+          />
+        </div>
+        <div class="input-group">
+          <label>Curriculum</label>
+          <input
+            type="text"
+            v-model="Curriculum"
+            placeholder="Enter Curriculum"
+            required
+          />
+        </div>
+        <div class="input-group">
+          <label>Academic Track</label>
+          <input
+            type="text"
+            v-model="AcademicTrack"
+            placeholder="Enter Academic Track"
+            required
+          />
+        </div>
+        <h5>Processor Information</h5>
+        <div class="input-group">
+          <label>Faculty Name</label>
+          <input
+            type="text"
+            v-model="FacultyName"
+            placeholder="Enter Faculty Name"
+            readonly
+          />
+        </div>
+        <div class="input-group">
+          <label>Date of Added </label>
+          <input type="text" v-model="DateAdded" placeholder="" readonly />
+        </div>
+
+        <div class="modal-buttons">
+          <button @click="closeModal" class="cancel">Cancel</button>
+          <button @click="saveStudent" class="add">Add Student</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -89,20 +202,63 @@ import Sidebar from "@/components/Sidebar.vue";
 
 export default {
   name: "Masterlist",
-  components: {
-    Sidebar,
-  },
+  components: { Sidebar },
   data() {
     return {
+      uploadedFile: null,
+      pdfUrl: "",
       selectedBatch: "",
       selectedCurriculum: "",
       selectedTrack: "",
       searchQuery: "",
-      batches: ["All", "Batch 2023 - 2024", "Batch 2024 - 2025", "Batch 2025 - 2026"],
-      curriculums: ["All", "SHS", "JHS", "College"],
-      tracks: ["All", "STEM", "HUMSS", "ABM", "TVL"],
-      activeDropdown: "",
+      selectedmodalCurriculum: "",
+      batches: [
+        "All",
+        "S.Y 21 - 22",
+        "S.Y 22 - 23",
+        "S.Y 23 - 24",
+        "S.Y 24 - 25",
+        "S.Y 25 - 26",
+      ],
+      curriculums: ["All", "JHS Grade 10", "SHS Grade 11", "SHS Grade 12"],
+      tracks: ["All", "SPJ", "BEC", "SPA", "HUMSS", "TVL - IEM"],
+      showModal: false,
+      newStudent: { name: "", lrn: "" },
     };
+  },
+  methods: {
+    openModal() {
+      this.showModal = true;
+    },
+    closeModal() {
+      this.removeFile();
+      this.showModal = false;
+    },
+    saveStudent() {
+      console.log("Saving student:", this.newStudent);
+      this.closeModal();
+    },
+    triggerFileInput() {
+      this.$refs.fileInput.click();
+    },
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+
+      if (file && file.type === "application/pdf") {
+        this.uploadedFile = file;
+        this.pdfUrl = URL.createObjectURL(file);
+      } else {
+        alert("Please upload a valid PDF file.");
+        event.target.value = "";
+      }
+    },
+    removeFile() {
+      this.uploadedFile = null;
+      this.pdfUrl = "";
+      if (this.$refs.fileInput) {
+        this.$refs.fileInput.value = ""; // Reset file input
+      }
+    },
   },
 };
 </script>
@@ -132,12 +288,14 @@ export default {
   gap: 10px;
 }
 .filter-dropdown {
-  padding: 8px;
-  width: 150px;
-  border: 1px solid #ccc;
+  padding: 15px 20px;
+  width: 160px;
+  border: 1px solid #295f98;
   border-radius: 5px;
   font-size: 14px;
-  background: white;
+  background: #fff;
+  font-weight: bold;
+  color: #295f98;
   cursor: pointer;
   appearance: none;
   position: relative;
@@ -159,7 +317,7 @@ export default {
 
 .search-bar input {
   padding: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid #295f98;
   border-radius: 5px;
   width: 500px;
 }
@@ -215,8 +373,8 @@ tr:hover {
   font-size: 12px;
 }
 
-.note{
-  font-size:10px;
+.note {
+  font-size: 10px;
   text-align: center;
   color: red;
 }
@@ -238,5 +396,129 @@ tr:hover {
 
 .page {
   font-weight: bold;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  display: flex;
+  background: white;
+  padding: 20px 0;
+  border-radius: 10px;
+  width: 750px;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content h5 {
+  text-align: center;
+  color: #295f98;
+  margin-bottom: 10px;
+  margin-top: 0;
+}
+.student-file-upload {
+  background-color: #ebf1fa;
+  width: 50%;
+  height: 575px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border-radius: 5px;
+  padding: 20px;
+  cursor: pointer;
+  border: 2px dashed #295f98;
+}
+.upload-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  padding: 20px;
+}
+
+.upload-box p i {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+.pdf-preview {
+  margin-top: 10px;
+  padding: 5px;
+  border-radius: 5px;
+}
+.student-file-upload p {
+  margin: 0;
+  padding: 0;
+}
+.modal-content label {
+  font-size: 10px;
+  text-align: left;
+  color: #295f98;
+  font-weight: bold;
+  margin-bottom: -50px;
+}
+
+.modal-content input {
+  width: 95%;
+  padding: 8px;
+  margin-top: -1px;
+  margin-bottom: 5px;
+  border: 1px solid #295f98;
+  outline: none;
+  border-radius: 5px;
+}
+
+.modal-content input::placeholder {
+  font-size: 11px;
+  color: #295f98;
+}
+
+.modal-content input:focus {
+  border-color: #295f9852;
+  box-shadow: 0 0 3px rgba(41, 95, 152, 0.5);
+}
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.modal-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.modal-buttons button.cancel {
+  background: #8b8b8b;
+  color: #fff;
+}
+.modal-buttons button.add {
+  background: #295f98;
+  color: #fff;
+}
+.remove-btn {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: red;
+  color: white;
+  border: none;
+  cursor: pointer;
 }
 </style>
