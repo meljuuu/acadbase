@@ -1,19 +1,9 @@
 <template>
   <div>
-    <nav class="navbar">
-      <div class="navbar-content">
-        <img
-          src="../assets/school-logo.png"
-          alt="School Logo"
-          class="navbar-logo"
-        />
-      </div>
-    </nav>
-
     <div class="sidebar">
       <div class="profile-section">
         <img
-          src="../assets/school-logo.png"
+          src="../assets/logo.png"
           alt="Profile"
           class="profile-icon"
         />
@@ -98,7 +88,7 @@ export default {
 <style scoped>
 .navbar {
   width: 100%;
-  height: 80px;
+  height: 60px;
   background-color: #295f98;
   color: white;
   display: flex;
@@ -113,7 +103,7 @@ export default {
 }
 
 .navbar-logo {
-  height: 80px;
+  height: 70px;
   border-radius: 50%;
   margin-right: 30px;
 }

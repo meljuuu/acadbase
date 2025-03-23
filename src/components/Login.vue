@@ -40,7 +40,7 @@
               <label>Password</label>
               <span @click="togglePassword" class="toggle-password">
                 <i
-                  :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"
+                  :class="showPassword ? 'fas fa-eye' : 'fas fa-eye-slash'"
                 ></i>
               </span>
             </div>
