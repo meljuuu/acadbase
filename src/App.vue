@@ -1,22 +1,17 @@
 <template>
-  <div class="app-container">
-    <Header />
-    <sidebar />
+  <div class="container">
     <router-view />
   </div>
 </template>
 
 <script setup>
-import Header from './components/Header.vue';
-import sidebar from './components/sidebar.vue';
 </script>
 
-<style scoped>
-.app-container {
-  width: 100%;
-  height: 100vh;
-}
+const router = useRouter();
+const route = useRoute();
+const isAuthenticated = ref(!!localStorage.getItem("userToken"));
 
+<style>
 .app-container {
   width: 100%;
   height: 100vh;

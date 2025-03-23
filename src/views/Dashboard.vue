@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <Sidebar />
     <div class="nav-title">
       <h1>Dashboard</h1>
     </div>
@@ -8,37 +7,13 @@
     <div class="dashboard-content">
       <div class="student-container">
         <div class="buttons">
-          <div class="dropdown-container">
-            <select
-              v-model="selectedCurriculum"
-              class="filter-dropdown"
-              @focus="activeDropdown = ''"
-              @blur="activeDropdown = ''"
-            >
-              <option disabled value="">Curriculum</option>
-              <option v-for="curriculum in curriculums" :key="curriculum">
-                {{ curriculum }}
-              </option>
-
-            </select>
-          </div>
-
-          <div class="year-filter">
-            <select
-              v-model="selectedYear"
-              class="filter-dropdown"
-              @focus="activeDropdown = ''"
-              @blur="activeDropdown = ''"
-            >
-              <option disabled value="">School Year</option>
-              <option v-for="year in years" :key="year">
-                {{ year }}
-              </option>
-            </select>
-          </div>
+          <Dropdown :showCurriculum="true" @update:selectedCurriculum="selectedCurriculum = $event"/>
+          <Dropdown :showYear="true" @update:selectedYear="selectedYear = $event"/>
         </div>
 
-        <div class="stats-container" v-if="selectedCurriculum === 'Junior High School'">
+        <div
+          class="stats-container"
+          v-if="selectedCurriculum === 'Junior High School'">
           <div class="stat-card">
             <div class="stat-icon">📖</div>
             <div class="stat-info">
@@ -62,7 +37,9 @@
           </div>
         </div>
 
-        <div class="stats-container" v-if="selectedCurriculum === 'G11 Senior High School'">
+        <div
+          class="stats-container"
+          v-if="selectedCurriculum === 'G11 Senior High School'">
           <div class="stat-card">
             <div class="stat-icon">📖</div>
             <div class="stat-info">
@@ -79,7 +56,9 @@
           </div>
         </div>
 
-        <div class="stats-container" v-if="selectedCurriculum === 'G12 Senior High School'">
+        <div
+          class="stats-container"
+          v-if="selectedCurriculum === 'G12 Senior High School'">
           <div class="stat-card">
             <div class="stat-icon">📖</div>
             <div class="stat-info">
@@ -162,20 +141,17 @@
 </template>
 
 <script>
-import Sidebar from "@/components/Sidebar.vue";
+import Dropdown from "@/components/Dropdown.vue";
 
 export default {
   name: "Dashboard",
   components: {
-    Sidebar,
+    Dropdown,
   },
   data() {
     return {
-      selectedYear: "",
       selectedCurriculum: "Junior High School",
-      curriculums: [ "Junior High School", "G11 Senior High School", "G12 Senior High School"],
-      years: ["2022", "2023", "2024", "2025", "2026"],
-      activeDropdown: "",
+      selectedYear: "",
     };
   },
 };
@@ -201,36 +177,6 @@ export default {
   width: 100%;
 }
 
-.dropdown-container{
-  display: flex;
-  gap: 10px;
-}
-
-.filter-dropdown {
-  padding: 15px 20px;
-  width: 210px;
-  border: 1px solid #295f98;
-  border-radius: 5px;
-  font-size: 14px;
-  margin: 20px 0;
-  background: #fff;
-  font-weight: bold;
-  color: #295f98;
-  cursor: pointer;
-  appearance: none;
-  position: relative;
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  padding-right: 30px;
-  transition: all 0.3s ease-in-out;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='%23295f98'><path d='M14 7l-5 5 5 5V7z'/></svg>");
-}
-
-.filter-dropdown:focus {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='18' height='18' fill='%23295f98'><path d='M7 10l5 5 5-5H7z'/></svg>");
-}
-
-
 .student-container {
   background-color: #ffffff;
   padding: 10px 20px;
@@ -246,6 +192,7 @@ export default {
   color: #ffffff;
   flex-wrap: wrap;
   gap: 10px;
+  margin: 20px 0;
 }
 
 .status.released {

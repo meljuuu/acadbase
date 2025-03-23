@@ -1,31 +1,20 @@
 <template>
   <div class="container">
-    <Sidebar />
     <div class="nav-title">
       <h1>Transaction History Report</h1>
     </div>
 
     <div class="filtering-section">
       <div class="filters">
-        <select v-model="selectedTrack" class="filter-dropdown">
-          <option disabled value="">Academic Track</option>
-          <option v-for="track in tracks" :key="track">{{ track }}</option>
-        </select>
-
-        <select v-model="selectedCurriculum" class="filter-dropdown">
-          <option disabled value="">Curriculum</option>
-          <option v-for="curriculum in curriculums" :key="curriculum">{{ curriculum }}</option>
-        </select>
-
-        <select v-model="selectedBatch" class="filter-dropdown">
-          <option disabled value="">Year</option>
-          <option v-for="batch in batches" :key="batch">{{ batch }}</option>
-        </select>
+        <Dropdown :showBatch="true" @update:selectedBatch="selectedBatch = $event"/>
+        <Dropdown :showCurriculum="true" @update:selectedCurriculum="selectedCurriculum = $event"/>
+        <Dropdown :showTrack="true" @update:selectedTrack="selectedTrack = $event"/>
       </div>
 
       
 
       <div class="search-bar">
+<<<<<<< Updated upstream:src/components/History.vue
         <input v-model="searchQuery" type="text" placeholder="Search students..." />
       </div>
 
@@ -35,6 +24,9 @@
           <option value="pdf">PDF</option>
           <option value="csv">CSV</option>
         </select>
+=======
+        <Dropdown :showType="true" @update:selectedType="selectedType = $event"/>
+>>>>>>> Stashed changes:src/views/History.vue
       </div>
     </div>
 
@@ -81,20 +73,25 @@
 </template>
 
 <script>
+<<<<<<< Updated upstream:src/components/History.vue
 import Sidebar from "@/components/Sidebar.vue";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+=======
+import Dropdown from "../components/dropdown.vue";
+>>>>>>> Stashed changes:src/views/History.vue
 
 export default {
   name: "History",
   components: {
-    Sidebar,
+    Dropdown,
   },
   data() {
     return {
       selectedBatch: "",
       selectedCurriculum: "",
       selectedTrack: "",
+<<<<<<< Updated upstream:src/components/History.vue
       selectedFile: "",
       searchQuery: "",
       batches: ["All", "2024", "2025", "2026"],
@@ -125,6 +122,9 @@ export default {
       ],
       currentPage: 1,
       itemsPerPage: 20,
+=======
+      selectedType: "",
+>>>>>>> Stashed changes:src/views/History.vue
     };
   },
 

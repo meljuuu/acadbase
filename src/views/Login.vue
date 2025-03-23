@@ -87,13 +87,9 @@ export default {
     return { toast };
   },
   methods: {
-    togglePassword() {
-      this.showPassword = !this.showPassword;
-    },
     login() {
       this.errorMessage = "";
 
-      
       const staticEmail = "admin@school.com";
       const staticPassword = "TrustedAdmin";
 
@@ -107,7 +103,6 @@ export default {
         return;
       }
 
-      
       if (this.email === staticEmail && this.password === staticPassword) {
         console.log("Login successful!");
         localStorage.setItem("userToken", "your_token_here");
@@ -116,7 +111,9 @@ export default {
           timeout: 3000,
         });
 
-        this.$router.push("/dashboard");
+        this.$router.push("/dashboard").then(() => {
+          window.location.reload();
+        });
       } else {
         this.errorMessage = "Invalid email or password. Please try again.";
       }
@@ -234,7 +231,7 @@ input {
 
 .input-group input,
 .password-field input {
-  width: 100%; 
+  width: 100%;
   padding: 15px;
   border: 1px solid #295f98;
   border-radius: 5px;

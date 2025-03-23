@@ -1,48 +1,28 @@
 <template>
   <div class="container">
-    <Sidebar />
     <div class="nav-title">
       <h1>Master List</h1>
     </div>
 
     <div class="filtering-section">
       <div class="filters">
-        <select
-          v-model="selectedBatch"
-          class="filter-dropdown"
-          @focus="activeDropdown = 'batch'"
-          @blur="activeDropdown = ''"
-        >
-          <option disabled value="">Batch</option>
-          <option v-for="batch in batches" :key="batch">{{ batch }}</option>
-        </select>
-
-        <select
-          v-model="selectedCurriculum"
-          class="filter-dropdown"
-          @focus="activeDropdown = 'curriculum'"
-          @blur="activeDropdown = ''"
-        >
-          <option disabled value="">Curriculum</option>
-          <option v-for="curriculum in curriculums" :key="curriculum">
-            {{ curriculum }}
-          </option>
-        </select>
-
-        <select
-          v-model="selectedTrack"
-          class="filter-dropdown"
-          @focus="activeDropdown = 'track'"
-          @blur="activeDropdown = ''"
-        >
-          <option disabled value="">Academic Track</option>
-          <option v-for="track in tracks" :key="track">{{ track }}</option>
-        </select>
+        <Dropdown
+          :showBatch="true"
+          @update:selectedBatch="selectedBatch = $event"
+        />
+        <Dropdown
+          :showCurriculum="true"
+          @update:selectedCurriculum="selectedCurriculum = $event"
+        />
+        <Dropdown
+          :showTrack="true"
+          @update:selectedTrack="selectedTrack = $event"
+        />
       </div>
 
       <div class="search-bar">
         <input type="text" v-model="searchQuery" placeholder="Search..." />
-        <button class="add-student" @click="openaddModal">Add Student</button>
+        <Buttons @click="openaddModal"/>
       </div>
     </div>
 
@@ -59,7 +39,11 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(student, index) in 11" :key="index" @click="showUnReleasedModal">
+          <tr
+            v-for="(student, index) in 11"
+            :key="index"
+            @click="showUnReleasedModal"
+          >
             <td>202110048</td>
             <td>Bueno, Ryan Joshua E.</td>
             <td>TVL - IEM</td>
@@ -85,8 +69,8 @@
     </div>
   </div>
 
-  <!-- Add Student -->
-  <div v-if="showModal" class="modal-overlay">
+    <!-- Add Student -->
+    <div v-if="showModal" class="modal-overlay">
     <div class="modal-content">
       <div class="student-file-upload" @click="triggerFileInput">
         <label for="fileInput" class="upload-box">
@@ -454,34 +438,26 @@
 </template>
 
 <script>
-import Sidebar from "@/components/Sidebar.vue";
+import Dropdown from "@/components/Dropdown.vue";
+import Buttons from "@/components/Buttons.vue";
 
 export default {
   name: "Masterlist",
-  components: { Sidebar },
+  components: {
+    Dropdown,
+    Buttons,
+  },
   data() {
     return {
-      uploadedFile: null,
-      pdfUrl: "",
       selectedBatch: "",
       selectedCurriculum: "",
       selectedTrack: "",
       searchQuery: "",
-      selectedmodalCurriculum: "",
-      batches: [
-        "All",
-        "S.Y 21 - 22",
-        "S.Y 22 - 23",
-        "S.Y 23 - 24",
-        "S.Y 24 - 25",
-        "S.Y 25 - 26",
-      ],
-      curriculums: ["All", "JHS Grade 10", "SHS Grade 11", "SHS Grade 12"],
-      tracks: ["All", "SPJ", "BEC", "SPA", "HUMSS", "TVL - IEM"],
       showModal: false,
       showreleasedModal: false,
       showunreleasedModal: false,
-      newStudent: { name: "", lrn: "" },
+      uploadedFile: null,
+      pdfUrl: "",
     };
   },
   methods: {
@@ -532,7 +508,6 @@ export default {
   },
 };
 </script>
-
 <style scoped>
 .container {
   margin-top: 50px;

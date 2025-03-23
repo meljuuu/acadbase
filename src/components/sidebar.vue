@@ -70,6 +70,11 @@ export default {
     closeModal() {
       this.showModal = false;
     },
+    logout() {
+    localStorage.removeItem("userToken"); // Clear token
+    this.$router.push("/login"); // Redirect to login page
+    setTimeout(() => location.reload(), 100); // Force reloading for a clean state
+  },
   },
   setup() {
     const router = useRouter();
