@@ -111,9 +111,7 @@ export default {
           timeout: 3000,
         });
 
-        this.$router.push("/dashboard").then(() => {
-          window.location.reload();
-        });
+        this.$router.push("/dashboard"); // Redirect to dashboard
       } else {
         this.errorMessage = "Invalid email or password. Please try again.";
       }

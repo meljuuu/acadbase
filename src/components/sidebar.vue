@@ -2,11 +2,7 @@
   <div>
     <div class="sidebar">
       <div class="profile-section">
-        <img
-          src="../assets/logo.png"
-          alt="Profile"
-          class="profile-icon"
-        />
+        <img src="../assets/logo.png" alt="Profile" class="profile-icon" />
         <p>Admin Panel</p>
       </div>
 
@@ -27,10 +23,9 @@
           </li>
         </router-link>
 
-        <router-link to="/history" custom v-slot="{ navigate, isActive }">
+        <router-link to="/History" custom v-slot="{ navigate, isActive }">
           <li :class="['menu-item', { active: isActive }]" @click="navigate">
             <i class="fas fa-clock"></i>
-            <!-- Changed to clock icon -->
             <span>History</span>
           </li>
         </router-link>
@@ -43,14 +38,14 @@
   </div>
 
   <div v-if="showModal" class="modal-overlay">
-  <div class="modal-content">
-    <p class="modal-text">Are you sure you want to logout?</p>
-    <div class="modal-buttons">
-      <button @click="logout" class="confirm-btn">Yes</button>
-      <button @click="closeModal" class="cancel-btn">No</button>
+    <div class="modal-content">
+      <p class="modal-text">Are you sure you want to logout?</p>
+      <div class="modal-buttons">
+        <button @click="logout" class="confirm-btn">Yes</button>
+        <button @click="closeModal" class="cancel-btn">No</button>
+      </div>
     </div>
   </div>
-</div>
 </template>
 
 <script>
@@ -63,6 +58,10 @@ export default {
       showModal: false,
     };
   },
+  setup() {
+    const router = useRouter();
+    return { router };
+  },
   methods: {
     openaddModal() {
       this.showModal = true;
@@ -71,48 +70,16 @@ export default {
       this.showModal = false;
     },
     logout() {
-    localStorage.removeItem("userToken"); // Clear token
-    this.$router.push("/login"); // Redirect to login page
-    setTimeout(() => location.reload(), 100); // Force reloading for a clean state
-  },
-  },
-  setup() {
-    const router = useRouter();
-
-    const logout = () => {
-      localStorage.removeItem("userToken");
-
-      router.push("/login");
-    };
-
-    return { logout };
+      localStorage.removeItem("user");
+      this.router.push("/").then(() => {
+        window.location.reload();
+      });
+    },
   },
 };
 </script>
 
 <style scoped>
-.navbar {
-  width: 100%;
-  height: 60px;
-  background-color: #295f98;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding-right: 20px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  padding: 10px;
-}
-
-.navbar-logo {
-  height: 70px;
-  border-radius: 50%;
-  margin-right: 30px;
-}
-
 .sidebar {
   width: 220px;
   height: 100%;

@@ -11,22 +11,8 @@
         <Dropdown :showTrack="true" @update:selectedTrack="selectedTrack = $event"/>
       </div>
 
-      
-
       <div class="search-bar">
-<<<<<<< Updated upstream:src/components/History.vue
-        <input v-model="searchQuery" type="text" placeholder="Search students..." />
-      </div>
-
-      <div class="download-report">
-        <select v-model="selectedFile" @change="handleDownload" class="filter-dropdown download-report">
-          <option disabled value="">Download</option>
-          <option value="pdf">PDF</option>
-          <option value="csv">CSV</option>
-        </select>
-=======
         <Dropdown :showType="true" @update:selectedType="selectedType = $event"/>
->>>>>>> Stashed changes:src/views/History.vue
       </div>
     </div>
 
@@ -73,17 +59,13 @@
 </template>
 
 <script>
-<<<<<<< Updated upstream:src/components/History.vue
 import Sidebar from "@/components/Sidebar.vue";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
-=======
-import Dropdown from "../components/dropdown.vue";
->>>>>>> Stashed changes:src/views/History.vue
+import Dropdown from "@/components/Dropdown.vue";
 
 export default {
   name: "History",
   components: {
+    Sidebar,
     Dropdown,
   },
   data() {
@@ -91,12 +73,8 @@ export default {
       selectedBatch: "",
       selectedCurriculum: "",
       selectedTrack: "",
-<<<<<<< Updated upstream:src/components/History.vue
       selectedFile: "",
       searchQuery: "",
-      batches: ["All", "2024", "2025", "2026"],
-      curriculums: ["All", "JHS Grade 10", "SHS Grade 11", "SHS Grade 12"],
-      tracks: ["All", "SPJ", "BEC", "SPA", "HUMSS", "TVL - IEM"],
       files: [".CSV", ".PDF"],
       students: [
         { lrn: "202110048", name: "Bueno, Ryan Joshua E.", track: "TVL", batch: "Batch 2020 - 2025", curriculum: "Senior High School", processor: "Galileo Galilei", status: "Released" },
@@ -122,9 +100,6 @@ export default {
       ],
       currentPage: 1,
       itemsPerPage: 20,
-=======
-      selectedType: "",
->>>>>>> Stashed changes:src/views/History.vue
     };
   },
 
@@ -221,11 +196,12 @@ export default {
 
 </script>
 
+
 <style scoped>
 .container {
-  margin-top: 50px;
-  margin-left: 270px;
-  width: 127%;
+  margin-top: 70px;
+  margin-left: 290px;
+  width: 125%;
   padding: 10px;
   box-sizing: border-box;
 }
@@ -233,7 +209,11 @@ export default {
 .nav-title h1 {
   color: #295f98;
   font-weight: bold;
+  font-size: 64px;
+  padding: 0;
+  margin: 0;
 }
+
 
 .filtering-section {
   display: flex;
@@ -241,7 +221,7 @@ export default {
   justify-content: space-between;
   gap: 10px;
   flex-wrap: wrap; 
-  margin: 20px 0;
+  margin: 0 0 20px 0;
 }
 
 .filters {
@@ -315,8 +295,6 @@ export default {
   pointer-events: none;
 }
 
-
-
 .donwload-report {
   display: flex;
   gap: 10px;
@@ -332,7 +310,7 @@ export default {
   border-radius: 8px;
   overflow-y: auto;
   overflow-x: hidden; 
-  max-height: 700px; 
+  max-height: 600px; 
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
     rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
   border: 1px solid #ddd; /* Optional: for better visibility */

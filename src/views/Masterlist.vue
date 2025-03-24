@@ -6,18 +6,9 @@
 
     <div class="filtering-section">
       <div class="filters">
-        <Dropdown
-          :showBatch="true"
-          @update:selectedBatch="selectedBatch = $event"
-        />
-        <Dropdown
-          :showCurriculum="true"
-          @update:selectedCurriculum="selectedCurriculum = $event"
-        />
-        <Dropdown
-          :showTrack="true"
-          @update:selectedTrack="selectedTrack = $event"
-        />
+        <Dropdown :showBatch="true" @update:selectedBatch="selectedBatch = $event"/>
+        <Dropdown :showCurriculum="true" @update:selectedCurriculum="selectedCurriculum = $event"/>
+        <Dropdown :showTrack="true" @update:selectedTrack="selectedTrack = $event"/>
       </div>
 
       <div class="search-bar">
@@ -510,9 +501,9 @@ export default {
 </script>
 <style scoped>
 .container {
-  margin-top: 50px;
-  margin-left: 270px;
-  width: 127%;
+  margin-top: 70px;
+  margin-left: 290px;
+  width: 125%;
   padding: 10px;
   box-sizing: border-box;
 }
@@ -520,12 +511,16 @@ export default {
 .nav-title h1 {
   color: #295f98;
   font-weight: bold;
+  font-size: 64px;
+  padding: 0;
+  margin: 0;
 }
+
 
 .filtering-section {
   display: flex;
   justify-content: space-between;
-  margin: 20px 0;
+  margin: 0 0 20px 0;
 }
 
 .filters {

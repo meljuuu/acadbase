@@ -5,30 +5,11 @@ import History from "@/views/History.vue";
 import Login from "@/views/Login.vue";
 
 const routes = [
-  {
-    path: '/',
-    redirect: '/login',
-  },
-  {
-    path: '/login',
-    name: 'Login',
-    component: Login,
-  },
-  {
-    path: '/dashboard',
-    name: 'Dashboard',
-    component: Dashboard,
-  },
-  {
-    path: '/masterlist',
-    name: 'Masterlist',
-    component: Masterlist,
-  },
-  {
-    path: '/history',
-    name: 'History',
-    component: History,
-  },
+  { path: "/", redirect: "/login" },
+  { path: "/login", name: "Login", component: Login },
+  { path: "/dashboard", name: "Dashboard", component: Dashboard },
+  { path: "/masterlist", name: "Masterlist", component: Masterlist },
+  { path: "/history", name: "History", component: History },
 ];
 
 const router = createRouter({

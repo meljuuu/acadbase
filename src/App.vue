@@ -1,15 +1,20 @@
 <template>
-  <div class="container">
+  <div class="app-container">
+    <Header v-if="!isLoginPage" />
+    <Sidebar v-if="!isLoginPage" />
     <router-view />
   </div>
 </template>
 
 <script setup>
-</script>
+import { computed } from "vue";
+import { useRoute } from "vue-router";
+import Sidebar from "@/components/Sidebar.vue";
+import Header from "@/components/Header.vue";
 
-const router = useRouter();
 const route = useRoute();
-const isAuthenticated = ref(!!localStorage.getItem("userToken"));
+const isLoginPage = computed(() => route.path === "/" || route.path === "/login");
+</script>
 
 <style>
 .app-container {
@@ -31,4 +36,3 @@ header {
   left: 0;
 }
 </style>
-

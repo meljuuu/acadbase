@@ -159,9 +159,9 @@ export default {
 
 <style scoped>
 .container {
-  margin-top: 50px;
-  margin-left: 270px;
-  width: 127%;
+  margin-top: 70px;
+  margin-left: 290px;
+  width: 125%;
   padding: 10px;
   box-sizing: border-box;
 }
@@ -169,6 +169,9 @@ export default {
 .nav-title h1 {
   color: #295f98;
   font-weight: bold;
+  font-size: 64px;
+  padding: 0;
+  margin: 0;
 }
 
 .dashboard-content {
