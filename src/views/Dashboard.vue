@@ -181,7 +181,7 @@ export default {
 }
 
 .student-container {
-  background-color: #FEFBF9;
+  background-color: #ffffff;
   padding: 10px 20px;
   border-radius: 5px;
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
@@ -192,7 +192,7 @@ export default {
 .buttons {
   display: flex;
   justify-content: space-between;
-  color: #FEFBF9;
+  color: #ffffff;
   flex-wrap: wrap;
   gap: 10px;
   margin: 20px 0;
@@ -225,7 +225,7 @@ export default {
 }
 
 .stat-card {
-  background-color: #FEFBF9;
+  background-color: #f5f5f5;
   padding: 15px;
   display: flex;
   align-items: center;
@@ -261,7 +261,7 @@ export default {
 .recent-added,
 .recent-released,
 .released-docs {
-  background-color: #FEFBF9;
+  background-color: #ffffff;
   padding: 10px 20px;
   border-radius: 5px;
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,

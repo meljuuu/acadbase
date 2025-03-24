@@ -1,6 +1,6 @@
 <template>
-        <!-- Add Student Modal -->
-        <div v-if="showModal" class="modal-overlay">
+  <!-- Add Student Modal -->
+  <div v-if="showModal" class="modal-overlay">
     <div class="modal-content">
       <div class="student-file-upload" @click="triggerFileInput">
         <label for="fileInput" class="upload-box">
@@ -111,8 +111,8 @@
     </div>
   </div>
 
-    <!-- released Modal -->
-    <div v-if="showreleasedModal" class="modal-overlay">
+  <!-- released Modal -->
+  <div v-if="showreleasedModal" class="modal-overlay">
     <div class="modal-content">
       <div class="student-file-upload-released" @click="triggerFileInput">
         <label for="fileInput" class="upload-box">
@@ -149,12 +149,7 @@
         <h5>Student Information</h5>
         <div class="input-group">
           <label>Student Name</label>
-          <input
-            type="text"
-            v-model="Name"
-            placeholder=""
-            readonly
-          />
+          <input type="text" v-model="Name" placeholder="" readonly />
         </div>
         <div class="input-group">
           <label>LRN</label>
@@ -169,10 +164,7 @@
         </div>
         <div class="input-group">
           <label>Birthdate</label>
-          <input
-          type="date"
-          v-model="birthdate"
-          readonly />
+          <input type="date" v-model="birthdate" readonly />
         </div>
         <div class="input-group">
           <label>S.Y Batch</label>
@@ -187,40 +179,20 @@
         </div>
         <div class="input-group">
           <label>Curriculum</label>
-          <input
-            type="text"
-            v-model="Curriculum"
-            placeholder=""
-            readonly
-          />
+          <input type="text" v-model="Curriculum" placeholder="" readonly />
         </div>
         <div class="input-group">
           <label>Academic Track</label>
-          <input
-            type="text"
-            v-model="AcademicTrack"
-            placeholder=""
-            readonly
-          />
+          <input type="text" v-model="AcademicTrack" placeholder="" readonly />
         </div>
         <h5>Processor Information</h5>
         <div class="input-group">
           <label>Faculty Name</label>
-          <input
-            type="text"
-            v-model="FacultyName"
-            placeholder=""
-            readonly
-          />
+          <input type="text" v-model="FacultyName" placeholder="" readonly />
         </div>
         <div class="input-group">
           <label>Document Released</label>
-          <input
-            type="text"
-            v-model="FacultyName"
-            placeholder=""
-            readonly
-          />
+          <input type="text" v-model="FacultyName" placeholder="" readonly />
         </div>
         <div class="input-group">
           <label>Date of Released</label>
@@ -233,10 +205,9 @@
       </div>
     </div>
   </div>
-  
 
-      <!-- Unreleased Modal -->
-      <div v-if="showunreleasedModal" class="modal-overlay">
+  <!-- Processing Modal -->
+  <div v-if="showunreleasedModal" class="modal-overlay">
     <div class="modal-content">
       <div class="student-file-upload-released" @click="triggerFileInput">
         <label for="fileInput" class="upload-box">
@@ -273,12 +244,7 @@
         <h5>Student Information</h5>
         <div class="input-group">
           <label>Student Name</label>
-          <input
-            type="text"
-            v-model="Name"
-            placeholder=""
-            readonly
-          />
+          <input type="text" v-model="Name" placeholder="" readonly />
         </div>
         <div class="input-group">
           <label>LRN</label>
@@ -293,10 +259,7 @@
         </div>
         <div class="input-group">
           <label>Birthdate</label>
-          <input
-          type="date"
-          v-model="birthdate"
-          readonly />
+          <input type="date" v-model="birthdate" readonly />
         </div>
         <div class="input-group">
           <label>S.Y Batch</label>
@@ -311,40 +274,20 @@
         </div>
         <div class="input-group">
           <label>Curriculum</label>
-          <input
-            type="text"
-            v-model="Curriculum"
-            placeholder=""
-            readonly
-          />
+          <input type="text" v-model="Curriculum" placeholder="" readonly />
         </div>
         <div class="input-group">
           <label>Academic Track</label>
-          <input
-            type="text"
-            v-model="AcademicTrack"
-            placeholder=""
-            readonly
-          />
+          <input type="text" v-model="AcademicTrack" placeholder="" readonly />
         </div>
         <h5>Processor Information</h5>
         <div class="input-group">
           <label>Faculty Name</label>
-          <input
-            type="text"
-            v-model="FacultyName"
-            placeholder=""
-            readonly
-          />
+          <input type="text" v-model="FacultyName" placeholder="" readonly />
         </div>
         <div class="input-group">
           <label>Document Released</label>
-          <input
-            type="text"
-            v-model="FacultyName"
-            placeholder=""
-            readonly
-          />
+          <input type="text" v-model="FacultyName" placeholder="" readonly />
         </div>
         <div class="input-group">
           <label>Date of Released</label>
@@ -360,7 +303,7 @@
         </div>
 
         <div class="modal-buttons">
-          <button @click="closeUnReleasedModal  " class="cancel">Back</button>
+          <button @click="closeUnReleasedModal" class="cancel">Back</button>
           <button class="add">Released Documents</button>
         </div>
       </div>
@@ -371,12 +314,12 @@
 <script>
 export default {
   name: "Modal",
-  data(){
-    return{
-        showModal: false,
-        showreleasedModal: false,
-        showunreleasedModal: false,
-    }
+  data() {
+    return {
+      showModal: false,
+      showreleasedModal: false,
+      showunreleasedModal: false,
+    };
   },
   methods: {
     showUnReleasedModal() {
@@ -567,7 +510,7 @@ export default {
   border: none;
   cursor: pointer;
 }
-.furnished{
+.furnished {
   display: flex;
   font-size: 8px;
   justify-content: space-between;
@@ -575,10 +518,9 @@ export default {
   align-items: center;
   margin-top: 15px;
   gap: 10px;
-  
 }
-.apply-button{
-  background: #0C5A48;
+.apply-button {
+  background: #0c5a48;
   color: #fff;
   border: none;
   padding: 3px 20px;
@@ -586,11 +528,11 @@ export default {
   cursor: pointer;
   width: 50%;
 }
-.status-apply{
-  border: 1px solid #0C5A48;
+.status-apply {
+  border: 1px solid #0c5a48;
   padding: 3px 20px;
   border-radius: 5px;
-  color: #0C5A48;
+  color: #0c5a48;
   width: 50%;
 }
 </style>

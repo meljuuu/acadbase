@@ -2,6 +2,8 @@
   font-family: "Poppins", sans-serif;
   line-height: 1.5;
   font-weight: 400;
+
+  --vt-color-progress-success: #295f98 !important;
 }
 
 body {
@@ -23,8 +25,4 @@ body {
   background-color: #FEFBF9 !important;
   color: #295f98 !important;
   font-weight: bold;
-}
-
-:root {
-  --vt-color-progress-success: #295f98 !important;
 }

@@ -6,13 +6,25 @@
 
     <div class="filtering-section">
       <div class="filters">
-        <Dropdown :showBatch="true" @update:selectedBatch="selectedBatch = $event"/>
-        <Dropdown :showCurriculum="true" @update:selectedCurriculum="selectedCurriculum = $event"/>
-        <Dropdown :showTrack="true" @update:selectedTrack="selectedTrack = $event"/>
+        <Dropdown
+          :showBatch="true"
+          @update:selectedBatch="selectedBatch = $event"
+        />
+        <Dropdown
+          :showCurriculum="true"
+          @update:selectedCurriculum="selectedCurriculum = $event"
+        />
+        <Dropdown
+          :showTrack="true"
+          @update:selectedTrack="selectedTrack = $event"
+        />
       </div>
 
       <div>
-        <Dropdown :showType="true" @update:selectedType="selectedType = $event"/>
+        <Dropdown
+          :showType="true"
+          @update:selectedType="selectedType = $event"
+        />
       </div>
     </div>
 
@@ -33,11 +45,15 @@
           <tr v-for="(student, index) in paginatedStudents" :key="index">
             <td>{{ student.lrn }}</td>
             <td>{{ student.name }}</td>
-            <td>{{ student.batch }}</td>        
+            <td>{{ student.batch }}</td>
             <td>{{ student.curriculum }}</td>
             <td>{{ student.track }}</td>
             <td>{{ student.processor }}</td>
-            <td><span :class="['status', student.status.toLowerCase()]">{{ student.status }}</span></td>
+            <td>
+              <span :class="['status', student.status.toLowerCase()]">{{
+                student.status
+              }}</span>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -49,11 +65,20 @@
     </p>
 
     <div class="pagination">
-      <button @click="prevPage" :disabled="currentPage === 1">← Previous</button>
-      <button v-for="page in totalPages" :key="page" @click="currentPage = page" :class="{ active: currentPage === page }">
+      <button @click="prevPage" :disabled="currentPage === 1">
+        ← Previous
+      </button>
+      <button
+        v-for="page in totalPages"
+        :key="page"
+        @click="currentPage = page"
+        :class="{ active: currentPage === page }"
+      >
         {{ page }}
       </button>
-      <button @click="nextPage" :disabled="currentPage === totalPages">Next →</button>
+      <button @click="nextPage" :disabled="currentPage === totalPages">
+        Next →
+      </button>
     </div>
   </div>
 </template>
@@ -75,28 +100,188 @@ export default {
       selectedTrack: "",
       selectedFile: "",
       searchQuery: "",
-      files: [".CSV", ".PDF"],
+      files: [".csv", ".pdf"],
       students: [
-        { lrn: "202110048", name: "Bueno, Ryan Joshua E.", track: "TVL - IEM", batch: "S.Y 2020 - 2021", curriculum: "Senior High School", processor: "Galileo Galilei", status: "Released" },
-        { lrn: "202110049", name: "Dela Cruz, Juan", track: "HUMSS", batch: "S.Y 2021 - 2022", curriculum: "Senior High School", processor: "Isaac Newton", status: "Pending" },
-        { lrn: "202110050", name: "Reyes, Maria Clara", track: "BEC", batch: "S.Y 2020 - 2021", curriculum: "JHS Grade 10", processor: "Albert Einstein", status: "Released" },
-        { lrn: "202110051", name: "Santos, Pedro P.", track: "SPA", batch: "S.Y 2022 - 2023", curriculum: "SHS Grade 12", processor: "Nikola Tesla", status: "Processing" },
-        { lrn: "202110052", name: "Gonzales, Angela R.", track: "SPJ", batch: "S.Y 2023 - 2024", curriculum: "SHS Grade 11", processor: "Marie Curie", status: "Released" },
-        { lrn: "202110053", name: "Mendoza, Paul J.", track: "TVL", batch: "S.Y 2024 - 2025", curriculum: "Senior High School", processor: "Galileo Galilei", status: "Pending" },
-        { lrn: "202110054", name: "Torres, Miguel A.", track: "HUMSS", batch: "S.Y 2021 - 2022", curriculum: "SHS Grade 12", processor: "Isaac Newton", status: "Released" },
-        { lrn: "202110055", name: "Fernandez, Lucia M.", track: "BEC", batch: "S.Y 2020 - 2021", curriculum: "JHS Grade 10", processor: "Albert Einstein", status: "Processing" },
-        { lrn: "202110056", name: "Navarro, Crisostomo I.", track: "SPA", batch: "S.Y 2022 - 2023", curriculum: "Senior High School", processor: "Nikola Tesla", status: "Released" },
-        { lrn: "202110057", name: "Luna, Antonio J.", track: "SPJ", batch: "S.Y 2023 - 2024", curriculum: "SHS Grade 11", processor: "Marie Curie", status: "Pending" },
-        { lrn: "202110058", name: "Rizal, Jose P.", track: "HUMSS", batch: "S.Y 2020 - 2021", curriculum: "Senior High School", processor: "Galileo Galilei", status: "Released" },
-        { lrn: "202110059", name: "Bonifacio, Andres", track: "TVL", batch: "S.Y 2021 - 2022", curriculum: "SHS Grade 12", processor: "Isaac Newton", status: "Processing" },
-        { lrn: "202110060", name: "Del Pilar, Marcelo", track: "SPA", batch: "S.Y 2022 - 2023", curriculum: "JHS Grade 10", processor: "Albert Einstein", status: "Pending" },
-        { lrn: "202110061", name: "Aguinaldo, Emilio", track: "SPJ", batch: "S.Y 2023 - 2024", curriculum: "Senior High School", processor: "Nikola Tesla", status: "Released" },
-        { lrn: "202110062", name: "Jacinto, Emilio", track: "BEC", batch: "S.Y 2024 - 2025", curriculum: "SHS Grade 12", processor: "Marie Curie", status: "Pending" },
-        { lrn: "202110063", name: "Mabini, Apolinario", track: "HUMSS", batch: "S.Y 2021 - 2022", curriculum: "Senior High School", processor: "Galileo Galilei", status: "Processing" },
-        { lrn: "202110064", name: "Silang, Gabriela", track: "TVL", batch: "S.Y 2020 - 2021", curriculum: "JHS Grade 10", processor: "Isaac Newton", status: "Released" },
-        { lrn: "202110065", name: "Lapu-Lapu, Datu", track: "SPA", batch: "S.Y 2022 - 2023", curriculum: "SHS Grade 11", processor: "Albert Einstein", status: "Pending" },
-        { lrn: "202110066", name: "Tandang Sora, Melchora", track: "SPJ", batch: "S.Y 2023 - 2024", curriculum: "Senior High School", processor: "Nikola Tesla", status: "Released" },
-        { lrn: "202110067", name: "Tandang Sora, Melody", track: "SPS", batch: "S.Y 2023 - 2024", curriculum: "Senior High School", processor: "Nikola Tesla", status: "Released" },
+        {
+          lrn: "202110048",
+          name: "Bueno, Ryan Joshua E.",
+          track: "TVL - IEM",
+          batch: "S.Y 2020 - 2021",
+          curriculum: "Senior High School",
+          processor: "Galileo Galilei",
+          status: "Released",
+        },
+        {
+          lrn: "202110049",
+          name: "Dela Cruz, Juan",
+          track: "HUMSS",
+          batch: "S.Y 2021 - 2022",
+          curriculum: "Senior High School",
+          processor: "Isaac Newton",
+          status: "Pending",
+        },
+        {
+          lrn: "202110050",
+          name: "Reyes, Maria Clara",
+          track: "BEC",
+          batch: "S.Y 2020 - 2021",
+          curriculum: "JHS Grade 10",
+          processor: "Albert Einstein",
+          status: "Released",
+        },
+        {
+          lrn: "202110051",
+          name: "Santos, Pedro P.",
+          track: "SPA",
+          batch: "S.Y 2022 - 2023",
+          curriculum: "SHS Grade 12",
+          processor: "Nikola Tesla",
+          status: "Processing",
+        },
+        {
+          lrn: "202110052",
+          name: "Gonzales, Angela R.",
+          track: "SPJ",
+          batch: "S.Y 2023 - 2024",
+          curriculum: "SHS Grade 11",
+          processor: "Marie Curie",
+          status: "Released",
+        },
+        {
+          lrn: "202110053",
+          name: "Mendoza, Paul J.",
+          track: "TVL",
+          batch: "S.Y 2024 - 2025",
+          curriculum: "Senior High School",
+          processor: "Galileo Galilei",
+          status: "Pending",
+        },
+        {
+          lrn: "202110054",
+          name: "Torres, Miguel A.",
+          track: "HUMSS",
+          batch: "S.Y 2021 - 2022",
+          curriculum: "SHS Grade 12",
+          processor: "Isaac Newton",
+          status: "Released",
+        },
+        {
+          lrn: "202110055",
+          name: "Fernandez, Lucia M.",
+          track: "BEC",
+          batch: "S.Y 2020 - 2021",
+          curriculum: "JHS Grade 10",
+          processor: "Albert Einstein",
+          status: "Processing",
+        },
+        {
+          lrn: "202110056",
+          name: "Navarro, Crisostomo I.",
+          track: "SPA",
+          batch: "S.Y 2022 - 2023",
+          curriculum: "Senior High School",
+          processor: "Nikola Tesla",
+          status: "Released",
+        },
+        {
+          lrn: "202110057",
+          name: "Luna, Antonio J.",
+          track: "SPJ",
+          batch: "S.Y 2023 - 2024",
+          curriculum: "SHS Grade 11",
+          processor: "Marie Curie",
+          status: "Pending",
+        },
+        {
+          lrn: "202110058",
+          name: "Rizal, Jose P.",
+          track: "HUMSS",
+          batch: "S.Y 2020 - 2021",
+          curriculum: "Senior High School",
+          processor: "Galileo Galilei",
+          status: "Released",
+        },
+        {
+          lrn: "202110059",
+          name: "Bonifacio, Andres",
+          track: "TVL",
+          batch: "S.Y 2021 - 2022",
+          curriculum: "SHS Grade 12",
+          processor: "Isaac Newton",
+          status: "Processing",
+        },
+        {
+          lrn: "202110060",
+          name: "Del Pilar, Marcelo",
+          track: "SPA",
+          batch: "S.Y 2022 - 2023",
+          curriculum: "JHS Grade 10",
+          processor: "Albert Einstein",
+          status: "Pending",
+        },
+        {
+          lrn: "202110061",
+          name: "Aguinaldo, Emilio",
+          track: "SPJ",
+          batch: "S.Y 2023 - 2024",
+          curriculum: "Senior High School",
+          processor: "Nikola Tesla",
+          status: "Released",
+        },
+        {
+          lrn: "202110062",
+          name: "Jacinto, Emilio",
+          track: "BEC",
+          batch: "S.Y 2024 - 2025",
+          curriculum: "SHS Grade 12",
+          processor: "Marie Curie",
+          status: "Pending",
+        },
+        {
+          lrn: "202110063",
+          name: "Mabini, Apolinario",
+          track: "HUMSS",
+          batch: "S.Y 2021 - 2022",
+          curriculum: "Senior High School",
+          processor: "Galileo Galilei",
+          status: "Processing",
+        },
+        {
+          lrn: "202110064",
+          name: "Silang, Gabriela",
+          track: "TVL",
+          batch: "S.Y 2020 - 2021",
+          curriculum: "JHS Grade 10",
+          processor: "Isaac Newton",
+          status: "Released",
+        },
+        {
+          lrn: "202110065",
+          name: "Lapu-Lapu, Datu",
+          track: "SPA",
+          batch: "S.Y 2022 - 2023",
+          curriculum: "SHS Grade 11",
+          processor: "Albert Einstein",
+          status: "Pending",
+        },
+        {
+          lrn: "202110066",
+          name: "Tandang Sora, Melchora",
+          track: "SPJ",
+          batch: "S.Y 2023 - 2024",
+          curriculum: "Senior High School",
+          processor: "Nikola Tesla",
+          status: "Released",
+        },
+        {
+          lrn: "202110067",
+          name: "Tandang Sora, Melody",
+          track: "SPS",
+          batch: "S.Y 2023 - 2024",
+          curriculum: "Senior High School",
+          processor: "Nikola Tesla",
+          status: "Released",
+        },
       ],
       currentPage: 1,
       itemsPerPage: 20,
@@ -106,20 +291,21 @@ export default {
   computed: {
     filteredStudents() {
       return this.students.filter((student) => {
-        const matchesSearch =
-          !this.searchQuery ||
-          student.lrn.includes(this.searchQuery) ||
-          student.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-          student.batch.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-          student.curriculum.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-          student.track.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-          student.processor.toLowerCase().includes(this.searchQuery.toLowerCase());
-
         return (
-          matchesSearch &&
-          (!this.selectedTrack || this.selectedTrack === "All" || student.track === this.selectedTrack) &&
-          (!this.selectedCurriculum || this.selectedCurriculum === "All" || student.curriculum === this.selectedCurriculum) &&
-          (!this.selectedBatch || this.selectedBatch === "All" || student.batch.includes(this.selectedBatch))
+          (this.selectedBatch === "" ||
+            this.selectedBatch === "All" ||
+            student.batch === this.selectedBatch) &&
+          (this.selectedCurriculum === "" ||
+            this.selectedCurriculum === "All" ||
+            student.curriculum === this.selectedCurriculum) &&
+          (this.selectedTrack === "" ||
+            this.selectedTrack === "All" ||
+            student.track === this.selectedTrack) &&
+          (!this.searchQuery ||
+            student.name
+              .toLowerCase()
+              .includes(this.searchQuery.toLowerCase()) ||
+            student.lrn.includes(this.searchQuery))
         );
       });
     },
@@ -158,7 +344,8 @@ export default {
 
     downloadCSV() {
       let csvContent = "data:text/csv;charset=utf-8,";
-      csvContent += "LRN,Student Name,S.Y. Batch,Curriculum,Track,Processor,Status\n"; // Headers
+      csvContent +=
+        "LRN,Student Name,S.Y. Batch,Curriculum,Track,Processor,Status\n"; // Headers
 
       this.filteredStudents.forEach((student) => {
         let row = `${student.lrn},${student.name},${student.batch},${student.curriculum},${student.track},${student.processor},${student.status}`;
@@ -175,27 +362,50 @@ export default {
     },
 
     downloadPDF() {
-      const doc = new jsPDF();
+      const doc = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: "a4",
+      });
+
       doc.text("Student Report", 14, 10);
 
-      const headers = [["LRN", "Student Name", "S.Y. Batch", "Curriculum", "Track", "Processor", "Status"]];
-      const data = this.filteredStudents.map(student => [
-        student.lrn, student.name, student.batch, student.curriculum, student.track, student.processor, student.status
+      const headers = [
+        [
+          "LRN",
+          "Student Name",
+          "S.Y. Batch",
+          "Curriculum",
+          "Track",
+          "Processor",
+          "Status",
+        ],
+      ];
+      const data = this.filteredStudents.map((student) => [
+        student.lrn,
+        student.name,
+        student.batch,
+        student.curriculum,
+        student.track,
+        student.processor,
+        student.status,
       ]);
 
       autoTable(doc, {
         head: headers,
         body: data,
         startY: 20,
+        styles: { fontSize: 10, cellPadding: 3 },
+        theme: "grid", // Can be "striped", "grid", or "plain"
+        headStyles: { fillColor: [22, 160, 133] }, // Customize header color
+        columnStyles: { 1: { cellWidth: "auto" } }, // Auto-adjust columns
       });
 
       doc.save("students_report.pdf");
-    }
-  }
+    },
+  },
 };
-
 </script>
-
 
 <style scoped>
 .container {
@@ -204,6 +414,8 @@ export default {
   width: 125%;
   padding: 10px;
   box-sizing: border-box;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .nav-title h1 {
@@ -214,13 +426,12 @@ export default {
   margin: 0;
 }
 
-
 .filtering-section {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  flex-wrap: wrap; 
+  flex-wrap: wrap;
   margin: 0 0 20px 0;
 }
 
@@ -280,7 +491,6 @@ export default {
   box-shadow: 0 0 5px rgba(41, 95, 152, 0.5);
 }
 
-
 .search-bar::after {
   content: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='20' height='20' fill='%23295f98'><path d='M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.02 14 5 11.98 5 9.5S7.02 5 9.5 5 14 7.02 14 9.5 11.98 14 9.5 14z'/></svg>");
   position: absolute;
@@ -309,8 +519,8 @@ export default {
   background: #fff;
   border-radius: 8px;
   overflow-y: auto;
-  overflow-x: hidden; 
-  max-height: 600px; 
+  overflow-x: hidden;
+  max-height: 600px;
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
     rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
   border: 1px solid #ddd;
@@ -366,14 +576,13 @@ tr:hover {
   font-size: 12px;
 }
 
-.status.processing  {
+.status.processing {
   background-color: #b32113;
   color: white;
   padding: 5px 20px;
   border-radius: 5px;
   font-size: 12px;
 }
-
 
 .note {
   font-size: 10px;

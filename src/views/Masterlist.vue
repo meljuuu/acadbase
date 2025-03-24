@@ -43,16 +43,16 @@
     </div>
 
     <p class="note">
-      *Note: Only 11 students are displayed in the table. Other students Name
+      *Note: Only 20 students are displayed in the table. Other students Name
       are on the next page.*
     </p>
 
     <div class="pagination">
-      <button class="prev">← Previous</button>
-      <button class="page">1</button>
-      <button class="page">2</button>
-      <button class="page">3</button>
-      <button class="next">Next →</button>
+      <button @click="prevPage" :disabled="currentPage === 1">← Previous</button>
+      <button v-for="page in totalPages" :key="page" @click="currentPage = page" :class="{ active: currentPage === page }">
+        {{ page }}
+      </button>
+      <button @click="nextPage" :disabled="currentPage === totalPages">Next →</button>
     </div>
   </div>
 </template>
@@ -100,25 +100,45 @@ export default {
     };
   },
 
+  
   computed: {
     filteredStudents() {
-      return this.students.filter((student) => {
-        return (
-          (!this.selectedBatch || student.batch === this.selectedBatch) &&
-          (!this.selectedCurriculum || student.curriculum === this.selectedCurriculum) &&
-          (!this.selectedTrack || student.track === this.selectedTrack) &&
-          (!this.searchQuery ||
-            student.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-            student.lrn.includes(this.searchQuery))
+    return this.students.filter((student) => {
+      return (
+        (this.selectedBatch === "" || this.selectedBatch === "All" || student.batch === this.selectedBatch) &&
+        (this.selectedCurriculum === "" || this.selectedCurriculum === "All" || student.curriculum === this.selectedCurriculum) &&
+        (this.selectedTrack === "" || this.selectedTrack === "All" || student.track === this.selectedTrack) &&
+        (!this.searchQuery ||
+          student.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+          student.lrn.includes(this.searchQuery))
         );
       });
     },
+    totalPages() {
+      return Math.ceil(this.filteredStudents.length / this.itemsPerPage);
+    },
+
     paginatedStudents() {
       const start = (this.currentPage - 1) * this.itemsPerPage;
-      return this.filteredStudents.slice(start, start + this.itemsPerPage);
+      const end = start + this.itemsPerPage;
+      return this.filteredStudents.slice(start, end);
     },
   },
+
+  methods: {
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
+    },
+  }
 };
+
 </script>
 
 
@@ -276,17 +296,32 @@ tr:hover {
   margin-top: 20px;
 }
 
+.page {
+  font-weight: bold;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
 .pagination button {
-  background: #f5f5f5;
-  border: none;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
   padding: 8px 12px;
   margin: 0 5px;
-  border-radius: 5px;
   cursor: pointer;
 }
 
-.page {
-  font-weight: bold;
+.pagination button.active {
+  background-color: #295f98;
+  color: white;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 </style>
