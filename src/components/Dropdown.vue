@@ -46,11 +46,11 @@
       class="filter-dropdown"
       @change="$emit('update:selectedTrack', selectedTrack)"
     >
-      <option disabled value="">Batch</option>
+      <option disabled value="">Track</option>
       <option v-for="track in tracks" :key="track">
         {{ track }}
       </option>
-    </select>    
+    </select>
 
     <!-- DD type-->
     <select
@@ -63,7 +63,7 @@
       <option v-for="type in types" :key="type">
         {{ type }}
       </option>
-    </select>   
+    </select>
   </div>
 </template>
 
@@ -71,23 +71,23 @@
 import { ref, defineProps } from "vue";
 
 const props = defineProps({
-  showCurriculum: { type: Boolean, default: false, },
-  showYear: { type: Boolean, default: false, },
-  showBatch: { type: Boolean, default: false, },
-  showTrack: { type: Boolean, default: false,}, 
-  showType: { type: Boolean, default: false, },
+  showCurriculum: { type: Boolean, default: false },
+  showYear: { type: Boolean, default: false },
+  showBatch: { type: Boolean, default: false },
+  showTrack: { type: Boolean, default: false },
+  showType: { type: Boolean, default: false },
 });
 
-const curriculums = ["All", "JHS Grade 10", "SHS Grade 11","SHS Grade 12", "Senior High School"];
-const years = ["All", "2023", "2024","2025"];
-const batchs = ["All", "S.Y. 23-24", "S.Y. 24-2","S.Y. 25-26"];
-const tracks = ["All", "TVL - IEM", "HUMSS", "SPJ", "SPA", "BEC",];
+const curriculums = ["All", "JHS Grade 10", "SHS Grade 11", "SHS Grade 12"];
+const years = ["All", "2023", "2024", "2025"];
+const batchs = ["All", "S.Y 2020 - 2021", "S.Y 2021 - 2022", "S.Y 2022 - 2023", "S.Y 2023 - 2024", "S.Y 2024 - 2025"];
+const tracks = ["All", "TVL - IEM", "HUMSS", "SPJ", "SPA", "BEC"];
 const types = [".csv", ".pdf"];
 
 const selectedCurriculum = ref("");
-const selectedYear = ref("2025");
-const selectedBatch = ref("S.Y. 25-26");
-const selectedTrack = ref("TVL - IEM");
+const selectedYear = ref("");
+const selectedBatch = ref("");
+const selectedTrack = ref("");
 const selectedType = ref("");
 </script>
 

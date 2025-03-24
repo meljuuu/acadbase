@@ -13,7 +13,7 @@
 
         <div
           class="stats-container"
-          v-if="selectedCurriculum === 'Junior High School'">
+          v-if="selectedCurriculum === 'JHS Grade 10'">
           <div class="stat-card">
             <div class="stat-icon">📖</div>
             <div class="stat-info">
@@ -39,7 +39,7 @@
 
         <div
           class="stats-container"
-          v-if="selectedCurriculum === 'G11 Senior High School'">
+          v-if="selectedCurriculum === 'SHS Grade 11'">
           <div class="stat-card">
             <div class="stat-icon">📖</div>
             <div class="stat-info">
@@ -58,7 +58,7 @@
 
         <div
           class="stats-container"
-          v-if="selectedCurriculum === 'G12 Senior High School'">
+          v-if="selectedCurriculum === 'SHS Grade 12'">
           <div class="stat-card">
             <div class="stat-icon">📖</div>
             <div class="stat-info">
@@ -150,7 +150,7 @@ export default {
   },
   data() {
     return {
-      selectedCurriculum: "Junior High School",
+      selectedCurriculum: "JHS Grade 10",
       selectedYear: "",
     };
   },
@@ -181,7 +181,7 @@ export default {
 }
 
 .student-container {
-  background-color: #ffffff;
+  background-color: #FEFBF9;
   padding: 10px 20px;
   border-radius: 5px;
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
@@ -192,7 +192,7 @@ export default {
 .buttons {
   display: flex;
   justify-content: space-between;
-  color: #ffffff;
+  color: #FEFBF9;
   flex-wrap: wrap;
   gap: 10px;
   margin: 20px 0;
@@ -225,7 +225,7 @@ export default {
 }
 
 .stat-card {
-  background-color: #f5f5f5;
+  background-color: #FEFBF9;
   padding: 15px;
   display: flex;
   align-items: center;
@@ -250,7 +250,6 @@ export default {
   font-size: 14px;
   color: gray;
   margin: 0;
-  font-size: 16px;
 }
 
 .student-list-container {
@@ -262,7 +261,7 @@ export default {
 .recent-added,
 .recent-released,
 .released-docs {
-  background-color: #ffffff;
+  background-color: #FEFBF9;
   padding: 10px 20px;
   border-radius: 5px;
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
