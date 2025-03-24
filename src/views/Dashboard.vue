@@ -250,6 +250,7 @@ export default {
   font-size: 14px;
   color: gray;
   margin: 0;
+  font-size: 16px;
 }
 
 .student-list-container {

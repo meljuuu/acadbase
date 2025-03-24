@@ -11,7 +11,7 @@
         <Dropdown :showTrack="true" @update:selectedTrack="selectedTrack = $event"/>
       </div>
 
-      <div class="search-bar">
+      <div>
         <Dropdown :showType="true" @update:selectedType="selectedType = $event"/>
       </div>
     </div>
@@ -77,7 +77,7 @@ export default {
       searchQuery: "",
       files: [".CSV", ".PDF"],
       students: [
-        { lrn: "202110048", name: "Bueno, Ryan Joshua E.", track: "TVL", batch: "Batch 2020 - 2025", curriculum: "Senior High School", processor: "Galileo Galilei", status: "Released" },
+        { lrn: "202110048", name: "Bueno, Ryan Joshua E.", track: "TVL - IEM", batch: "Batch 2020 - 2025", curriculum: "Senior High School", processor: "Galileo Galilei", status: "Released" },
         { lrn: "202110049", name: "Dela Cruz, Juan", track: "HUMSS", batch: "Batch 2023 - 2026", curriculum: "Senior High School", processor: "Isaac Newton", status: "Pending" },
         { lrn: "202110050", name: "Reyes, Maria Clara", track: "BEC", batch: "Batch 2022 - 2025", curriculum: "JHS Grade 10", processor: "Albert Einstein", status: "Released" },
         { lrn: "202110051", name: "Santos, Pedro P.", track: "SPA", batch: "Batch 2021 - 2024", curriculum: "SHS Grade 12", processor: "Nikola Tesla", status: "Processing" },
@@ -346,8 +346,28 @@ tr:hover {
   background-color: #f6f6f6;
 }
 
+.status {
+  min-width: 70px;
+  display: inline-block;
+}
+
 .status.released {
   background: #0c5a48;
+  color: white;
+  padding: 5px 20px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+.status.pending {
+  background-color: #fbdf5a;
+  color: white;
+  padding: 5px 20px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.status.processing  {
+  background-color: #b32113;
   color: white;
   padding: 5px 20px;
   border-radius: 5px;

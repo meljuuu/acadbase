@@ -593,9 +593,14 @@ td {
   font-size: 12px;
 }
 
+
 th {
   padding-top: 20px;
-  background: #f6f6f6;
+  background: #295f98;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 tr {

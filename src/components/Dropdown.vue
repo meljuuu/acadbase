@@ -71,35 +71,20 @@
 import { ref, defineProps } from "vue";
 
 const props = defineProps({
-  showCurriculum: {
-    type: Boolean,
-    default: false,
-  },
-  showYear: {
-    type: Boolean,
-    default: false,
-  },
-  showBatch: {
-    type: Boolean,
-    default: false,
-  },
-  showTrack: {
-    type: Boolean,
-    default: false,
-  },
-  showType: {
-    type: Boolean,
-    default: false,
-  },
+  showCurriculum: { type: Boolean, default: false, },
+  showYear: { type: Boolean, default: false, },
+  showBatch: { type: Boolean, default: false, },
+  showTrack: { type: Boolean, default: false,}, 
+  showType: { type: Boolean, default: false, },
 });
 
-const curriculums = ["Junior High School", "G11 Senior High School","G12 Senior High School"];
+const curriculums = ["All", "JHS Grade 10", "SHS Grade 11","SHS Grade 12", "Senior High School"];
 const years = ["All", "2023", "2024","2025"];
 const batchs = ["All", "S.Y. 23-24", "S.Y. 24-2","S.Y. 25-26"];
 const tracks = ["All", "TVL - IEM", "HUMSS", "SPJ", "SPA", "BEC",];
 const types = [".csv", ".pdf"];
 
-const selectedCurriculum = ref("Junior High School");
+const selectedCurriculum = ref("");
 const selectedYear = ref("2025");
 const selectedBatch = ref("S.Y. 25-26");
 const selectedTrack = ref("TVL - IEM");
