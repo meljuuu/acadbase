@@ -78,8 +78,8 @@ const props = defineProps({
   showType: { type: Boolean, default: false },
 });
 
-const curriculums = ["All", "JHS Grade 10", "SHS Grade 11", "SHS Grade 12"];
-const years = ["All", "2023", "2024", "2025"];
+const curriculums = ["JHS Grade 10", "SHS Grade 11", "SHS Grade 12"];
+const years = ["2023", "2024", "2025"];
 const batchs = ["All", "S.Y 2020 - 2021", "S.Y 2021 - 2022", "S.Y 2022 - 2023", "S.Y 2023 - 2024", "S.Y 2024 - 2025"];
 const tracks = ["All", "TVL - IEM", "HUMSS", "SPJ", "SPA", "BEC"];
 const types = [".csv", ".pdf"];
