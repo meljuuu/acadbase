@@ -14,6 +14,7 @@
       <div class="search-bar">
         <input type="text" v-model="searchQuery" placeholder="Search..." />
         <Buttons @click="openaddModal"/>
+        <Modal ref="addModalRef" />
       </div>
     </div>
 
@@ -42,6 +43,8 @@
       </table>
     </div>
 
+    <Modal ref="unreleasedModalRef" />
+
     <p class="note">
       *Note: Only 20 students are displayed in the table. Other students Name
       are on the next page.*
@@ -60,12 +63,14 @@
 <script>
 import Dropdown from "@/components/Dropdown.vue";
 import Buttons from "@/components/Buttons.vue";
+import Modal from "@/components/Modal.vue";
 
 export default {
   name: "Masterlist",
   components: {
     Dropdown,
     Buttons,
+    Modal,
   },
   data() {
     return {
@@ -126,6 +131,13 @@ export default {
   },
 
   methods: {
+    openaddModal() {
+      this.$refs.addModalRef.openaddModal(); 
+    },
+    showUnReleasedModal() {
+      this.$refs.unreleasedModalRef.showUnReleasedModal(); 
+    },
+
     prevPage() {
       if (this.currentPage > 1) {
         this.currentPage--;
