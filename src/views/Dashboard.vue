@@ -329,7 +329,7 @@ export default {
 .nav-title h1 {
   color: #295f98;
   font-weight: bold;
-  font-size: 64px;
+  font-size: 48px;
   padding: 0;
   margin: 0;
 }
