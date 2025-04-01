@@ -79,7 +79,6 @@
               <h3>Recent Released</h3>
             </div>
             <div class="filter-container">
-              <label for="syFilter">Filter by Batch:</label>
               <select v-model="selectedSY" id="syFilter">
                 <option value="">All</option>
                 <option v-for="batch in uniqueSYs" :key="batch" :value="batch">{{ batch }}</option>
@@ -130,17 +129,23 @@
           
           <div class="stats-doc"> 
             <div class="stat-box-doc">
-              <p class="stat-number-doc">{{ filteredData.seniorHigh }}</p>
+              <!-- <p class="stat-number-doc">{{ filteredData.seniorHigh }}</p> -->
               <div class="stat-label-container-doc">
                 <div class="stat-icon-doc"></div>
-                <p class="stat-label-doc">Senior High School</p>
+                <div class="stat-label-container-doc-container">
+                  <p class="stat-number-doc">{{ filteredData.seniorHigh }}</p>
+                  <p class="stat-label-doc">Senior High School</p>
+                </div>
               </div>
             </div>
             <div class="stat-box-doc">
-              <p class="stat-number-doc">{{ filteredData.juniorHigh }}</p>
+              <!-- <p class="stat-number-doc">{{ filteredData.juniorHigh }}</p> -->
               <div class="stat-label-container-doc">
                 <div class="stat-icon-doc"></div>
-                <p class="stat-label-doc">Junior High School</p>
+                <div class="stat-label-container-doc-container">
+                  <p class="stat-number-doc">{{ filteredData.juniorHigh }}</p>
+                  <p class="stat-label-doc">Junior High School</p>
+                </div>
               </div>
             </div>
           </div>
@@ -305,7 +310,7 @@ export default {
 }
 
 .filter select {
-  padding: 5px 10px;
+  padding: 15px 20px;
   font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -422,7 +427,7 @@ export default {
 .recent-released,
 .released-docs {
   background-color: #ffffff;
-  padding: 10px 20px;
+  padding: 20px;
   border-radius: 5px;
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
     rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
@@ -434,7 +439,7 @@ export default {
   height: 550px; 
   overflow-y: auto; 
   border: 1px solid #ddd; 
-  padding: 15px;
+  padding: 20px;
   background-color: #ffffff;
 }
 
@@ -446,7 +451,7 @@ export default {
 }
 
 .filter-container-recent-added select {
-  padding: 6px 10px;
+  padding: 15px 20px;
   font-size: 14px;
   min-width: 150px; 
 }
@@ -481,7 +486,7 @@ export default {
   align-items: center;
   padding: 10px;
   border-radius: 10px;
-  font-size: 12px;
+  font-size: 14px;
   background-color: #f5f5f5;
 }
 
@@ -546,7 +551,7 @@ select:focus {
   height: 600px;
 }
 .released-docs {
-  height: 535px;
+  height: 558px;
 }
 
 .content-title-docs {
@@ -554,12 +559,16 @@ select:focus {
   display: flex;
   justify-content: space-between;
   width: 100%; 
+
+  h3 {
+    margin: 0;
+  }
 }
 
 .year-filter {
   border: 1px solid #ccc;
   border-radius: 5px;
-  padding: 5px;
+  padding: 15px 20px;
   font-size: 14px;
   border-color: #1f4b7a;
 }
@@ -567,7 +576,7 @@ select:focus {
 .circle-container {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 50px;
 }
 
 .circle {
@@ -591,7 +600,7 @@ select:focus {
 }
 
 .doc-text {
-  font-size: 14px;
+  font-size: 16px;
   color: #666;
   margin-top: 5px; 
 }
@@ -599,7 +608,7 @@ select:focus {
 .stats-doc {
   display: flex;
   justify-content: space-between;
-  margin-top: 20px;
+  margin-top: 60px;
   gap: 10px; 
 }
 
@@ -610,11 +619,14 @@ select:focus {
   width: 45%;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .stat-number-doc {
-  font-size: 18px;
+  font-size: 24px;
   font-weight: bold;
+  margin: 0;
 }
 
 .stat-label-container-doc {
@@ -632,13 +644,14 @@ select:focus {
 }
 
 .stat-label-doc {
-  font-size: 12px;
+  font-size: 13px;
   color: #666;
+  margin: 0;
 }
 
 .recent-released {
-  width: 75%;
-  margin-top: -65px;
+  width: 74.8%;
+  margin-top: -42px;
 }
 
 table {
@@ -650,6 +663,10 @@ th, td {
   padding: 10px;
   border: 1px solid #ddd;
   text-align: left;
+}
+
+td {
+  font-size: 14px;
 }
 
 th {
