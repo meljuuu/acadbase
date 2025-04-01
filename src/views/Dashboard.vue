@@ -651,7 +651,7 @@ select:focus {
 
 .recent-released {
   width: 74.8%;
-  margin-top: -42px;
+  margin-top: -37px;
 }
 
 table {
