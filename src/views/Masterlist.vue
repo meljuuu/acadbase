@@ -5,18 +5,38 @@
     </div>
 
     <div class="filtering-section">
-      <div class="filters">
-        <Dropdown :showBatch="true" @update:selectedBatch="selectedBatch = $event"/>
-        <Dropdown :showCurriculum="true" @update:selectedCurriculum="selectedCurriculum = $event"/>
-        <Dropdown :showTrack="true" @update:selectedTrack="selectedTrack = $event"/>
-      </div>
-
       <div class="search-bar">
         <input type="text" v-model="searchQuery" placeholder="Search..." />
-        <Buttons @click="openaddModal"/>
+        
+       
+        <Buttons @click="openaddModal" />
+        
+       
+        <ImportClassListButton @click="openImportModal" />
+        
+      
         <Modal ref="addModalRef" />
+
+
+        <Modal ref="importModalRef" />
       </div>
+
+      <div class="filters">
+        <Dropdown
+          :showBatch="true"
+          @update:selectedBatch="selectedBatch = $event"
+        />
+        <Dropdown
+          :showCurriculum="true"
+          @update:selectedCurriculum="selectedCurriculum = $event"
+        />
+        <Dropdown
+          :showTrack="true"
+          @update:selectedTrack="selectedTrack = $event"
+        />
+      </div>  
     </div>
+
 
     <div class="table-container">
       <table>
@@ -31,13 +51,21 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(student, index) in paginatedStudents" :key="index" @click="showUnReleasedModal">
+          <tr
+            v-for="(student, index) in paginatedStudents"
+            :key="index"
+            @click="showUnReleasedModal"
+          >
             <td>{{ student.lrn }}</td>
             <td>{{ student.name }}</td>
             <td>{{ student.track }}</td>
             <td>{{ student.curriculum }}</td>
             <td>{{ student.batch }}</td>
-            <td><span :class="['status', student.status.toLowerCase()]">{{ student.status }}</span></td>
+            <td>
+              <span :class="['status', student.status.toLowerCase()]">{{
+                student.status
+              }}</span>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -51,11 +79,20 @@
     </p>
 
     <div class="pagination">
-      <button @click="prevPage" :disabled="currentPage === 1">← Previous</button>
-      <button v-for="page in totalPages" :key="page" @click="currentPage = page" :class="{ active: currentPage === page }">
+      <button @click="prevPage" :disabled="currentPage === 1">
+        ← Previous
+      </button>
+      <button
+        v-for="page in totalPages"
+        :key="page"
+        @click="currentPage = page"
+        :class="{ active: currentPage === page }"
+      >
         {{ page }}
       </button>
-      <button @click="nextPage" :disabled="currentPage === totalPages">Next →</button>
+      <button @click="nextPage" :disabled="currentPage === totalPages">
+        Next →
+      </button>
     </div>
   </div>
 </template>
@@ -64,12 +101,15 @@
 import Dropdown from "@/components/Dropdown.vue";
 import Buttons from "@/components/Buttons.vue";
 import Modal from "@/components/Modal.vue";
+import ImportClassListButton from "../components/ImportClassListButton.vue";
+
 
 export default {
   name: "Masterlist",
   components: {
     Dropdown,
     Buttons,
+    ImportClassListButton,
     Modal,
   },
   data() {
@@ -81,41 +121,174 @@ export default {
       uploadedFile: null,
       pdfUrl: "",
       students: [
-      { lrn: "202110048", name: "Bueno, Ryan Joshua E.", track: "TVL - IEM", batch: "S.Y 2020 - 2021", curriculum: "Senior High School", status: "Released" },
-        { lrn: "202110049", name: "Dela Cruz, Juan", track: "HUMSS", batch: "S.Y 2021 - 2022", curriculum: "Senior High School", status: "Pending" },
-        { lrn: "202110050", name: "Reyes, Maria Clara", track: "BEC", batch: "S.Y 2022 - 2023", curriculum: "JHS Grade 10", status: "Released" },
-        { lrn: "202110051", name: "Santos, Pedro P.", track: "SPA", batch: "S.Y 2023 - 2024", curriculum: "SHS Grade 12", status: "Processing" },
-        { lrn: "202110052", name: "Gonzales, Angela R.", track: "SPJ", batch: "S.Y 2024 - 2025", curriculum: "SHS Grade 11", status: "Released" },
-        { lrn: "202110053", name: "Mendoza, Paul J.", track: "TVL", batch: "S.Y 2020 - 2021", curriculum: "Senior High School", status: "Pending" },
-        { lrn: "202110054", name: "Torres, Miguel A.", track: "HUMSS", batch: "S.Y 2021 - 2022", curriculum: "SHS Grade 12", status: "Released" },
-        { lrn: "202110055", name: "Fernandez, Lucia M.", track: "BEC", batch: "S.Y 2022 - 2023", curriculum: "JHS Grade 10", status: "Processing" },
-        { lrn: "202110056", name: "Navarro, Crisostomo I.", track: "SPA", batch: "S.Y 2023 - 2024", curriculum: "Senior High School", status: "Released" },
-        { lrn: "202110048", name: "Bueno, Ryan Joshua E.", track: "TVL - IEM", batch: "S.Y 2020 - 2021", curriculum: "Senior High School", status: "Released" },
-        { lrn: "202110049", name: "Dela Cruz, Juan", track: "HUMSS", batch: "S.Y 2021 - 2022", curriculum: "Senior High School", status: "Pending" },
-        { lrn: "202110050", name: "Reyes, Maria Clara", track: "BEC", batch: "S.Y 2022 - 2023", curriculum: "JHS Grade 10", status: "Released" },
-        { lrn: "202110051", name: "Santos, Pedro P.", track: "SPA", batch: "S.Y 2023 - 2024", curriculum: "SHS Grade 12", status: "Processing" },
-        { lrn: "202110052", name: "Gonzales, Angela R.", track: "SPJ", batch: "S.Y 2024 - 2025", curriculum: "SHS Grade 11", status: "Released" },
-        { lrn: "202110053", name: "Mendoza, Paul J.", track: "TVL", batch: "S.Y 2020 - 2021", curriculum: "Senior High School", status: "Pending" },
-        { lrn: "202110054", name: "Torres, Miguel A.", track: "HUMSS", batch: "S.Y 2021 - 2022", curriculum: "SHS Grade 12", status: "Released" },
-        { lrn: "202110055", name: "Fernandez, Lucia M.", track: "BEC", batch: "S.Y 2022 - 2023", curriculum: "JHS Grade 10", status: "Processing" },
-        { lrn: "202110056", name: "Navarro, Crisostomo I.", track: "SPA", batch: "S.Y 2023 - 2024", curriculum: "Senior High School", status: "Released" },
+        {
+          lrn: "202110048",
+          name: "Bueno, Ryan Joshua E.",
+          track: "TVL - IEM",
+          batch: "S.Y 2020 - 2021",
+          curriculum: "Senior High School",
+          status: "Released",
+        },
+        {
+          lrn: "202110049",
+          name: "Dela Cruz, Juan",
+          track: "HUMSS",
+          batch: "S.Y 2021 - 2022",
+          curriculum: "Senior High School",
+          status: "Pending",
+        },
+        {
+          lrn: "202110050",
+          name: "Reyes, Maria Clara",
+          track: "BEC",
+          batch: "S.Y 2022 - 2023",
+          curriculum: "JHS Grade 10",
+          status: "Released",
+        },
+        {
+          lrn: "202110051",
+          name: "Santos, Pedro P.",
+          track: "SPA",
+          batch: "S.Y 2023 - 2024",
+          curriculum: "SHS Grade 12",
+          status: "Processing",
+        },
+        {
+          lrn: "202110052",
+          name: "Gonzales, Angela R.",
+          track: "SPJ",
+          batch: "S.Y 2024 - 2025",
+          curriculum: "SHS Grade 11",
+          status: "Released",
+        },
+        {
+          lrn: "202110053",
+          name: "Mendoza, Paul J.",
+          track: "TVL",
+          batch: "S.Y 2020 - 2021",
+          curriculum: "Senior High School",
+          status: "Pending",
+        },
+        {
+          lrn: "202110054",
+          name: "Torres, Miguel A.",
+          track: "HUMSS",
+          batch: "S.Y 2021 - 2022",
+          curriculum: "SHS Grade 12",
+          status: "Released",
+        },
+        {
+          lrn: "202110055",
+          name: "Fernandez, Lucia M.",
+          track: "BEC",
+          batch: "S.Y 2022 - 2023",
+          curriculum: "JHS Grade 10",
+          status: "Processing",
+        },
+        {
+          lrn: "202110056",
+          name: "Navarro, Crisostomo I.",
+          track: "SPA",
+          batch: "S.Y 2023 - 2024",
+          curriculum: "Senior High School",
+          status: "Released",
+        },
+        {
+          lrn: "202110048",
+          name: "Bueno, Ryan Joshua E.",
+          track: "TVL - IEM",
+          batch: "S.Y 2020 - 2021",
+          curriculum: "Senior High School",
+          status: "Released",
+        },
+        {
+          lrn: "202110049",
+          name: "Dela Cruz, Juan",
+          track: "HUMSS",
+          batch: "S.Y 2021 - 2022",
+          curriculum: "Senior High School",
+          status: "Pending",
+        },
+        {
+          lrn: "202110050",
+          name: "Reyes, Maria Clara",
+          track: "BEC",
+          batch: "S.Y 2022 - 2023",
+          curriculum: "JHS Grade 10",
+          status: "Released",
+        },
+        {
+          lrn: "202110051",
+          name: "Santos, Pedro P.",
+          track: "SPA",
+          batch: "S.Y 2023 - 2024",
+          curriculum: "SHS Grade 12",
+          status: "Processing",
+        },
+        {
+          lrn: "202110052",
+          name: "Gonzales, Angela R.",
+          track: "SPJ",
+          batch: "S.Y 2024 - 2025",
+          curriculum: "SHS Grade 11",
+          status: "Released",
+        },
+        {
+          lrn: "202110053",
+          name: "Mendoza, Paul J.",
+          track: "TVL",
+          batch: "S.Y 2020 - 2021",
+          curriculum: "Senior High School",
+          status: "Pending",
+        },
+        {
+          lrn: "202110054",
+          name: "Torres, Miguel A.",
+          track: "HUMSS",
+          batch: "S.Y 2021 - 2022",
+          curriculum: "SHS Grade 12",
+          status: "Released",
+        },
+        {
+          lrn: "202110055",
+          name: "Fernandez, Lucia M.",
+          track: "BEC",
+          batch: "S.Y 2022 - 2023",
+          curriculum: "JHS Grade 10",
+          status: "Processing",
+        },
+        {
+          lrn: "202110056",
+          name: "Navarro, Crisostomo I.",
+          track: "SPA",
+          batch: "S.Y 2023 - 2024",
+          curriculum: "Senior High School",
+          status: "Released",
+        },
       ],
       currentPage: 1,
       itemsPerPage: 20,
     };
   },
 
-  
   computed: {
     filteredStudents() {
-    return this.students.filter((student) => {
-      return (
-        (this.selectedBatch === "" || this.selectedBatch === "All" || student.batch === this.selectedBatch) &&
-        (this.selectedCurriculum === "" || this.selectedCurriculum === "All" || student.curriculum === this.selectedCurriculum) &&
-        (this.selectedTrack === "" || this.selectedTrack === "All" || student.track === this.selectedTrack) &&
-        (!this.searchQuery ||
-          student.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-          student.lrn.includes(this.searchQuery))
+      return this.students.filter((student) => {
+        return (
+          (this.selectedBatch === "" ||
+            this.selectedBatch === "All" ||
+            student.batch === this.selectedBatch) &&
+          (this.selectedCurriculum === "" ||
+            this.selectedCurriculum === "All" ||
+            student.curriculum === this.selectedCurriculum) &&
+          (this.selectedTrack === "" ||
+            this.selectedTrack === "All" ||
+            student.track === this.selectedTrack) &&
+          (!this.searchQuery ||
+            student.name
+              .toLowerCase()
+              .includes(this.searchQuery.toLowerCase()) ||
+            student.lrn.includes(this.searchQuery))
         );
       });
     },
@@ -131,11 +304,14 @@ export default {
   },
 
   methods: {
+    openImportModal() {
+      this.$refs.importModalRef.openImportModal();
+    },
     openaddModal() {
-      this.$refs.addModalRef.openaddModal(); 
+      this.$refs.addModalRef.openaddModal();
     },
     showUnReleasedModal() {
-      this.$refs.unreleasedModalRef.showUnReleasedModal(); 
+      this.$refs.unreleasedModalRef.showUnReleasedModal();
     },
 
     prevPage() {
@@ -148,11 +324,9 @@ export default {
         this.currentPage++;
       }
     },
-  }
+  },
 };
-
 </script>
-
 
 <style scoped>
 .container {
@@ -171,11 +345,15 @@ export default {
   margin: 0;
 }
 
-
 .filtering-section {
   display: flex;
   justify-content: space-between;
-  margin: 0 0 20px 0;
+  background-color: #ffffff;
+  padding: 30px 20px;
+  border-radius: 5px;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  margin-bottom: 20px;
 }
 
 .filters {
@@ -214,7 +392,7 @@ export default {
   padding: 8px;
   border: 1px solid #295f98;
   border-radius: 5px;
-  width: 500px;
+  width: 250px;
 }
 
 .add-student {
@@ -231,8 +409,8 @@ export default {
   background: #fff;
   border-radius: 8px;
   overflow-y: auto;
-  overflow-x: hidden; 
-  max-height: 600px; 
+  overflow-x: hidden;
+  max-height: 600px;
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
     rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
   border: 1px solid #ddd;
@@ -250,7 +428,6 @@ td {
   border-bottom: 1px solid #ddd;
   font-size: 12px;
 }
-
 
 th {
   padding-top: 20px;
@@ -288,7 +465,7 @@ tr:hover {
   font-size: 12px;
 }
 
-.status.processing  {
+.status.processing {
   background-color: #b32113;
   color: white;
   padding: 5px 20px;
@@ -335,5 +512,4 @@ tr:hover {
   cursor: not-allowed;
   opacity: 0.5;
 }
-
 </style>

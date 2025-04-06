@@ -13,7 +13,9 @@
         
         <div class="stats-container" v-if="filteredStats.length">
           <div v-for="(stat, index) in filteredStats" :key="index" class="stat-card">
-            <div class="stat-icon">📖</div>
+            <div class="stat-icon">
+              <font-awesome-icon icon="book-open" />
+            </div>
             <div class="stat-info">
               <h3>{{ stat.count }}</h3>
               <p>{{ stat.label }}</p>
@@ -401,7 +403,7 @@ export default {
 }
 
 .stat-icon {
-  font-size: 50px;
+  font-size: 64px;
   min-width: 50px;
 }
 
