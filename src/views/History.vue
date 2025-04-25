@@ -109,7 +109,7 @@ export default {
           batch: "S.Y 2020 - 2021",
           curriculum: "Senior High School",
           processor: "Galileo Galilei",
-          status: "Released",
+          status: "Not-Applicable",
         },
         {
           lrn: "202110049",
@@ -118,7 +118,7 @@ export default {
           batch: "S.Y 2021 - 2022",
           curriculum: "Senior High School",
           processor: "Isaac Newton",
-          status: "Pending",
+          status: "Review",
         },
         {
           lrn: "202110050",
@@ -127,7 +127,7 @@ export default {
           batch: "S.Y 2020 - 2021",
           curriculum: "JHS Grade 10",
           processor: "Albert Einstein",
-          status: "Released",
+          status: "Not-Applicable",
         },
         {
           lrn: "202110051",
@@ -136,7 +136,7 @@ export default {
           batch: "S.Y 2022 - 2023",
           curriculum: "SHS Grade 12",
           processor: "Nikola Tesla",
-          status: "Processing",
+          status: "Revised",
         },
         {
           lrn: "202110052",
@@ -145,7 +145,7 @@ export default {
           batch: "S.Y 2023 - 2024",
           curriculum: "SHS Grade 11",
           processor: "Marie Curie",
-          status: "Released",
+          status: "Approved",
         },
         {
           lrn: "202110053",
@@ -154,7 +154,7 @@ export default {
           batch: "S.Y 2024 - 2025",
           curriculum: "Senior High School",
           processor: "Galileo Galilei",
-          status: "Pending",
+          status: "Review",
         },
         {
           lrn: "202110054",
@@ -163,7 +163,7 @@ export default {
           batch: "S.Y 2021 - 2022",
           curriculum: "SHS Grade 12",
           processor: "Isaac Newton",
-          status: "Released",
+          status: "Not-Applicable",
         },
         {
           lrn: "202110055",
@@ -172,7 +172,7 @@ export default {
           batch: "S.Y 2020 - 2021",
           curriculum: "JHS Grade 10",
           processor: "Albert Einstein",
-          status: "Processing",
+          status: "Revised",
         },
         {
           lrn: "202110056",
@@ -181,7 +181,7 @@ export default {
           batch: "S.Y 2022 - 2023",
           curriculum: "Senior High School",
           processor: "Nikola Tesla",
-          status: "Released",
+          status: "Approved",
         },
         {
           lrn: "202110057",
@@ -190,7 +190,7 @@ export default {
           batch: "S.Y 2023 - 2024",
           curriculum: "SHS Grade 11",
           processor: "Marie Curie",
-          status: "Pending",
+          status: "Review",
         },
         {
           lrn: "202110058",
@@ -199,7 +199,7 @@ export default {
           batch: "S.Y 2020 - 2021",
           curriculum: "Senior High School",
           processor: "Galileo Galilei",
-          status: "Released",
+          status: "Approved",
         },
         {
           lrn: "202110059",
@@ -208,7 +208,7 @@ export default {
           batch: "S.Y 2021 - 2022",
           curriculum: "SHS Grade 12",
           processor: "Isaac Newton",
-          status: "Processing",
+          status: "Revised",
         },
         {
           lrn: "202110060",
@@ -217,7 +217,7 @@ export default {
           batch: "S.Y 2022 - 2023",
           curriculum: "JHS Grade 10",
           processor: "Albert Einstein",
-          status: "Pending",
+          status: "Review",
         },
         {
           lrn: "202110061",
@@ -226,7 +226,7 @@ export default {
           batch: "S.Y 2023 - 2024",
           curriculum: "Senior High School",
           processor: "Nikola Tesla",
-          status: "Released",
+          status: "Approved",
         },
         {
           lrn: "202110062",
@@ -235,7 +235,7 @@ export default {
           batch: "S.Y 2024 - 2025",
           curriculum: "SHS Grade 12",
           processor: "Marie Curie",
-          status: "Pending",
+          status: "Review",
         },
         {
           lrn: "202110063",
@@ -244,7 +244,7 @@ export default {
           batch: "S.Y 2021 - 2022",
           curriculum: "Senior High School",
           processor: "Galileo Galilei",
-          status: "Processing",
+          status: "Revised",
         },
         {
           lrn: "202110064",
@@ -253,7 +253,7 @@ export default {
           batch: "S.Y 2020 - 2021",
           curriculum: "JHS Grade 10",
           processor: "Isaac Newton",
-          status: "Released",
+          status: "Approved",
         },
         {
           lrn: "202110065",
@@ -262,7 +262,7 @@ export default {
           batch: "S.Y 2022 - 2023",
           curriculum: "SHS Grade 11",
           processor: "Albert Einstein",
-          status: "Pending",
+          status: "Review",
         },
         {
           lrn: "202110066",
@@ -271,7 +271,7 @@ export default {
           batch: "S.Y 2023 - 2024",
           curriculum: "Senior High School",
           processor: "Nikola Tesla",
-          status: "Released",
+          status: "Approved",
         },
         {
           lrn: "202110067",
@@ -280,7 +280,7 @@ export default {
           batch: "S.Y 2023 - 2024",
           curriculum: "Senior High School",
           processor: "Nikola Tesla",
-          status: "Released",
+          status: "Approved",
         },
       ],
       currentPage: 1,
@@ -563,14 +563,14 @@ tr:hover {
   display: inline-block;
 }
 
-.status.released {
+.status.approved {
   background: #0c5a48;
   color: white;
   padding: 5px 20px;
   border-radius: 5px;
   font-size: 12px;
 }
-.status.pending {
+.status.review {
   background-color: #fbdf5a;
   color: white;
   padding: 5px 20px;
@@ -578,8 +578,16 @@ tr:hover {
   font-size: 12px;
 }
 
-.status.processing {
+.status.revised {
   background-color: #b32113;
+  color: white;
+  padding: 5px 20px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.status.not-applicable {
+  background-color: #7e7a79;
   color: white;
   padding: 5px 20px;
   border-radius: 5px;

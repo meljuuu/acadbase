@@ -54,8 +54,8 @@
               <div class="filter-container-recent-added">
                 <select v-model="selectedSYRecentAdded" id="recentAddedFilter">
                   <option value="">All</option>
-                  <option v-for="batch in uniqueSYsRecentAdded" :key="batch" :value="batch">
-                    {{ batch }}
+                  <option v-for="school_year in uniqueSYsRecentAdded" :key="school_year" :value="school_year">
+                    {{ school_year }}
                   </option>
                 </select>
               </div>
@@ -83,7 +83,7 @@
             <div class="filter-container">
               <select v-model="selectedSY" id="syFilter">
                 <option value="">All</option>
-                <option v-for="batch in uniqueSYs" :key="batch" :value="batch">{{ batch }}</option>
+                <option v-for="school_year in uniqueSYs" :key="school_year" :value="school_year">{{ school_year }}</option>
               </select>
             </div>
           </div>
@@ -94,7 +94,7 @@
                 <!-- <th>#</th> -->
                 <th>Name</th>
                 <th>Track</th>
-                <th>Batch</th>
+                <th>School Year</th>
                 <th>Release Date & Time</th>
                 
               </tr>
@@ -104,7 +104,7 @@
                 <!-- <td>{{ index + 1 }}</td> -->
                 <td>{{ student.name }}</td>
                 <td>{{ student.track }}</td>
-                <td>{{ student.batch }}</td>
+                <td>{{ student.school_year }}</td>
                 <td>{{ formatDate(student.releaseDate) }}</td>
                
               </tr>
@@ -169,38 +169,53 @@ export default {
   },
   data() {
     return {
-      selectedCurriculum: "JHS Grade 10",
-      selectedSY: "",
+      selectedCurriculum: "JHS Grade 7",
+      selectedSY: "2024 - 2025",
       currentPage: 1,
       itemsPerPage: 10,
-      selectedSYRecentAdded: "",
+      selectedSYRecentAdded: "2024 - 2025",
       studentsRecentAdded: [
-        { name: "John Doe", track: "TVL-ICT", batch: "2024", level: "SHS" },
-        { name: "Jane Smith", track: "HUMSS", batch: "2023", level: "SHS" },
-        { name: "Michael Johnson", track: "SPJ", batch: "2025", level: "SHS" },
-        { name: "Emily Davis", track: "BEC", batch: "2024", level: "JHS" },
-        { name: "Daniel Martinez", track: "TVL-HE", batch: "2026", level: "SHS" },
-        { name: "Sophia Garcia", track: "SPA", batch: "2025", level: "SHS" },
-        { name: "Christopher Wilson", track: "STEM", batch: "2024", level: "SHS" },
-        { name: "Olivia Brown", track: "ABM", batch: "2026", level: "SHS" },
-        { name: "Matthew Taylor", track: "BEC", batch: "2027", level: "JHS" },
-        { name: "Isabella Anderson", track: "GAS", batch: "2026", level: "SHS" }
+        { name: "John Doe", track: "TVL-ICT", school_year: "2023 - 2024", level: "SHS" },
+        { name: "Jane Smith", track: "HUMSS", school_year: "2023 - 2024", level: "SHS" },
+        { name: "Michael Johnson", track: "SPJ", school_year: "2024 - 2025", level: "SHS" },
+        { name: "Emily Davis", track: "BEC", school_year: "2024 - 2025", level: "JHS" },
+        { name: "Daniel Martinez", track: "TVL-HE", school_year: "2025 - 2026", level: "SHS" },
+        { name: "Sophia Garcia", track: "SPA", school_year: "2024 - 2025", level: "SHS" },
+        { name: "Christopher Wilson", track: "STEM", school_year: "2023 - 2024", level: "SHS" },
+        { name: "Olivia Brown", track: "ABM", school_year: "2022 - 2023", level: "SHS" },
+        { name: "Matthew Taylor", track: "BEC", school_year: "2021 - 2022", level: "JHS" },
+        { name: "Isabella Anderson", track: "GAS", school_year: "2021 - 2022", level: "SHS" }
       ],
       students: [
-        { lrn: "202110048", name: "Bueno, Ryan Joshua E.", track: "TVL", batch: "Batch 2020 - 2025", curriculum: "Senior High School", processor: "Galileo Galilei", status: "Released", releaseDate: new Date() },
-        { lrn: "202110050", name: "Reyes, Maria Clara", track: "BEC", batch: "Batch 2022 - 2025", curriculum: "JHS Grade 10", processor: "Albert Einstein", status: "Released", releaseDate: new Date() },
-        { lrn: "202110052", name: "Gonzales, Angela R.", track: "SPJ", batch: "Batch 2024 - 2027", curriculum: "SHS Grade 11", processor: "Marie Curie", status: "Released", releaseDate: new Date() },
-        { lrn: "202110054", name: "Torres, Miguel A.", track: "HUMSS", batch: "Batch 2023 - 2026", curriculum: "SHS Grade 12", processor: "Isaac Newton", status: "Released", releaseDate: new Date() },
-        { lrn: "202110056", name: "Navarro, Crisostomo I.", track: "SPA", batch: "Batch 2021 - 2024", curriculum: "Senior High School", processor: "Nikola Tesla", status: "Released", releaseDate: new Date() },
-        { lrn: "202110058", name: "Rizal, Jose P.", track: "HUMSS", batch: "Batch 2022 - 2025", curriculum: "Senior High School", processor: "Galileo Galilei", status: "Released", releaseDate: new Date() },
-        { lrn: "202110061", name: "Aguinaldo, Emilio", track: "SPJ", batch: "Batch 2024 - 2027", curriculum: "Senior High School", processor: "Nikola Tesla", status: "Released", releaseDate: new Date() },
-        { lrn: "202110064", name: "Silang, Gabriela", track: "TVL", batch: "Batch 2022 - 2025", curriculum: "JHS Grade 10", processor: "Isaac Newton", status: "Released", releaseDate: new Date() },
-        { lrn: "202110066", name: "Tandang Sora, Melchora", track: "SPJ", batch: "Batch 2024 - 2027", curriculum: "Senior High School", processor: "Nikola Tesla", status: "Released", releaseDate: new Date() },
-        { lrn: "202110067", name: "Tandang Sora, Melody", track: "SPS", batch: "Batch 2024 - 2027", curriculum: "Senior High School", processor: "Nikola Tesla", status: "Released", releaseDate: new Date() },
+        { lrn: "202110048", name: "Bueno, Ryan Joshua E.", track: "TVL", school_year: "2020 - 2021", curriculum: "Senior High School", processor: "Galileo Galilei", status: "Released", releaseDate: new Date() },
+        { lrn: "202110050", name: "Reyes, Maria Clara", track: "BEC", school_year: "2022 - 2023", curriculum: "JHS Grade 10", processor: "Albert Einstein", status: "Released", releaseDate: new Date() },
+        { lrn: "202110052", name: "Gonzales, Angela R.", track: "SPJ", school_year: "2024 - 2025", curriculum: "SHS Grade 11", processor: "Marie Curie", status: "Released", releaseDate: new Date() },
+        { lrn: "202110054", name: "Torres, Miguel A.", track: "HUMSS", school_year: "2025 - 2026", curriculum: "SHS Grade 12", processor: "Isaac Newton", status: "Released", releaseDate: new Date() },
+        { lrn: "202110056", name: "Navarro, Crisostomo I.", track: "SPA", school_year: "2021 - 2022", curriculum: "Senior High School", processor: "Nikola Tesla", status: "Released", releaseDate: new Date() },
+        { lrn: "202110058", name: "Rizal, Jose P.", track: "HUMSS", school_year: "2024 - 2025", curriculum: "Senior High School", processor: "Galileo Galilei", status: "Released", releaseDate: new Date() },
+        { lrn: "202110061", name: "Aguinaldo, Emilio", track: "SPJ", school_year: "2024 - 2025", curriculum: "Senior High School", processor: "Nikola Tesla", status: "Released", releaseDate: new Date() },
+        { lrn: "202110064", name: "Silang, Gabriela", track: "TVL", school_year: "2022 - 2023", curriculum: "JHS Grade 10", processor: "Isaac Newton", status: "Released", releaseDate: new Date() },
+        { lrn: "202110066", name: "Tandang Sora, Melchora", track: "SPJ", school_year: "2024 - 2025", curriculum: "Senior High School", processor: "Nikola Tesla", status: "Released", releaseDate: new Date() },
+        { lrn: "202110067", name: "Tandang Sora, Melody", track: "SPS", school_year: "2024 - 2025", curriculum: "Senior High School", processor: "Nikola Tesla", status: "Released", releaseDate: new Date() },
       ],
       selectedCurriculum: null,
       selectedYear: null,
       studentStats: {
+        "JHS Grade 7": [
+          { label: "SPJ Students", count: 300 },
+          { label: "BEC Students", count: 300 },
+          { label: "SPA Students", count: 300 },
+        ],
+        "JHS Grade 8": [
+          { label: "SPJ Students", count: 300 },
+          { label: "BEC Students", count: 300 },
+          { label: "SPA Students", count: 300 },
+        ],
+        "JHS Grade 9": [
+          { label: "SPJ Students", count: 300 },
+          { label: "BEC Students", count: 300 },
+          { label: "SPA Students", count: 300 },
+        ],
         "JHS Grade 10": [
           { label: "SPJ Students", count: 300 },
           { label: "BEC Students", count: 300 },
@@ -215,7 +230,8 @@ export default {
           { label: "TVL - IEM Grade 12 Students", count: 300 },
         ],
       },
-      selectedYearDocs: "2023 - 2024",
+
+      selectedYearDocs: "2024 - 2025",
       years: ["2022 - 2023", "2023 - 2024", "2024 - 2025"],
       data: {
         "2023 - 2024": { releasedDocs: 3003, seniorHigh: 10000, juniorHigh: 10000 },
@@ -228,7 +244,7 @@ export default {
     releasedStudents() {
       let filtered = this.students;
       if (this.selectedSY) {
-        filtered = filtered.filter(student => student.batch === this.selectedSY);
+        filtered = filtered.filter(student => student.school_year === this.selectedSY);
       }
       const start = (this.currentPage - 1) * this.itemsPerPage;
       return filtered.slice(start, start + this.itemsPerPage);
@@ -237,25 +253,25 @@ export default {
         return Math.ceil(this.releasedStudents.length / this.itemsPerPage);
       },
       uniqueSYs() {
-        return [...new Set(this.students.map(student => student.batch))];
+        return [...new Set(this.students.map(student => student.school_year))];
       },
       filteredStats() {
         return this.selectedCurriculum ? this.studentStats[this.selectedCurriculum] || [] : [];
       },
-      getUniqueBatches() {
-      return [...new Set(this.students.map(student => student.batch))];
+      getUniqueschool_yeares() {
+      return [...new Set(this.students.map(student => student.school_year))];
       },
       filteredStudents() {
         return this.selectedSY
-          ? this.students.filter(student => student.batch === this.selectedSY)
+          ? this.students.filter(student => student.school_year === this.selectedSY)
           : this.students;
       },
       uniqueSYsRecentAdded() {
-        return [...new Set(this.studentsRecentAdded.map(student => student.batch))];
+        return [...new Set(this.studentsRecentAdded.map(student => student.school_year))];
       },
       filteredRecentAddedStudents() {
         return this.selectedSYRecentAdded
-          ? this.studentsRecentAdded.filter(student => student.batch === this.selectedSYRecentAdded)
+          ? this.studentsRecentAdded.filter(student => student.school_year === this.selectedSYRecentAdded)
           : this.studentsRecentAdded;
       },
       filteredData() {

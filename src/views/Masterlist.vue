@@ -46,7 +46,7 @@
             <th>STUDENT NAME</th>
             <th>ACADEMIC TRACK</th>
             <th>CURRICULUM</th>
-            <th>S.Y. BATCH</th>
+            <th>SCHOOL YEAR</th>
             <th>STATUS</th>
           </tr>
         </thead>
@@ -127,7 +127,7 @@ export default {
           track: "TVL - IEM",
           batch: "S.Y 2020 - 2021",
           curriculum: "Senior High School",
-          status: "Released",
+          status: "Approved",
         },
         {
           lrn: "202110049",
@@ -135,7 +135,7 @@ export default {
           track: "HUMSS",
           batch: "S.Y 2021 - 2022",
           curriculum: "Senior High School",
-          status: "Pending",
+          status: "Review",
         },
         {
           lrn: "202110050",
@@ -143,7 +143,7 @@ export default {
           track: "BEC",
           batch: "S.Y 2022 - 2023",
           curriculum: "JHS Grade 10",
-          status: "Released",
+          status: "Not-Applicable",
         },
         {
           lrn: "202110051",
@@ -151,7 +151,7 @@ export default {
           track: "SPA",
           batch: "S.Y 2023 - 2024",
           curriculum: "SHS Grade 12",
-          status: "Processing",
+          status: "Revised",
         },
         {
           lrn: "202110052",
@@ -159,7 +159,7 @@ export default {
           track: "SPJ",
           batch: "S.Y 2024 - 2025",
           curriculum: "SHS Grade 11",
-          status: "Released",
+          status: "Approved",
         },
         {
           lrn: "202110053",
@@ -167,7 +167,7 @@ export default {
           track: "TVL",
           batch: "S.Y 2020 - 2021",
           curriculum: "Senior High School",
-          status: "Pending",
+          status: "Review",
         },
         {
           lrn: "202110054",
@@ -175,7 +175,7 @@ export default {
           track: "HUMSS",
           batch: "S.Y 2021 - 2022",
           curriculum: "SHS Grade 12",
-          status: "Released",
+          status: "Not-Applicable",
         },
         {
           lrn: "202110055",
@@ -183,7 +183,7 @@ export default {
           track: "BEC",
           batch: "S.Y 2022 - 2023",
           curriculum: "JHS Grade 10",
-          status: "Processing",
+          status: "Revised",
         },
         {
           lrn: "202110056",
@@ -191,7 +191,7 @@ export default {
           track: "SPA",
           batch: "S.Y 2023 - 2024",
           curriculum: "Senior High School",
-          status: "Released",
+          status: "Approved",
         },
         {
           lrn: "202110048",
@@ -199,7 +199,7 @@ export default {
           track: "TVL - IEM",
           batch: "S.Y 2020 - 2021",
           curriculum: "Senior High School",
-          status: "Released",
+          status: "Not-Applicable",
         },
         {
           lrn: "202110049",
@@ -207,7 +207,7 @@ export default {
           track: "HUMSS",
           batch: "S.Y 2021 - 2022",
           curriculum: "Senior High School",
-          status: "Pending",
+          status: "Review",
         },
         {
           lrn: "202110050",
@@ -215,7 +215,7 @@ export default {
           track: "BEC",
           batch: "S.Y 2022 - 2023",
           curriculum: "JHS Grade 10",
-          status: "Released",
+          status: "Approved",
         },
         {
           lrn: "202110051",
@@ -223,7 +223,7 @@ export default {
           track: "SPA",
           batch: "S.Y 2023 - 2024",
           curriculum: "SHS Grade 12",
-          status: "Processing",
+          status: "Revised",
         },
         {
           lrn: "202110052",
@@ -231,7 +231,7 @@ export default {
           track: "SPJ",
           batch: "S.Y 2024 - 2025",
           curriculum: "SHS Grade 11",
-          status: "Released",
+          status: "Approved",
         },
         {
           lrn: "202110053",
@@ -239,7 +239,7 @@ export default {
           track: "TVL",
           batch: "S.Y 2020 - 2021",
           curriculum: "Senior High School",
-          status: "Pending",
+          status: "Review",
         },
         {
           lrn: "202110054",
@@ -247,7 +247,7 @@ export default {
           track: "HUMSS",
           batch: "S.Y 2021 - 2022",
           curriculum: "SHS Grade 12",
-          status: "Released",
+          status: "Approved",
         },
         {
           lrn: "202110055",
@@ -255,7 +255,7 @@ export default {
           track: "BEC",
           batch: "S.Y 2022 - 2023",
           curriculum: "JHS Grade 10",
-          status: "Processing",
+          status: "Revised",
         },
         {
           lrn: "202110056",
@@ -263,7 +263,7 @@ export default {
           track: "SPA",
           batch: "S.Y 2023 - 2024",
           curriculum: "Senior High School",
-          status: "Released",
+          status: "Approved",
         },
       ],
       currentPage: 1,
@@ -450,14 +450,14 @@ tr:hover {
   display: inline-block;
 }
 
-.status.released {
+.status.approved {
   background: #0c5a48;
   color: white;
   padding: 5px 20px;
   border-radius: 5px;
   font-size: 12px;
 }
-.status.pending {
+.status.review {
   background-color: #fbdf5a;
   color: white;
   padding: 5px 20px;
@@ -465,8 +465,16 @@ tr:hover {
   font-size: 12px;
 }
 
-.status.processing {
+.status.revised {
   background-color: #b32113;
+  color: white;
+  padding: 5px 20px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.status.not-applicable {
+  background-color: #7e7a79;
   color: white;
   padding: 5px 20px;
   border-radius: 5px;

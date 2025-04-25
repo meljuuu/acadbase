@@ -1,6 +1,5 @@
 <template>
   <div class="dropdown-container">
-    <!-- DD Curriculum -->
     <select
       v-if="showCurriculum"
       v-model="selectedCurriculum"
@@ -13,7 +12,6 @@
       </option>
     </select>
 
-    <!-- DD Year-->
     <select
       v-if="showYear"
       v-model="selectedYear"
@@ -78,8 +76,15 @@ const props = defineProps({
   showType: { type: Boolean, default: false },
 });
 
-const curriculums = ["JHS Grade 10", "SHS Grade 11", "SHS Grade 12"];
-const years = ["2023", "2024", "2025"];
+const curriculums = [
+  "JHS Grade 7",
+  "JHS Grade 8",
+  "JHS Grade 9",
+  "JHS Grade 10",
+  "SHS Grade 11",
+  "SHS Grade 12"
+];
+const years = ["2024 - 2025", "2023 - 2024", "2022 - 2023"];
 const batchs = ["All", "S.Y 2020 - 2021", "S.Y 2021 - 2022", "S.Y 2022 - 2023", "S.Y 2023 - 2024", "S.Y 2024 - 2025"];
 const tracks = ["All", "TVL - IEM", "HUMSS", "SPJ", "SPA", "BEC"];
 const types = [".csv", ".pdf"];
