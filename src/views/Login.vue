@@ -70,6 +70,7 @@
 
 <script>
 import { useToast } from "vue-toastification";
+import { loginTeacher } from "@/service/authService"; // Ensure path is correct
 
 export default {
   name: "Login",
@@ -82,17 +83,16 @@ export default {
       errorMessage: "",
     };
   },
-  setup() {
-    const toast = useToast();
-    return { toast };
-  },
   methods: {
-    login() {
+    togglePassword() {
+      this.showPassword = !this.showPassword;
+    },
+
+    async login() {
       this.errorMessage = "";
+      const toast = useToast(); // ✅ Move useToast inside method
 
-      const staticEmail = "admin@school.com";
-      const staticPassword = "TrustedAdmin";
-
+      // Basic client-side validation
       if (!this.email.includes("@")) {
         this.errorMessage = "Invalid email format. Please enter a valid email.";
         return;
@@ -103,22 +103,37 @@ export default {
         return;
       }
 
-      if (this.email === staticEmail && this.password === staticPassword) {
-        console.log("Login successful!");
-        localStorage.setItem("userToken", "your_token_here");
-        this.toast.success("Login successful! Welcome back.", {
+      try {
+        const { user, token, role } = await loginTeacher(this.email, this.password);
+
+        // Optionally remember email
+        if (this.rememberMe) {
+          localStorage.setItem("rememberMe", true);
+          localStorage.setItem("email", this.email);
+        } else {
+          localStorage.removeItem("rememberMe");
+          localStorage.removeItem("email");
+        }
+
+        // Store credentials
+        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("token", token);
+
+        toast.success("Login successful! Welcome back.", {
           position: "top-center",
           timeout: 3000,
         });
 
-        this.$router.push("/dashboard"); // Redirect to dashboard
-      } else {
-        this.errorMessage = "Invalid email or password. Please try again.";
+        this.$router.push("/dashboard");
+      } catch (error) {
+        this.errorMessage = error || "Login failed. Please try again.";
+        toast.error(error.message || "Login failed.");
       }
     },
   },
 };
 </script>
+
 
 <style scoped>
 .login-container {

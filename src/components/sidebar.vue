@@ -3,7 +3,7 @@
     <div class="sidebar">
       <div class="profile-section">
         <img src="../assets/logo.png" alt="Profile" class="profile-icon" />
-        <p>Admin Panel</p>
+        <p>Book-Keeping Panel</p>
       </div>
 
       <hr />
