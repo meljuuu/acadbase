@@ -7,16 +7,12 @@
     <div class="filtering-section">
       <div class="search-bar">
         <input type="text" v-model="searchQuery" placeholder="Search..." />
-        
-       
-        <Buttons @click="openaddModal" />
-        
-       
-        <ImportClassListButton @click="openImportModal" />
-        
-      
-        <Modal ref="addModalRef" />
 
+        <Buttons @click="openaddModal" />
+
+        <ImportClassListButton @click="openImportModal" />
+
+        <Modal ref="addModalRef" />
 
         <Modal ref="importModalRef" />
       </div>
@@ -34,9 +30,8 @@
           :showTrack="true"
           @update:selectedTrack="selectedTrack = $event"
         />
-      </div>  
+      </div>
     </div>
-
 
     <div class="table-container">
       <table>
@@ -47,6 +42,7 @@
             <th>ACADEMIC TRACK</th>
             <th>CURRICULUM</th>
             <th>SCHOOL YEAR</th>
+            <th>ACTION</th>
             <th>STATUS</th>
           </tr>
         </thead>
@@ -61,6 +57,11 @@
             <td>{{ student.track }}</td>
             <td>{{ student.curriculum }}</td>
             <td>{{ student.batch }}</td>
+            <td class="action-wrapper" @click.stop>
+              <button class="action-button" @click="openEditModal">
+                <i class="fas fa-edit"></i>
+              </button>
+            </td>
             <td>
               <span :class="['status', student.status.toLowerCase()]">{{
                 student.status
@@ -72,6 +73,7 @@
     </div>
 
     <Modal ref="unreleasedModalRef" />
+    <EditModal ref="editModalRef" />
 
     <p class="note">
       *Note: Only 20 students are displayed in the table. Other students Name
@@ -102,7 +104,7 @@ import Dropdown from "@/components/Dropdown.vue";
 import Buttons from "@/components/Buttons.vue";
 import Modal from "@/components/Modal.vue";
 import ImportClassListButton from "../components/ImportClassListButton.vue";
-
+import EditModal from "@/components/EditModal.vue";
 
 export default {
   name: "Masterlist",
@@ -111,6 +113,7 @@ export default {
     Buttons,
     ImportClassListButton,
     Modal,
+    EditModal,
   },
   data() {
     return {
@@ -120,6 +123,9 @@ export default {
       searchQuery: "",
       uploadedFile: null,
       pdfUrl: "",
+      activeDropdown: null,
+      currentPage: 1,
+      itemsPerPage: 20,
       students: [
         {
           lrn: "202110048",
@@ -271,7 +277,7 @@ export default {
     };
   },
 
-  computed: {
+   computed: {
     filteredStudents() {
       return this.students.filter((student) => {
         return (
@@ -295,14 +301,12 @@ export default {
     totalPages() {
       return Math.ceil(this.filteredStudents.length / this.itemsPerPage);
     },
-
     paginatedStudents() {
       const start = (this.currentPage - 1) * this.itemsPerPage;
       const end = start + this.itemsPerPage;
       return this.filteredStudents.slice(start, end);
     },
   },
-
   methods: {
     openImportModal() {
       this.$refs.importModalRef.openImportModal();
@@ -313,7 +317,13 @@ export default {
     showUnReleasedModal() {
       this.$refs.unreleasedModalRef.showUnReleasedModal();
     },
-
+    toggleDropdown(index) {
+      this.activeDropdown = this.activeDropdown === index ? null : index;
+    },
+    openEditModal() {
+      this.activeDropdown = null; // close dropdown
+      this.$refs.editModalRef.showunreleasedModal = true; // assuming your EditModal uses this flag
+    },
     prevPage() {
       if (this.currentPage > 1) {
         this.currentPage--;
@@ -324,6 +334,17 @@ export default {
         this.currentPage++;
       }
     },
+    handleClickOutside(event) {
+      if (!this.$el.contains(event.target)) {
+        this.activeDropdown = null;
+      }
+    },
+  },
+  mounted() {
+    document.addEventListener("click", this.handleClickOutside);
+  },
+  beforeDestroy() {
+    document.removeEventListener("click", this.handleClickOutside);
   },
 };
 </script>
@@ -519,5 +540,35 @@ tr:hover {
 .pagination button:disabled {
   cursor: not-allowed;
   opacity: 0.5;
+}
+.action-button {
+  background: none;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+  background-color: #295f98;
+  color: #ffffff;
+  padding: 0;
+}
+.action-button:hover {
+  color: #1a3f66;
+}
+.action-wrapper {
+  position: relative;
+}
+
+.action-button {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  background-color: #295f98;
+  color: #ffffff;
+  padding: 0;
+  border-radius: 3px;
+}
+
+.action-button i{
+  padding: 10px;
 }
 </style>

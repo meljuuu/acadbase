@@ -175,19 +175,23 @@
   <div v-if="showreleasedModal" class="modal-overlay">
     <div class="modal-content">
       <div class="student-file-upload-released" @click="triggerFileInput">
-        <label for="fileInput" class="upload-box">
-          <!-- <p><i class="fas fa-upload"></i></p> -->
-          <p v-if="!uploadedFile"></p>
-          <p v-else>{{ uploadedFile.name }}</p>
-        </label>
-        <input
-          type="file"
-          id="fileInput"
-          accept=".pdf"
-          ref="fileInput"
-          @change="handleFileUpload"
-          hidden
-        />
+      <label for="fileInput" class="upload-box">
+        <p><i class="fas fa-upload"></i></p>
+        <p v-if="!uploadedFile">Upload CSV File (CSV Only)</p>
+        <p v-else>
+          {{ uploadedFile.name }}
+          <button @click.stop="removeFile" class="remove-btn">✕</button>
+        </p>
+
+      </label>
+      <input
+        type="file"
+        id="fileInput"
+        accept=".csv"
+        ref="fileInput"
+        @change="handleFileUpload"
+        hidden
+      />
 
         <div v-if="pdfUrl" class="pdf-preview">
           <object
@@ -270,19 +274,23 @@
   <div v-if="showunreleasedModal" class="modal-overlay">
     <div class="modal-content">
       <div class="student-file-upload-released" @click="triggerFileInput">
-        <label for="fileInput" class="upload-box">
-          <!-- <p><i class="fas fa-upload"></i></p> -->
-          <p v-if="!uploadedFile"></p>
-          <p v-else>{{ uploadedFile.name }}</p>
-        </label>
-        <input
-          type="file"
-          id="fileInput"
-          accept=".pdf"
-          ref="fileInput"
-          @change="handleFileUpload"
-          hidden
-        />
+      <label for="fileInput" class="upload-box">
+        <p><i class="fas fa-upload"></i></p>
+        <p v-if="!uploadedFile">Upload PDF File (PDF Only)</p>
+        <p v-else>
+          {{ uploadedFile.name }}
+          <button @click.stop="removeFile" class="remove-btn">✕</button>
+        </p>
+
+      </label>
+      <input
+        type="file"
+        id="fileInput"
+        accept=".pdf"
+        ref="fileInput"
+        @change="handleFileUpload"
+        hidden
+      />
 
         <div v-if="pdfUrl" class="pdf-preview">
           <object
