@@ -53,7 +53,7 @@
         <tbody>
           <tr
             v-for="(student, index) in paginatedStudents"
-            :key="index"
+            :key="student.id"
             @click="showUnReleasedModal"
           >
             <td>{{ student.lrn }}</td>
@@ -62,7 +62,7 @@
             <td>{{ student.curriculum }}</td>
             <td>{{ student.batch }}</td>
             <td class="action-wrapper" @click.stop>
-              <button class="action-button" @click="openEditModal">
+              <button class="action-button" @click="openEditModal(student.id)">
                 <i class="fas fa-edit"></i>
               </button>
             </td>
@@ -100,6 +100,11 @@
         Next →
       </button>
     </div>
+
+    <div v-if="error" class="error-message">
+      {{ error }}
+      <button @click="fetchStudents">Retry</button>
+    </div>
   </div>
 </template>
 
@@ -109,6 +114,7 @@ import Buttons from "@/components/Buttons.vue";
 import Modal from "@/components/Modal.vue";
 import ImportClassListButton from "../components/ImportClassListButton.vue";
 import EditModal from "@/components/EditModal.vue";
+import MasterlistService from "@/service/MasterlistService";
 
 export default {
   name: "Masterlist",
@@ -131,189 +137,111 @@ export default {
       activeDropdown: null,
       currentPage: 1,
       itemsPerPage: 20,
-      students: [
-        {
-          lrn: "202110048",
-          name: "Bueno, Ryan Joshua E.",
-          track: "TVL - IEM",
-          batch: "S.Y 2020 - 2021",
-          curriculum: "Senior High School",
-          status: "Released",
-        },
-        {
-          lrn: "202110049",
-          name: "Dela Cruz, Juan",
-          track: "HUMSS",
-          batch: "S.Y 2021 - 2022",
-          curriculum: "Senior High School",
-          status: "Unreleased",
-        },
-        {
-          lrn: "202110050",
-          name: "Reyes, Maria Clara",
-          track: "BEC",
-          batch: "S.Y 2022 - 2023",
-          curriculum: "JHS Grade 10",
-          status: "Not-Applicable",
-        },
-        {
-          lrn: "202110051",
-          name: "Santos, Pedro P.",
-          track: "SPA",
-          batch: "S.Y 2023 - 2024",
-          curriculum: "SHS Grade 12",
-          status: "Dropped-Out",
-        },
-        {
-          lrn: "202110052",
-          name: "Gonzales, Angela R.",
-          track: "SPJ",
-          batch: "S.Y 2024 - 2025",
-          curriculum: "SHS Grade 11",
-          status: "Released",
-        },
-        {
-          lrn: "202110053",
-          name: "Mendoza, Paul J.",
-          track: "TVL",
-          batch: "S.Y 2020 - 2021",
-          curriculum: "Senior High School",
-          status: "Unreleased",
-        },
-        {
-          lrn: "202110054",
-          name: "Torres, Miguel A.",
-          track: "HUMSS",
-          batch: "S.Y 2021 - 2022",
-          curriculum: "SHS Grade 12",
-          status: "Not-Applicable",
-        },
-        {
-          lrn: "202110055",
-          name: "Fernandez, Lucia M.",
-          track: "BEC",
-          batch: "S.Y 2022 - 2023",
-          curriculum: "JHS Grade 10",
-          status: "Dropped-Out",
-        },
-        {
-          lrn: "202110056",
-          name: "Navarro, Crisostomo I.",
-          track: "SPA",
-          batch: "S.Y 2023 - 2024",
-          curriculum: "Senior High School",
-          status: "Released",
-        },
-        {
-          lrn: "202110048",
-          name: "Bueno, Ryan Joshua E.",
-          track: "TVL - IEM",
-          batch: "S.Y 2020 - 2021",
-          curriculum: "Senior High School",
-          status: "Not-Applicable",
-        },
-        {
-          lrn: "202110049",
-          name: "Dela Cruz, Juan",
-          track: "HUMSS",
-          batch: "S.Y 2021 - 2022",
-          curriculum: "Senior High School",
-          status: "Unreleased",
-        },
-        {
-          lrn: "202110050",
-          name: "Reyes, Maria Clara",
-          track: "BEC",
-          batch: "S.Y 2022 - 2023",
-          curriculum: "JHS Grade 10",
-          status: "Released",
-        },
-        {
-          lrn: "202110051",
-          name: "Santos, Pedro P.",
-          track: "SPA",
-          batch: "S.Y 2023 - 2024",
-          curriculum: "SHS Grade 12",
-          status: "Unreleased",
-        },
-        {
-          lrn: "202110052",
-          name: "Gonzales, Angela R.",
-          track: "SPJ",
-          batch: "S.Y 2024 - 2025",
-          curriculum: "SHS Grade 11",
-          status: "Released",
-        },
-        {
-          lrn: "202110053",
-          name: "Mendoza, Paul J.",
-          track: "TVL",
-          batch: "S.Y 2020 - 2021",
-          curriculum: "Senior High School",
-          status: "Unreleased",
-        },
-        {
-          lrn: "202110054",
-          name: "Torres, Miguel A.",
-          track: "HUMSS",
-          batch: "S.Y 2021 - 2022",
-          curriculum: "SHS Grade 12",
-          status: "Released",
-        },
-        {
-          lrn: "202110055",
-          name: "Fernandez, Lucia M.",
-          track: "BEC",
-          batch: "S.Y 2022 - 2023",
-          curriculum: "JHS Grade 10",
-          status: "Dropped-Out",
-        },
-        {
-          lrn: "202110056",
-          name: "Navarro, Crisostomo I.",
-          track: "SPA",
-          batch: "S.Y 2023 - 2024",
-          curriculum: "Senior High School",
-          status: "Released",
-        },
-      ],
-      currentPage: 1,
-      itemsPerPage: 20,
+      students: [],
+      loading: false,
+      error: null
     };
   },
-
-   computed: {
-filteredStudents() {
-  return this.students.filter((student) => {
-    return (
-      (this.selectedBatch === "" ||
-        this.selectedBatch === "All" ||
-        student.batch === this.selectedBatch) &&
-      (this.selectedCurriculum === "" ||
-        this.selectedCurriculum === "All" ||
-        student.curriculum === this.selectedCurriculum) &&
-      (this.selectedTrack === "" ||
-        this.selectedTrack === "All" ||
-        student.track === this.selectedTrack) &&
-      (this.selectedStatus === "" ||
-        this.selectedStatus === "All" ||
-        student.status === this.selectedStatus) &&
-      (!this.searchQuery ||
-        student.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        student.lrn.includes(this.searchQuery))
-    );
-  });
-},
+  computed: {
+    filteredStudents() {
+      return this.students;
+    },
     totalPages() {
-      return Math.ceil(this.filteredStudents.length / this.itemsPerPage);
+      return Math.ceil(this.students.length / this.itemsPerPage);
     },
     paginatedStudents() {
+      console.log('Current students:', this.students);
       const start = (this.currentPage - 1) * this.itemsPerPage;
       const end = start + this.itemsPerPage;
       return this.filteredStudents.slice(start, end);
     },
   },
+  watch: {
+    selectedStatus() {
+      this.fetchStudents();
+    },
+    selectedBatch() {
+      this.fetchStudents();
+    },
+    selectedCurriculum() {
+      this.fetchStudents();
+    },
+    selectedTrack() {
+      this.fetchStudents();
+    },
+    searchQuery() {
+      this.fetchStudents();
+    }
+  },
   methods: {
+    async fetchStudents() {
+      this.loading = true;
+      this.error = null;
+      try {
+        const filters = {
+          batch: this.selectedBatch,
+          curriculum: this.selectedCurriculum,
+          track: this.selectedTrack,
+          status: this.selectedStatus,
+          search: this.searchQuery
+        };
+        
+        console.log('Fetching with filters:', filters);
+        const response = await MasterlistService.filterStudents(filters);
+        console.log('API Response:', response);
+        
+        if (!response?.data) {
+          throw new Error('Invalid response structure from API');
+        }
+        
+        this.students = Array.isArray(response.data) ? response.data : [];
+        this.currentPage = response.current_page || 1;
+        
+        // Force update if needed
+        this.$nextTick(() => this.$forceUpdate());
+        
+      } catch (error) {
+        console.error('Detailed fetch error:', {
+          message: error.message,
+          stack: error.stack,
+          response: error.response
+        });
+        this.error = `Failed to load data: ${error.message}`;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async addStudent(studentData) {
+      try {
+        await MasterlistService.addStudent(studentData);
+        await this.fetchStudents();
+      } catch (error) {
+        this.error = 'Error adding student: ' + error.message;
+        console.error('Error:', error);
+      }
+    },
+
+    async updateStudent(id, studentData) {
+      try {
+        await MasterlistService.updateStudent(id, studentData);
+        await this.fetchStudents();
+      } catch (error) {
+        this.error = 'Error updating student: ' + error.message;
+        console.error('Error:', error);
+      }
+    },
+
+    async deleteStudent(id) {
+      try {
+        await MasterlistService.deleteStudent(id);
+        await this.fetchStudents();
+      } catch (error) {
+        this.error = 'Error deleting student: ' + error.message;
+        console.error('Error:', error);
+      }
+    },
+
     openImportModal() {
       this.$refs.importModalRef.openImportModal();
     },
@@ -326,9 +254,10 @@ filteredStudents() {
     toggleDropdown(index) {
       this.activeDropdown = this.activeDropdown === index ? null : index;
     },
-    openEditModal() {
+    openEditModal(id) {
       this.activeDropdown = null; // close dropdown
       this.$refs.editModalRef.showunreleasedModal = true; // assuming your EditModal uses this flag
+      this.$refs.editModalRef.studentId = id;
     },
     prevPage() {
       if (this.currentPage > 1) {
@@ -347,10 +276,19 @@ filteredStudents() {
     },
   },
   mounted() {
+    console.log('Component mounted, fetching students');
+    this.fetchStudents();
     document.addEventListener("click", this.handleClickOutside);
   },
-  beforeDestroy() {
+  beforeUnmount() {
+    console.log('Component unmounting');
     document.removeEventListener("click", this.handleClickOutside);
+  },
+  errorCaptured(err, vm, info) {
+    console.error('Error captured:', err, info);
+    this.error = 'An unexpected error occurred';
+    // Prevent the error from propagating further
+    return false;
   },
 };
 </script>
@@ -576,5 +514,16 @@ tr:hover {
 
 .action-button i{
   padding: 10px;
+}
+
+.error-message {
+  color: #d32f2f;
+  background-color: #ffebee;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>
