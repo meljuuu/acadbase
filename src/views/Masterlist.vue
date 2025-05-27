@@ -12,29 +12,39 @@
 
         <ImportClassListButton @click="openImportModal" />
 
+
+
         <Modal ref="addModalRef" />
 
         <Modal ref="importModalRef" />
       </div>
 
       <div class="filters">
-          <Dropdown
-            :showStatus="true"
-            @update:selectedStatus="selectedStatus = $event"
+        <Dropdown
+          :showStatus="true"
+          :hideAllOption="true"
+          @update:selectedStatus="selectedStatus = $event"
         />
         <Dropdown
           :showBatch="true"
+          :hideAllOption="true"
           @update:selectedBatch="selectedBatch = $event"
         />
         <Dropdown
           :showCurriculum="true"
+          :hideAllOption="true"
           @update:selectedCurriculum="selectedCurriculum = $event"
         />
         <Dropdown
           :showTrack="true"
+          :hideAllOption="true"
           @update:selectedTrack="selectedTrack = $event"
         />
       </div>
+
+      <button class="reset-button" @click="resetFilters" title="Reset Filters">
+          <i class="fas fa-sync-alt"></i>
+        </button>
     </div>
 
     <div class="table-container">
@@ -277,6 +287,15 @@ export default {
         this.activeDropdown = null;
       }
     },
+    resetFilters() {
+      this.selectedStatus = "";
+      this.selectedBatch = "";
+      this.selectedCurriculum = "";
+      this.selectedTrack = "";
+      this.searchQuery = "";
+      this.currentPage = 1;
+      this.fetchStudents();
+    },
   },
   mounted() {
     console.log('Component mounted, fetching students');
@@ -327,13 +346,15 @@ export default {
   position: sticky;
   top: 70px;
   z-index: 10;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
 }
 
 .filters {
   display: flex;
   gap: 10px;
   align-items: center;
+  flex-shrink: 0;
 }
 .filter-dropdown {
   padding: 15px 20px;
@@ -538,5 +559,24 @@ tr:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.reset-button {
+  background: #295f98;
+  color: #fff;
+  border: none;
+  padding: 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.reset-button:hover {
+  background: #1a3f66;
 }
 </style>
