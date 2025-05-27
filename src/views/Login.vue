@@ -136,13 +136,42 @@ export default {
 
 
 <style scoped>
+/* Add these styles at the very top of your style section */
+:root {
+  overflow: hidden;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+body::-webkit-scrollbar,
+html::-webkit-scrollbar {
+  display: none;
+}
+
 .login-container {
   display: flex;
   width: 100vw;
   height: 100vh;
   background-color: #547fad;
   overflow: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  position: fixed; /* Add this */
+  top: 0; /* Add this */
+  left: 0; /* Add this */
 }
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.login-container::-webkit-scrollbar {
+  display: none;
+}
+
 .left-section .dot1 {
   position: absolute;
   height: 850px;
@@ -180,6 +209,12 @@ export default {
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   border-top-left-radius: 50px;
   border-bottom-left-radius: 50px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.right-section::-webkit-scrollbar {
+  display: none;
 }
 
 .login-box {
@@ -319,5 +354,102 @@ input {
   font-size: 12px;
   color: #999;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Add these media queries at the end of the style section */
+@media screen and (max-width: 1024px) {
+  .login-container {
+    flex-direction: column;
+  }
+
+  .left-section {
+    min-width: 100%;
+    height: 40vh;
+  }
+
+  .right-section {
+    min-width: 100%;
+    height: 60vh;
+    border-radius: 50px 50px 0 0;
+  }
+
+  .illustration {
+    width: 50%;
+  }
+
+  .login-box {
+    width: 90%;
+    max-width: 450px;
+    padding: 20px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .left-section {
+    height: 30vh;
+  }
+
+  .right-section {
+    height: 70vh;
+  }
+
+  .illustration {
+    width: 40%;
+  }
+
+  .school-logo {
+    width: 120px;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  .options {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+
+  .remember-me {
+    margin-bottom: 10px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .left-section {
+    height: 25vh;
+  }
+
+  .right-section {
+    height: 75vh;
+  }
+
+  .illustration {
+    width: 35%;
+  }
+
+  .login-box {
+    padding: 15px;
+  }
+
+  .school-logo {
+    width: 100px;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+  }
+
+  .input-group input,
+  .password-field input {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .login-btn {
+    padding: 12px;
+  }
 }
 </style>
