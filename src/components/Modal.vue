@@ -5,8 +5,8 @@
       <div class="student-file-upload" @click="triggerFileInput" :class="{ 'disabled-upload': !isStudentInfoComplete }">
         <label for="fileInput" class="upload-box">
           <p><i class="fas fa-upload"></i></p>
-          <p v-if="!uploadedFile">Upload Student File (One PDF Only)</p>
-          <p v-else>{{ uploadedFile.name }}</p>
+          <p v-if="!uploadedFile">Upload Student Files (PDFs Only)</p>
+          <p v-else>{{ uploadedFile.name }} (1 of {{ $refs.fileInput?.files?.length || 1 }})</p>
         </label>
         <input
           type="file"
@@ -15,6 +15,7 @@
           ref="fileInput"
           @change="handleFileUpload"
           hidden
+          multiple
         />
 
         <div v-if="pdfUrl" class="pdf-preview">
@@ -515,17 +516,20 @@ export default {
     },
     triggerFileInput() {
       if (!this.isStudentInfoComplete) {
-        return; // Disable upload if student info is incomplete
+        return; // Prevent opening the file dialog
       }
       this.$refs.fileInput.click();
     },
     handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (file && file.type === "application/pdf") {
-        this.uploadedFile = file;
-        this.pdfUrl = URL.createObjectURL(file);
-      } else {
-        event.target.value = ""; // Clear the file input
+      const files = event.target.files;
+      if (files && files.length > 0) {
+        const pdfFiles = Array.from(files).filter(file => file.type === "application/pdf");
+        if (pdfFiles.length > 0) {
+          this.uploadedFile = pdfFiles[0]; // For simplicity, we'll use the first file
+          this.pdfUrl = URL.createObjectURL(pdfFiles[0]);
+        } else {
+          event.target.value = ""; // Clear the file input
+        }
       }
     },
     readCSV(file) {
@@ -556,7 +560,7 @@ export default {
     },
     removeFile() {
       this.uploadedFile = null;
-      this.csvPreview = [];
+      this.pdfUrl = null;
       if (this.$refs.fileInput) {
         this.$refs.fileInput.value = "";
       }
@@ -769,8 +773,9 @@ export default {
   cursor: pointer;
   font-size: 1rem;
 }
-.disabled-upload {
+.student-file-upload.disabled-upload {
   opacity: 0.5;
   cursor: not-allowed;
+  pointer-events: none; 
 }
 </style>
