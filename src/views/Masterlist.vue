@@ -56,7 +56,6 @@
             <th>ACADEMIC TRACK</th>
             <th>CURRICULUM</th>
             <th>SCHOOL YEAR</th>
-            <th>ACTION</th>
             <th>STATUS</th>
           </tr>
         </thead>
@@ -71,11 +70,6 @@
             <td>{{ student.track }}</td>
             <td>{{ student.curriculum }}</td>
             <td>{{ student.batch }}</td>
-            <td class="action-wrapper" @click.stop>
-              <button class="action-button" @click="openEditModal(student.id)">
-                <i class="fas fa-edit"></i>
-              </button>
-            </td>
             <td>
               <span :class="['status', student.status.toLowerCase()]">{{
                 student.status
@@ -345,7 +339,7 @@ export default {
   margin-bottom: 20px;
   position: sticky;
   top: 70px;
-  z-index: 10;
+  z-index: 1;
   flex-wrap: nowrap;
   overflow-x: auto;
 }
