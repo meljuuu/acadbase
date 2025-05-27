@@ -63,6 +63,19 @@
       </option>
     </select>
   </div>
+
+<!-- DD Status -->
+  <select
+    v-if="showStatus"
+    v-model="selectedStatus"
+    class="filter-dropdown"
+    @change="$emit('update:selectedStatus', selectedStatus)"
+  >
+    <option disabled value="">Status</option>
+    <option v-for="status in statuses" :key="status">
+      {{ status }}
+    </option>
+  </select>
 </template>
 
 <script setup>
@@ -74,6 +87,7 @@ const props = defineProps({
   showBatch: { type: Boolean, default: false },
   showTrack: { type: Boolean, default: false },
   showType: { type: Boolean, default: false },
+  showStatus: { type: Boolean, default: false },
 });
 
 const curriculums = [
@@ -88,12 +102,14 @@ const years = ["2024 - 2025", "2023 - 2024", "2022 - 2023"];
 const batchs = ["All", "S.Y 2020 - 2021", "S.Y 2021 - 2022", "S.Y 2022 - 2023", "S.Y 2023 - 2024", "S.Y 2024 - 2025"];
 const tracks = ["All", "TVL - IEM", "HUMSS", "SPJ", "SPA", "BEC"];
 const types = [".csv", ".pdf"];
+const statuses = ["All", "Dropped-Out", "Not-Applicable", "Released", "Unreleased"]; 
 
 const selectedCurriculum = ref("");
 const selectedYear = ref("");
 const selectedBatch = ref("");
 const selectedTrack = ref("");
 const selectedType = ref("");
+const selectedStatus = ref("");
 </script>
 
 <style scoped>

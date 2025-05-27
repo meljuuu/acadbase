@@ -18,6 +18,10 @@
       </div>
 
       <div class="filters">
+          <Dropdown
+            :showStatus="true"
+            @update:selectedStatus="selectedStatus = $event"
+        />
         <Dropdown
           :showBatch="true"
           @update:selectedBatch="selectedBatch = $event"
@@ -117,6 +121,7 @@ export default {
   },
   data() {
     return {
+      selectedStatus: "",
       selectedBatch: "",
       selectedCurriculum: "",
       selectedTrack: "",
@@ -133,7 +138,7 @@ export default {
           track: "TVL - IEM",
           batch: "S.Y 2020 - 2021",
           curriculum: "Senior High School",
-          status: "Approved",
+          status: "Released",
         },
         {
           lrn: "202110049",
@@ -141,7 +146,7 @@ export default {
           track: "HUMSS",
           batch: "S.Y 2021 - 2022",
           curriculum: "Senior High School",
-          status: "Review",
+          status: "Unreleased",
         },
         {
           lrn: "202110050",
@@ -157,7 +162,7 @@ export default {
           track: "SPA",
           batch: "S.Y 2023 - 2024",
           curriculum: "SHS Grade 12",
-          status: "Revised",
+          status: "Dropped-Out",
         },
         {
           lrn: "202110052",
@@ -165,7 +170,7 @@ export default {
           track: "SPJ",
           batch: "S.Y 2024 - 2025",
           curriculum: "SHS Grade 11",
-          status: "Approved",
+          status: "Released",
         },
         {
           lrn: "202110053",
@@ -173,7 +178,7 @@ export default {
           track: "TVL",
           batch: "S.Y 2020 - 2021",
           curriculum: "Senior High School",
-          status: "Review",
+          status: "Unreleased",
         },
         {
           lrn: "202110054",
@@ -189,7 +194,7 @@ export default {
           track: "BEC",
           batch: "S.Y 2022 - 2023",
           curriculum: "JHS Grade 10",
-          status: "Revised",
+          status: "Dropped-Out",
         },
         {
           lrn: "202110056",
@@ -197,7 +202,7 @@ export default {
           track: "SPA",
           batch: "S.Y 2023 - 2024",
           curriculum: "Senior High School",
-          status: "Approved",
+          status: "Released",
         },
         {
           lrn: "202110048",
@@ -213,7 +218,7 @@ export default {
           track: "HUMSS",
           batch: "S.Y 2021 - 2022",
           curriculum: "Senior High School",
-          status: "Review",
+          status: "Unreleased",
         },
         {
           lrn: "202110050",
@@ -221,7 +226,7 @@ export default {
           track: "BEC",
           batch: "S.Y 2022 - 2023",
           curriculum: "JHS Grade 10",
-          status: "Approved",
+          status: "Released",
         },
         {
           lrn: "202110051",
@@ -229,7 +234,7 @@ export default {
           track: "SPA",
           batch: "S.Y 2023 - 2024",
           curriculum: "SHS Grade 12",
-          status: "Revised",
+          status: "Unreleased",
         },
         {
           lrn: "202110052",
@@ -237,7 +242,7 @@ export default {
           track: "SPJ",
           batch: "S.Y 2024 - 2025",
           curriculum: "SHS Grade 11",
-          status: "Approved",
+          status: "Released",
         },
         {
           lrn: "202110053",
@@ -245,7 +250,7 @@ export default {
           track: "TVL",
           batch: "S.Y 2020 - 2021",
           curriculum: "Senior High School",
-          status: "Review",
+          status: "Unreleased",
         },
         {
           lrn: "202110054",
@@ -253,7 +258,7 @@ export default {
           track: "HUMSS",
           batch: "S.Y 2021 - 2022",
           curriculum: "SHS Grade 12",
-          status: "Approved",
+          status: "Released",
         },
         {
           lrn: "202110055",
@@ -261,7 +266,7 @@ export default {
           track: "BEC",
           batch: "S.Y 2022 - 2023",
           curriculum: "JHS Grade 10",
-          status: "Revised",
+          status: "Dropped-Out",
         },
         {
           lrn: "202110056",
@@ -269,7 +274,7 @@ export default {
           track: "SPA",
           batch: "S.Y 2023 - 2024",
           curriculum: "Senior High School",
-          status: "Approved",
+          status: "Released",
         },
       ],
       currentPage: 1,
@@ -278,26 +283,27 @@ export default {
   },
 
    computed: {
-    filteredStudents() {
-      return this.students.filter((student) => {
-        return (
-          (this.selectedBatch === "" ||
-            this.selectedBatch === "All" ||
-            student.batch === this.selectedBatch) &&
-          (this.selectedCurriculum === "" ||
-            this.selectedCurriculum === "All" ||
-            student.curriculum === this.selectedCurriculum) &&
-          (this.selectedTrack === "" ||
-            this.selectedTrack === "All" ||
-            student.track === this.selectedTrack) &&
-          (!this.searchQuery ||
-            student.name
-              .toLowerCase()
-              .includes(this.searchQuery.toLowerCase()) ||
-            student.lrn.includes(this.searchQuery))
-        );
-      });
-    },
+filteredStudents() {
+  return this.students.filter((student) => {
+    return (
+      (this.selectedBatch === "" ||
+        this.selectedBatch === "All" ||
+        student.batch === this.selectedBatch) &&
+      (this.selectedCurriculum === "" ||
+        this.selectedCurriculum === "All" ||
+        student.curriculum === this.selectedCurriculum) &&
+      (this.selectedTrack === "" ||
+        this.selectedTrack === "All" ||
+        student.track === this.selectedTrack) &&
+      (this.selectedStatus === "" ||
+        this.selectedStatus === "All" ||
+        student.status === this.selectedStatus) &&
+      (!this.searchQuery ||
+        student.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        student.lrn.includes(this.searchQuery))
+    );
+  });
+},
     totalPages() {
       return Math.ceil(this.filteredStudents.length / this.itemsPerPage);
     },
@@ -467,18 +473,18 @@ tr:hover {
 }
 
 .status {
-  min-width: 70px;
+  width: 100px;
   display: inline-block;
 }
 
-.status.approved {
+.status.released {
   background: #0c5a48;
   color: white;
   padding: 5px 20px;
   border-radius: 5px;
   font-size: 12px;
 }
-.status.review {
+.status.unreleased {
   background-color: #fbdf5a;
   color: white;
   padding: 5px 20px;
@@ -486,7 +492,7 @@ tr:hover {
   font-size: 12px;
 }
 
-.status.revised {
+.status.dropped-out {
   background-color: #b32113;
   color: white;
   padding: 5px 20px;
