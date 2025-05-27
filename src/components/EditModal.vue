@@ -19,7 +19,7 @@
         @change="handleFileUpload"
         hidden
       />
-
+ 
         <div v-if="pdfUrl" class="pdf-preview">
           <object
             :data="pdfUrl"
