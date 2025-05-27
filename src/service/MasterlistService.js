@@ -4,7 +4,7 @@ import * as pdfjsLib from 'pdfjs-dist'; // Import pdf.js
 import { createWorker } from 'tesseract.js';
 
 // Use import.meta.env for Vue 3 or process.env for Vue 2
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 class MasterlistService {
     // Get all students with pagination

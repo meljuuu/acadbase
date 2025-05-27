@@ -408,6 +408,7 @@
 </template>
 
 <script>
+import MasterlistService from '../service/MasterlistService';
 export default {
   name: "Modal",
   data() {
@@ -476,14 +477,13 @@ export default {
     async saveStudent() {
       try {
         const studentData = {
-          Name: this.Name,
           lrn: this.lrn,
-          birthdate: this.birthdate,
-          syBatch: this.syBatch,
-          Curriculum: this.Curriculum,
-          AcademicTrack: this.AcademicTrack,
-          FacultyName: this.FacultyName,
-          DateAdded: this.DateAdded,
+          name: this.Name,
+          track: this.AcademicTrack,
+          batch: this.syBatch,
+          curriculum: this.Curriculum,
+          status: 'Unreleased',
+          faculty_name: this.FacultyName,
         };
 
         await MasterlistService.addStudent(studentData);
@@ -491,7 +491,7 @@ export default {
         this.$emit("student-saved");
       } catch (error) {
         console.error("Error saving student:", error);
-        alert("Failed to save student. Please try again.");
+        alert("Failed to save student. Please check the fields and try again.");
       }
     },
 
