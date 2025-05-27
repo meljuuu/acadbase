@@ -60,7 +60,7 @@ class MasterlistService {
         try {
             const response = await axios.get(`${API_URL}/masterlist/filter`, {
                 params: filters,
-                validateStatus: (status) => status < 500 // Don't throw for 4xx errors
+                validateStatus: (status) => status < 500
             });
             
             if (!response.data?.data) {
@@ -73,14 +73,13 @@ class MasterlistService {
                 total: response.data.total || 0,
                 per_page: response.data.per_page || 20
             };
-            
         } catch (error) {
             console.error('Service layer error:', {
                 config: error.config,
                 response: error.response,
                 message: error.message
             });
-            throw error; // Re-throw for component to handle
+            throw error;
         }
     }
 }

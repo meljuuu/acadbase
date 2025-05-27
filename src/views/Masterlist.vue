@@ -52,7 +52,7 @@
         </thead>
         <tbody>
           <tr
-            v-for="(student, index) in paginatedStudents"
+            v-for="(student, index) in students"
             :key="student.id"
             @click="showUnReleasedModal"
           >
@@ -138,6 +138,7 @@ export default {
       currentPage: 1,
       itemsPerPage: 20,
       students: [],
+      total: 0,
       loading: false,
       error: null
     };
@@ -147,13 +148,10 @@ export default {
       return this.students;
     },
     totalPages() {
-      return Math.ceil(this.students.length / this.itemsPerPage);
-    },
-    paginatedStudents() {
-      console.log('Current students:', this.students);
-      const start = (this.currentPage - 1) * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
-      return this.filteredStudents.slice(start, end);
+      if (this.itemsPerPage <= 0 || this.total <= 0) {
+        return 1; // Fallback to 1 page if invalid values
+      }
+      return Math.ceil(this.total / this.itemsPerPage);
     },
   },
   watch: {
@@ -183,7 +181,8 @@ export default {
           curriculum: this.selectedCurriculum,
           track: this.selectedTrack,
           status: this.selectedStatus,
-          search: this.searchQuery
+          search: this.searchQuery,
+          page: this.currentPage
         };
         
         console.log('Fetching with filters:', filters);
@@ -194,8 +193,10 @@ export default {
           throw new Error('Invalid response structure from API');
         }
         
-        this.students = Array.isArray(response.data) ? response.data : [];
+        this.students = response.data;
         this.currentPage = response.current_page || 1;
+        this.total = response.total || 0;
+        this.itemsPerPage = response.per_page || 20;
         
         // Force update if needed
         this.$nextTick(() => this.$forceUpdate());
@@ -262,11 +263,13 @@ export default {
     prevPage() {
       if (this.currentPage > 1) {
         this.currentPage--;
+        this.fetchStudents();
       }
     },
     nextPage() {
       if (this.currentPage < this.totalPages) {
         this.currentPage++;
+        this.fetchStudents();
       }
     },
     handleClickOutside(event) {
