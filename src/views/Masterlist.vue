@@ -312,18 +312,25 @@ export default {
 
 .filtering-section {
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
   background-color: #ffffff;
-  padding: 30px 20px;
-  border-radius: 5px;
+  padding: 10px 20px;
+  border-radius: 8px;
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
     rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
   margin-bottom: 20px;
+  position: sticky;
+  top: 70px;
+  z-index: 10;
+  flex-wrap: wrap;
 }
 
 .filters {
   display: flex;
   gap: 10px;
+  align-items: center;
 }
 .filter-dropdown {
   padding: 15px 20px;
@@ -351,6 +358,8 @@ export default {
 .search-bar {
   display: flex;
   gap: 10px;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .search-bar input {
@@ -364,21 +373,22 @@ export default {
   background: #295f98;
   color: #fff;
   border: none;
-  padding: 15px 20px;
+  padding: 8px 12px;
   border-radius: 3px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
+  white-space: nowrap;
 }
 
 .table-container {
   background: #fff;
   border-radius: 8px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  max-height: 600px;
+  overflow: hidden;
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
     rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
   border: 1px solid #ddd;
+  width: 100%;
+  margin-top: 20px;
 }
 
 table {
@@ -388,10 +398,10 @@ table {
 
 th,
 td {
-  padding: 15px;
+  padding: 12px 15px;
   text-align: center;
   border-bottom: 1px solid #ddd;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 th {
