@@ -16,7 +16,12 @@
 
         <Modal ref="addModalRef" />
 
-        <Modal ref="importModalRef" />
+        <Modal ref="importModalRef">
+          <template #default>
+            <input type="file" accept=".pdf" @change="handlePdfUpload" />
+            <button @click="processPdf">Process PDF</button>
+          </template>
+        </Modal>
       </div>
 
       <div class="filters">
@@ -37,7 +42,6 @@
         />
         <Dropdown
           :showTrack="true"
-          :hideAllOption="true"
           @update:selectedTrack="selectedTrack = $event"
         />
       </div>
@@ -119,6 +123,7 @@ import Modal from "@/components/Modal.vue";
 import ImportClassListButton from "../components/ImportClassListButton.vue";
 import EditModal from "@/components/EditModal.vue";
 import MasterlistService from "@/service/MasterlistService";
+import * as pdfjsLib from 'pdfjs-dist';
 
 export default {
   name: "Masterlist",
@@ -290,6 +295,44 @@ export default {
       this.currentPage = 1;
       this.fetchStudents();
     },
+    async handlePdfUpload(event) {
+      this.uploadedFile = event.target.files[0];
+    },
+    async processPdf() {
+      if (!this.uploadedFile) {
+        this.error = 'No PDF file uploaded.';
+        return;
+      }
+
+      try {
+        await MasterlistService.processPdfAndAddStudent(this.uploadedFile);
+        await this.fetchStudents(); // Refresh the list
+        this.$refs.importModalRef.closeModal(); // Close the modal on success
+      } catch (error) {
+        this.error = 'Failed to process PDF: ' + error.message;
+      }
+    },
+    parsePdfText(text) {
+      // Example parsing logic (adjust based on your PDF's structure)
+      const lrnMatch = text.match(/LRN[:.]?\s*(\d+)/i);
+      const nameMatch = text.match(/Name[:.]?\s*([^\n]+)/i);
+      const trackMatch = text.match(/Track[:.]?\s*([^\n]+)/i);
+      const curriculumMatch = text.match(/Curriculum[:.]?\s*([^\n]+)/i);
+      const yearMatch = text.match(/School Year[:.]?\s*([^\n]+)/i);
+
+      if (!lrnMatch || !nameMatch) {
+        this.error = 'Required fields (LRN or Name) not found in PDF.';
+        return null;
+      }
+
+      return {
+        lrn: lrnMatch ? lrnMatch[1].trim() : '',
+        name: nameMatch ? nameMatch[1].trim() : '',
+        track: trackMatch ? trackMatch[1].trim() : '',
+        curriculum: curriculumMatch ? curriculumMatch[1].trim() : '',
+        batch: yearMatch ? yearMatch[1].trim() : '',
+      };
+    },
   },
   mounted() {
     console.log('Component mounted, fetching students');
@@ -428,7 +471,7 @@ th {
   color: white;
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 0;
 }
 
 tr {

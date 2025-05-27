@@ -1,5 +1,7 @@
 // RESILIENT-AcadBase/src/service/MasterlistService.js
 import axios from 'axios';
+import * as pdfjsLib from 'pdfjs-dist'; // Import pdf.js
+import { createWorker } from 'tesseract.js';
 
 // Use import.meta.env for Vue 3 or process.env for Vue 2
 const API_URL = import.meta.env.VITE_API_URL
@@ -81,6 +83,85 @@ class MasterlistService {
             });
             throw error;
         }
+    }
+
+    /**
+     * Process a PDF file, extract student data, and save it via API.
+     * @param {File} pdfFile - The uploaded PDF file.
+     * @returns {Promise<Object>} - The saved student data.
+     */
+    async processPdfAndAddStudent(pdfFile) {
+        try {
+            // Step 1: Extract text from PDF
+            const extractedText = await this.extractTextFromPdf(pdfFile);
+
+            // Step 2: Parse the extracted text into student data
+            const studentData = this.parsePdfText(extractedText);
+            if (!studentData) {
+                throw new Error('Failed to parse required fields from PDF.');
+            }
+
+            // Step 3: Save the student data via API
+            const response = await this.addStudent(studentData);
+            return response;
+        } catch (error) {
+            console.error('PDF processing error:', error);
+            throw error; // Re-throw for handling in the component
+        }
+    }
+
+    /**
+     * Extract text from a PDF file using pdf.js.
+     * @param {File} pdfFile - The uploaded PDF file.
+     * @returns {Promise<string>} - Extracted text.
+     */
+    async extractTextFromPdf(pdfFile) {
+        const pdfBytes = await pdfFile.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+        let extractedText = '';
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            extractedText += textContent.items.map(item => item.str).join(' ');
+        }
+
+        return extractedText;
+    }
+
+    /**
+     * Parse extracted text into student data.
+     * @param {string} text - Raw text from the PDF.
+     * @returns {Object|null} - Parsed student data or null if fields are missing.
+     */
+    parsePdfText(text) {
+        // Adjust these regex patterns to match your PDF's structure
+        const lrnMatch = text.match(/LRN[:.]?\s*(\d+)/i);
+        const nameMatch = text.match(/Name[:.]?\s*([^\n]+)/i);
+        const trackMatch = text.match(/Track[:.]?\s*([^\n]+)/i);
+        const curriculumMatch = text.match(/Curriculum[:.]?\s*([^\n]+)/i);
+        const yearMatch = text.match(/School Year[:.]?\s*([^\n]+)/i);
+
+        if (!lrnMatch || !nameMatch) {
+            return null; // Required fields missing
+        }
+
+        return {
+            lrn: lrnMatch[1].trim(),
+            name: nameMatch[1].trim(),
+            track: trackMatch?.[1]?.trim() || '',
+            curriculum: curriculumMatch?.[1]?.trim() || '',
+            batch: yearMatch?.[1]?.trim() || '',
+        };
+    }
+
+    async extractTextFromScannedPdf(pdfFile) {
+        const worker = await createWorker();
+        await worker.loadLanguage('eng');
+        await worker.initialize('eng');
+        const { data } = await worker.recognize(pdfFile);
+        await worker.terminate();
+        return data.text;
     }
 }
 

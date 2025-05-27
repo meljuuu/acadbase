@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button @click="$emit('open-modal')" class="add-student">Add Student</button>
+    <button @click="$emit('open-modal-modal')" class="add-student">Add Student</button>
   </div>
 </template>
 

@@ -88,6 +88,7 @@ const props = defineProps({
   showTrack: { type: Boolean, default: false },
   showType: { type: Boolean, default: false },
   showStatus: { type: Boolean, default: false },
+  hideAllOption: Boolean,
 });
 
 const curriculums = [

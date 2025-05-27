@@ -418,10 +418,41 @@ export default {
       showImportModal: false,
       uploadedFile: null,
       csvPreview: [],
-
+      pdfUrl: null,
+      Name: "",
+      lrn: "",
+      birthdate: "",
+      syBatch: "",
+      Curriculum: "",
+      AcademicTrack: "",
+      FacultyName: this.getFacultyName(),
+      DateAdded: new Date().toLocaleDateString(),
+      isApplied: false,
     };
   },
+  props: {
+    studentData: {
+      type: Object,
+      default: () => ({
+        Name: "",
+        lrn: "",
+        AcademicTrack: "",
+        // ... other fields ...
+      }),
+    },
+  },
   methods: {
+    getFacultyName() {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user) return "";
+
+      const { FirstName, MiddleName, LastName } = user;
+      let fullName = FirstName || "";
+      if (MiddleName) fullName += ` ${MiddleName}`;
+      if (LastName) fullName += ` ${LastName}`;
+
+      return fullName.trim();
+    },
     showUnReleasedModal() {
       this.showunreleasedModal = true;
     },
@@ -435,15 +466,33 @@ export default {
       this.showreleasedModal = false;
     },
     openaddModal() {
+      this.DateAdded = new Date().toLocaleDateString();
       this.showModal = true;
     },
     closeModal() {
       this.removeFile();
       this.showModal = false;
     },
-    saveStudent() {
-      console.log("Saving student:", this.newStudent);
-      this.closeModal();
+    async saveStudent() {
+      try {
+        const studentData = {
+          Name: this.Name,
+          lrn: this.lrn,
+          birthdate: this.birthdate,
+          syBatch: this.syBatch,
+          Curriculum: this.Curriculum,
+          AcademicTrack: this.AcademicTrack,
+          FacultyName: this.FacultyName,
+          DateAdded: this.DateAdded,
+        };
+
+        await MasterlistService.addStudent(studentData);
+        this.closeModal();
+        this.$emit("student-saved");
+      } catch (error) {
+        console.error("Error saving student:", error);
+        alert("Failed to save student. Please try again.");
+      }
     },
 
     openImportModal() {
