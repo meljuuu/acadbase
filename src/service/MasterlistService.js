@@ -20,7 +20,23 @@ class MasterlistService {
     // Add new student
     async addStudent(studentData) {
         try {
-            const response = await axios.post(`${API_URL}/masterlist`, studentData);
+            const formData = new FormData();
+            formData.append('lrn', studentData.lrn);
+            formData.append('name', studentData.name);
+            formData.append('track', studentData.track);
+            formData.append('batch', studentData.batch);
+            formData.append('curriculum', studentData.curriculum);
+            formData.append('status', studentData.status);
+            formData.append('faculty_name', studentData.faculty_name);
+            if (studentData.pdfFile) {
+                formData.append('pdf_file', studentData.pdfFile);
+            }
+
+            const response = await axios.post(`${API_URL}/masterlist`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
             return response.data;
         } catch (error) {
             throw error;

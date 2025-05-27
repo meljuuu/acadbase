@@ -2,7 +2,7 @@
   <!-- Add Student Modal -->
   <div v-if="showModal" class="modal-overlay">
     <div class="modal-content">
-      <div class="student-file-upload" @click="triggerFileInput">
+      <div class="student-file-upload" @click="triggerFileInput" :class="{ 'disabled-upload': !isStudentInfoComplete }">
         <label for="fileInput" class="upload-box">
           <p><i class="fas fa-upload"></i></p>
           <p v-if="!uploadedFile">Upload Student File (One PDF Only)</p>
@@ -475,6 +475,16 @@ export default {
       this.showModal = false;
     },
     async saveStudent() {
+      if (!this.Name || !this.lrn || !this.AcademicTrack || !this.syBatch || !this.Curriculum) {
+        alert('Please fill all required student information fields.');
+        return;
+      }
+
+      if (this.uploadedFile && this.uploadedFile.size > 10 * 1024 * 1024) {
+        alert('PDF file size must not exceed 10MB.');
+        return;
+      }
+
       try {
         const studentData = {
           lrn: this.lrn,
@@ -484,6 +494,7 @@ export default {
           curriculum: this.Curriculum,
           status: 'Unreleased',
           faculty_name: this.FacultyName,
+          pdfFile: this.uploadedFile,
         };
 
         await MasterlistService.addStudent(studentData);
@@ -503,16 +514,18 @@ export default {
       this.removeFile();  // Optionally remove file when modal is closed
     },
     triggerFileInput() {
+      if (!this.isStudentInfoComplete) {
+        return; // Disable upload if student info is incomplete
+      }
       this.$refs.fileInput.click();
     },
     handleFileUpload(event) {
       const file = event.target.files[0];
-      if (file && file.type === "text/csv") {
+      if (file && file.type === "application/pdf") {
         this.uploadedFile = file;
-        this.readCSV(file);
+        this.pdfUrl = URL.createObjectURL(file);
       } else {
-        alert("Please upload a valid CSV file.");
-        event.target.value = "";
+        event.target.value = ""; // Clear the file input
       }
     },
     readCSV(file) {
@@ -564,6 +577,11 @@ export default {
 
       applyButton.style.display = this.isApplied ? "none" : "block";
       statusButton.style.display = this.isApplied ? "block" : "none";
+    },
+  },
+  computed: {
+    isStudentInfoComplete() {
+      return this.Name && this.lrn && this.AcademicTrack && this.syBatch && this.Curriculum;
     },
   },
 };
@@ -750,5 +768,9 @@ export default {
   margin-left: 10px;
   cursor: pointer;
   font-size: 1rem;
+}
+.disabled-upload {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>
