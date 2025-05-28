@@ -59,9 +59,28 @@ class MasterlistService {
     // Update student
     async updateStudent(id, studentData) {
         try {
-            const response = await axios.put(`${API_URL}/masterlist/${id}`, studentData);
+            const formData = new FormData();
+            
+            // Append all student data to FormData
+            Object.keys(studentData).forEach(key => {
+                if (key === 'pdfFile' && studentData[key]) {
+                    formData.append('pdf_file', studentData[key]);
+                } else if (key !== 'pdfFile') {
+                    formData.append(key, studentData[key]);
+                }
+            });
+
+            // For PUT requests with FormData, we need to use _method=PUT
+            formData.append('_method', 'PUT');
+
+            const response = await axios.post(`${API_URL}/masterlist/${id}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
             return response.data;
         } catch (error) {
+            console.error('Update error:', error.response?.data || error);
             throw error;
         }
     }

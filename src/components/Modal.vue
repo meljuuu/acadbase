@@ -354,6 +354,8 @@
 
         <div class="modal-buttons">
           <button @click="closeUnReleasedModal" class="cancel">Back</button>
+          <button @click="markAsDropOut" class="dropout-button">Drop Out</button>
+          <button @click="saveStudentInfo" class="save-button">Save</button>
           <button class="released-button">Released Documents</button>
         </div>
       </div>
@@ -364,6 +366,7 @@
 <script>
 import MasterlistService from '../service/MasterlistService';
 import ReleaseService from '../service/releaseService';
+import Swal from 'sweetalert2';
 
 // Define API_BASE_URL (use the same value as in MasterlistService.js)
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -379,6 +382,7 @@ export default {
       showunreleasedModal: false,
       uploadedFile: null,
       pdfUrl: null,
+      originalPdfUrl: null,
       Name: "",
       lrn: "",
       birthdate: "",
@@ -396,6 +400,7 @@ export default {
       ],
       isProcessing: false,
       studentId: null,
+      studentStatus: 'Not-Applicable',
     };
   },
   props: {
@@ -424,7 +429,12 @@ export default {
     async fetchStudentData(id) {
       if (!id) {
         console.error("Invalid student ID:", id);
-        alert("Invalid student ID. Please try again.");
+        await Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Invalid student ID. Please try again.',
+          confirmButtonColor: '#295f98'
+        });
         return;
       }
 
@@ -444,11 +454,19 @@ export default {
           let pdfPath = student.pdf_storage.replace('public/pdfs/public/pdfs/', 'public/pdfs/');
           if (!pdfPath.endsWith('.pdf')) pdfPath += '.pdf';
           
-          this.pdfUrl = `${PDF_BASE_URL}/${pdfPath}`;
+          this.originalPdfUrl = `${PDF_BASE_URL}/${pdfPath}`;
+          this.pdfUrl = this.originalPdfUrl;
           console.log("Constructed PDF URL:", this.pdfUrl);
         }
+        this.updateStudentStatus();
       } catch (error) {
         console.error("Error:", error);
+        await Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to fetch student data',
+          confirmButtonColor: '#295f98'
+        });
       }
     },
     showUnReleasedModal(id) {
@@ -475,13 +493,47 @@ export default {
       this.showModal = false;
     },
     async saveStudent() {
+      // Validate required fields
       if (!this.Name || !this.lrn || !this.AcademicTrack || !this.syBatch || !this.Curriculum) {
-        alert('Please fill all required student information fields.');
+        await Swal.fire({
+          icon: 'error',
+          title: 'Validation Error',
+          text: 'Please fill all required student information fields.',
+          confirmButtonColor: '#295f98'
+        });
         return;
       }
 
+      // Validate LRN format
+      if (this.lrn.length !== 12) {
+        await Swal.fire({
+          icon: 'error',
+          title: 'Invalid LRN',
+          text: 'LRN must be exactly 12 digits.',
+          confirmButtonColor: '#295f98'
+        });
+        return;
+      }
+
+      // Validate birthdate
+      if (!this.birthdate) {
+        await Swal.fire({
+          icon: 'error',
+          title: 'Missing Information',
+          text: 'Please enter a valid birthdate.',
+          confirmButtonColor: '#295f98'
+        });
+        return;
+      }
+
+      // Validate file size
       if (this.uploadedFile && this.uploadedFile.size > 10 * 1024 * 1024) {
-        alert('PDF file size must not exceed 10MB.');
+        await Swal.fire({
+          icon: 'error',
+          title: 'File Too Large',
+          text: 'PDF file size must not exceed 10MB.',
+          confirmButtonColor: '#295f98'
+        });
         return;
       }
 
@@ -492,19 +544,43 @@ export default {
           track: this.AcademicTrack,
           batch: this.syBatch,
           curriculum: this.Curriculum,
-          status: this.uploadedFile ? 'Unreleased' : 'Not Applicable',
+          status: this.uploadedFile ? 'Unreleased' : 'No Document',
           faculty_name: this.FacultyName,
           birthdate: this.birthdate,
-          pdfFile: this.uploadedFile,
+          pdfFile: this.uploadedFile || null,
         };
 
+        // Log the data being sent for debugging
         console.log('Submitting student data:', studentData);
-        await MasterlistService.addStudent(studentData);
+
+        const response = await MasterlistService.addStudent(studentData);
+        console.log('Server response:', response);
+        
         this.closeModal();
         this.$emit("student-saved");
       } catch (error) {
-        console.error("Error saving student:", error.response?.data || error.message);
-        alert(`Failed to save student: ${error.response?.data?.message || error.message}`);
+        console.error("Error saving student:", error);
+        
+        if (error.response?.data?.errors) {
+          const validationErrors = error.response.data.errors;
+          const errorMessages = Object.entries(validationErrors)
+            .map(([field, messages]) => `${field}: ${messages.join(', ')}`)
+            .join('\n');
+          
+          await Swal.fire({
+            icon: 'error',
+            title: 'Validation Errors',
+            html: `<pre style="text-align: left;">${errorMessages}</pre>`,
+            confirmButtonColor: '#295f98'
+          });
+        } else {
+          await Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: `Failed to save student: ${error.response?.data?.message || error.message}`,
+            confirmButtonColor: '#295f98'
+          });
+        }
       }
     },
     triggerFileInput() {
@@ -551,7 +627,11 @@ export default {
           if (response.success && response.stampedPdfPath) {
             // Update PDF URL to show the stamped version
             this.pdfUrl = `${PDF_BASE_URL}/${response.stampedPdfPath}`;
+            console.log("Updated PDF URL with stamped version:", this.pdfUrl);
           }
+        } else {
+          // When toggling back, restore the original PDF
+          this.pdfUrl = this.originalPdfUrl;
         }
         
         this.isApplied = !this.isApplied;
@@ -597,6 +677,118 @@ export default {
     handlePdfError() {
       this.pdfLoadFailed = true;
     },
+    async markAsDropOut() {
+      if (!this.studentId) {
+        await Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Student ID is missing',
+          confirmButtonColor: '#295f98'
+        });
+        return;
+      }
+
+      try {
+        const response = await MasterlistService.updateStudentStatus(this.studentId, 'Drop Out');
+        if (response.success) {
+          await Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Student status updated to Drop Out',
+            confirmButtonColor: '#295f98'
+          });
+          this.closeUnReleasedModal();
+          this.$emit('student-saved');
+        }
+      } catch (error) {
+        console.error('Error updating student status:', error);
+        await Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to update student status',
+          confirmButtonColor: '#295f98'
+        });
+      }
+    },
+    async saveStudentInfo() {
+      if (!this.studentId) {
+        await Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Student ID is missing',
+          confirmButtonColor: '#295f98'
+        });
+        return;
+      }
+
+      try {
+        this.updateStudentStatus();
+
+        const studentData = {
+          name: this.Name,
+          lrn: this.lrn,
+          birthdate: this.birthdate,
+          batch: this.syBatch,
+          curriculum: this.Curriculum,
+          track: this.AcademicTrack,
+          faculty_name: this.FacultyName,
+          status: this.studentStatus,
+          pdfFile: this.uploadedFile || null
+        };
+
+        console.log('Sending update data:', {
+          ...studentData,
+          pdfFile: studentData.pdfFile ? 'File present' : 'No file'
+        });
+
+        const response = await MasterlistService.updateStudent(this.studentId, studentData);
+        
+        if (response.success) {
+          await Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Student information updated successfully',
+            confirmButtonColor: '#295f98'
+          });
+          this.closeUnReleasedModal();
+          this.$emit('student-saved');
+        } else {
+          throw new Error(response.message || 'Update failed');
+        }
+      } catch (error) {
+        console.error('Error updating student:', error);
+        if (error.response?.data?.errors) {
+          const validationErrors = error.response.data.errors;
+          const errorMessages = Object.entries(validationErrors)
+            .map(([field, messages]) => `${field}: ${messages.join(', ')}`)
+            .join('\n');
+          
+          await Swal.fire({
+            icon: 'error',
+            title: 'Validation Errors',
+            html: `<pre style="text-align: left;">${errorMessages}</pre>`,
+            confirmButtonColor: '#295f98'
+          });
+        } else {
+          await Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to update student information: ' + (error.message || 'Unknown error'),
+            confirmButtonColor: '#295f98'
+          });
+        }
+      }
+    },
+    updateStudentStatus() {
+      // If all required fields are present and PDF is uploaded, set status to Unreleased
+      if (this.isStudentInfoComplete && this.uploadedFile) {
+        this.studentStatus = 'Unreleased';
+      } else if (this.isStudentInfoComplete) {
+        this.studentStatus = 'No Document';
+      } else {
+        this.studentStatus = 'Not-Applicable';
+      }
+    },
   },
   computed: {
     isStudentInfoComplete() {
@@ -609,11 +801,21 @@ export default {
   },
   mounted() {
     this.checkPdfSupport();
+    this.updateStudentStatus();
     console.log('Environment Variables:', {
       VITE_API_URL: import.meta.env.VITE_API_URL,
       VITE_API_PDF: import.meta.env.VITE_API_PDF,
       ALL_ENV: import.meta.env
     });
+  },
+  watch: {
+    // Watch for changes in student information
+    Name: 'updateStudentStatus',
+    birthdate: 'updateStudentStatus',
+    syBatch: 'updateStudentStatus',
+    Curriculum: 'updateStudentStatus',
+    AcademicTrack: 'updateStudentStatus',
+    uploadedFile: 'updateStudentStatus'
   },
 };
 </script>
@@ -837,5 +1039,15 @@ select:focus {
 .pdf-download {
   color: #295f98;
   text-decoration: underline;
+}
+
+.modal-buttons button.dropout-button {
+  background: #dc3545;
+  color: white;
+}
+
+.modal-buttons button.save-button {
+  background: #28a745;
+  color: white;
 }
 </style>

@@ -10,6 +10,10 @@ class ReleaseService {
                 student_id: studentId
             });
             
+            if (!response.data.success) {
+                throw new Error(response.data.message || 'Failed to add image overlay');
+            }
+            
             // Return both success status and the new stamped PDF path
             return {
                 success: response.data.success,
