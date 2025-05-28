@@ -424,6 +424,15 @@ export default {
 
       try {
         const student = await MasterlistService.getStudent(id);
+        
+        // Reset all states first
+        this.hasStampedPdf = false;
+        this.stampedPdfPath = null;
+        this.isApplied = false;
+        this.pdfUrl = null;
+        this.originalPdfUrl = null;
+        
+        // Set basic student information
         this.Name = student.name;
         this.lrn = student.lrn;
         this.birthdate = student.birthdate || '';
@@ -440,6 +449,7 @@ export default {
           const stampedPath = student.stamped_pdf_storage.replace('public/', '');
           this.pdfUrl = `${PDF_BASE_URL}/${stampedPath}`;
           this.isApplied = true;
+          console.log('Student has stamped PDF:', this.stampedPdfPath);
         } else if (student.pdf_storage) {
           let pdfPath = student.pdf_storage.replace('public/pdfs/public/pdfs/', 'public/pdfs/');
           if (!pdfPath.endsWith('.pdf')) pdfPath += '.pdf';
@@ -447,27 +457,52 @@ export default {
           pdfPath = pdfPath.replace('public/', '');
           this.originalPdfUrl = `${PDF_BASE_URL}/${pdfPath}`;
           this.pdfUrl = this.originalPdfUrl;
+          console.log('Student has original PDF:', this.originalPdfUrl);
+        } else {
+          console.log('Student has no PDF files');
         }
         
         this.updateStudentStatus();
       } catch (error) {
-        console.error("Error:", error);
+        console.error("Error fetching student data:", error);
         await Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'Failed to fetch student data',
+          text: 'Failed to fetch student data. Please try again.',
           confirmButtonColor: '#295f98'
         });
       }
     },
     showUnReleasedModal(id) {
+      // Reset all states
+      this.studentId = null;
+      this.hasStampedPdf = false;
+      this.stampedPdfPath = null;
+      this.isApplied = false;
+      this.pdfUrl = null;
+      this.originalPdfUrl = null;
+      this.isProcessing = false;
+      this.uploadedFile = null;
+      this.pdfLoadFailed = false;
+      
+      // Set new student ID and fetch data
       this.studentId = id;
       this.fetchStudentData(id);
       this.showunreleasedModal = true;
     },
     closeUnReleasedModal() {
-      this.showunreleasedModal = false;
+      // Reset all states
       this.studentId = null;
+      this.hasStampedPdf = false;
+      this.stampedPdfPath = null;
+      this.isApplied = false;
+      this.pdfUrl = null;
+      this.originalPdfUrl = null;
+      this.isProcessing = false;
+      this.uploadedFile = null;
+      this.pdfLoadFailed = false;
+      
+      this.showunreleasedModal = false;
     },
     showReleasedModal() {
       this.showreleasedModal = true;
@@ -610,31 +645,17 @@ export default {
             throw new Error('Student ID is missing');
           }
 
-          console.log('Sending student ID:', this.studentId);
-          
-          // Call the API to add the overlay
           const response = await ReleaseService.addImageOverlay(this.studentId);
           
           if (response.success && response.stampedPdfPath) {
-            // Update PDF URL to show the stamped version
             const stampedPath = response.stampedPdfPath.replace('public/', '');
             this.pdfUrl = `${PDF_BASE_URL}/${stampedPath}`;
-            console.log("Updated PDF URL with stamped version:", this.pdfUrl);
           }
         } else {
-          // When toggling back, restore the original PDF
           this.pdfUrl = this.originalPdfUrl;
         }
         
         this.isApplied = !this.isApplied;
-        
-        // Update button styles
-        const applyButton = document.querySelector(".apply-button");
-        const statusButton = document.querySelector(".status-apply");
-        
-        applyButton.style.display = this.isApplied ? "none" : "block";
-        statusButton.style.display = this.isApplied ? "block" : "none";
-        
       } catch (error) {
         console.error('Error applying copy furnished:', error);
         alert('Failed to apply copy furnished. Please try again.');
