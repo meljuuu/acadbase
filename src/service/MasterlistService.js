@@ -28,6 +28,7 @@ class MasterlistService {
             formData.append('curriculum', studentData.curriculum);
             formData.append('status', studentData.status);
             formData.append('faculty_name', studentData.faculty_name);
+            formData.append('birthdate', studentData.birthdate);
             if (studentData.pdfFile) {
                 formData.append('pdf_file', studentData.pdfFile);
             }

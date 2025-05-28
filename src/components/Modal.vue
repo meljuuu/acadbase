@@ -62,13 +62,29 @@
         </div>
         <div class="input-group">
           <label>S.Y Batch</label>
-          <input
-            type="text"
-            v-model="syBatch"
-            placeholder="YYYY-YYYY"
-            @input="validateSyBatch"
-            readonly
-          />
+          <div style="display: flex; gap: 5px;">
+            <select 
+              v-model="syBatch" 
+              @change="validateSyBatch"
+              style="flex: 1;"
+            >
+              <option value="">Select Year</option>
+              <option 
+                v-for="year in academicYears" 
+                :key="year" 
+                :value="year"
+              >
+                {{ year }}
+              </option>
+            </select>
+            <input
+              type="text"
+              v-model="syBatch"
+              placeholder="YYYY-YYYY"
+              @input="validateSyBatch"
+              style="flex: 1;"
+            />
+          </div>
         </div>
 
         <div class="input-group">
@@ -434,6 +450,16 @@ export default {
       isApplied: false,
       isPdfLoaded: false,
       pdfLoadFailed: false,
+      academicYears: [
+  "2025-2026", // Current year (auto-populated)
+  "2024-2025", // Previous year
+  "2023-2024",
+  "2022-2023",
+  "2021-2022",
+  "2020-2021",
+  "2019-2020",
+]
+
     };
   },
   props: {
@@ -503,7 +529,7 @@ export default {
       this.showreleasedModal = false;
     },
     openaddModal() {
-      this.DateAdded = new Date().toLocaleDateString();
+      this.syBatch = this.currentAcademicYear; // Auto-populate with current year
       this.showModal = true;
     },
     closeModal() {
@@ -530,15 +556,17 @@ export default {
           curriculum: this.Curriculum,
           status: 'Unreleased',
           faculty_name: this.FacultyName,
+          birthdate: this.birthdate,
           pdfFile: this.uploadedFile,
         };
 
+        console.log('Submitting student data:', studentData);
         await MasterlistService.addStudent(studentData);
         this.closeModal();
         this.$emit("student-saved");
       } catch (error) {
-        console.error("Error saving student:", error);
-        alert("Failed to save student. Please check the fields and try again.");
+        console.error("Error saving student:", error.response?.data || error.message);
+        alert(`Failed to save student: ${error.response?.data?.message || error.message}`);
       }
     },
 
@@ -648,6 +676,10 @@ export default {
   computed: {
     isStudentInfoComplete() {
       return this.Name && this.lrn && this.AcademicTrack && this.syBatch && this.Curriculum;
+    },
+    currentAcademicYear() {
+      const currentYear = new Date().getFullYear();
+      return `${currentYear}-${currentYear + 1}`;
     },
   },
   mounted() {
