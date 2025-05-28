@@ -64,14 +64,14 @@
             :key="student.id"
             @click="showUnReleasedModal(student.id)"
           >
-            <td>{{ student.lrn }}</td>
-            <td>{{ student.name }}</td>
-            <td>{{ student.track }}</td>
-            <td>{{ student.curriculum }}</td>
-            <td>{{ student.batch }}</td>
+            <td>{{ student.lrn || '-' }}</td>
+            <td>{{ student.name || '-' }}</td>
+            <td>{{ student.track || '-' }}</td>
+            <td>{{ student.curriculum || '-' }}</td>
+            <td>{{ student.batch || '-' }}</td>
             <td>
-              <span :class="['status', student.status.toLowerCase()]">
-                {{ formattedStatus(student.status) }}
+              <span :class="['status', (student.status || 'not-applicable').toLowerCase()]">
+                {{ formattedStatus(student.status || 'Not-Applicable') }}
               </span>
             </td>
           </tr>
@@ -144,7 +144,15 @@ export default {
   },
   computed: {
     filteredStudents() {
-      return this.students;
+      return this.students.map(student => ({
+        ...student,
+        lrn: student.lrn || '-',
+        name: student.name || '-',
+        track: student.track || '-',
+        curriculum: student.curriculum || '-',
+        batch: student.batch || '-',
+        status: student.status || 'Not-Applicable'
+      }));
     },
     totalPages() {
       if (this.itemsPerPage <= 0 || this.total <= 0) {
@@ -154,6 +162,8 @@ export default {
     },
     formattedStatus() {
       return (status) => {
+        if (!status) return 'Not Applicable';
+        
         // Convert camelCase or snake_case to Title Case with spaces
         return status
           .replace(/([A-Z])/g, ' $1') // Add space before capital letters
@@ -185,11 +195,11 @@ export default {
       this.error = null;
       try {
         const filters = {
-          batch: this.selectedBatch,
-          curriculum: this.selectedCurriculum,
-          track: this.selectedTrack,
-          status: this.selectedStatus,
-          search: this.searchQuery,
+          batch: this.selectedBatch || null,
+          curriculum: this.selectedCurriculum || null,
+          track: this.selectedTrack || null,
+          status: this.selectedStatus || null,
+          search: this.searchQuery || null,
           page: this.currentPage
         };
         
@@ -201,7 +211,17 @@ export default {
           throw new Error('Invalid response structure from API');
         }
         
-        this.students = response.data;
+        // Process the data to handle null values
+        this.students = response.data.map(student => ({
+          ...student,
+          lrn: student.lrn || null,
+          name: student.name || null,
+          track: student.track || null,
+          curriculum: student.curriculum || null,
+          batch: student.batch || null,
+          status: student.status || 'Not-Applicable'
+        }));
+        
         this.currentPage = response.current_page || 1;
         this.total = response.total || 0;
         this.itemsPerPage = response.per_page || 20;
@@ -286,10 +306,10 @@ export default {
       }
     },
     resetFilters() {
-      this.selectedStatus = "";
-      this.selectedBatch = "";
-      this.selectedCurriculum = "";
-      this.selectedTrack = "";
+      this.selectedStatus = null;
+      this.selectedBatch = null;
+      this.selectedCurriculum = null;
+      this.selectedTrack = null;
       this.searchQuery = "";
       this.currentPage = 1;
       this.fetchStudents();
@@ -663,5 +683,16 @@ tr:hover {
 
 .process-button:hover {
   background: #1f4b79;
+}
+
+/* Add a style for - text */
+td {
+  color: #666;
+}
+
+td:empty::before {
+  content: '-';
+  color: #999;
+  font-style: italic;
 }
 </style>

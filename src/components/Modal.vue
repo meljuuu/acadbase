@@ -42,7 +42,6 @@
             type="text"
             v-model="Name"
             placeholder="Enter Student Name"
-            required
           />
         </div>
         <div class="input-group">
@@ -53,12 +52,11 @@
             placeholder="Enter LRN"
             maxlength="12"
             @input="validateLRN"
-            required
           />
         </div>
         <div class="input-group">
           <label>Birthdate</label>
-          <input type="date" v-model="birthdate" required />
+          <input type="date" v-model="birthdate" />
         </div>
         <div class="input-group">
           <label>S.Y Batch</label>
@@ -89,7 +87,7 @@
 
         <div class="input-group">
           <label>Curriculum</label>
-          <select v-model="Curriculum" required>
+          <select v-model="Curriculum">
             <option value="">Select Curriculum</option>
             <option value="JHS">JHS</option>
             <option value="SHS">SHS</option>
@@ -97,7 +95,7 @@
         </div>
         <div class="input-group">
           <label>Academic Track</label>
-          <select v-model="AcademicTrack" required>
+          <select v-model="AcademicTrack">
             <option value="">Select Track</option>
             <option value="SPJ">SPJ</option>
             <option value="BEC">BEC</option>
@@ -345,7 +343,7 @@
         <div class="furnished">
           <button
             class="apply-button"
-            :disabled="isProcessing || hasStampedPdf"
+            :disabled="isProcessing || hasStampedPdf || !originalPdfUrl"
             :style="{
               backgroundColor: isApplied || hasStampedPdf ? '#fff' : '#0c5a48',
               color: isApplied || hasStampedPdf ? '#0c5a48' : '#fff',
@@ -358,6 +356,7 @@
               {{ isProcessing ? 'Processing...' : (isApplied || hasStampedPdf ? "Copy Furnished Applied" : "Apply Copy Furnished") }}
             </p>
           </button>
+          <p v-if="!originalPdfUrl" class="note">Upload a PDF document first to enable copy furnish</p>
         </div>
 
         <div class="modal-buttons">
@@ -558,40 +557,23 @@ export default {
       this.showModal = false;
     },
     async saveStudent() {
-      // Validate required fields
-      if (!this.Name || !this.lrn || !this.AcademicTrack || !this.syBatch || !this.Curriculum) {
-        await Swal.fire({
-          icon: 'error',
-          title: 'Validation Error',
-          text: 'Please fill all required student information fields.',
-          confirmButtonColor: '#295f98'
-        });
-        return;
+      // Only validate LRN format if it's provided and not empty
+      if (this.lrn && this.lrn.trim() !== '') {
+        // Remove any non-numeric characters and validate length
+        const cleanLrn = this.lrn.replace(/[^0-9]/g, '');
+        if (cleanLrn.length !== 12) {
+          await Swal.fire({
+            icon: 'error',
+            title: 'Invalid LRN',
+            text: 'LRN must be exactly 12 digits.',
+            confirmButtonColor: '#295f98'
+          });
+          return;
+        }
+        this.lrn = cleanLrn; // Update with cleaned LRN
       }
 
-      // Validate LRN format
-      if (this.lrn.length !== 12) {
-        await Swal.fire({
-          icon: 'error',
-          title: 'Invalid LRN',
-          text: 'LRN must be exactly 12 digits.',
-          confirmButtonColor: '#295f98'
-        });
-        return;
-      }
-
-      // Validate birthdate
-      if (!this.birthdate) {
-        await Swal.fire({
-          icon: 'error',
-          title: 'Missing Information',
-          text: 'Please enter a valid birthdate.',
-          confirmButtonColor: '#295f98'
-        });
-        return;
-      }
-
-      // Validate file size
+      // Validate file size if a file is uploaded
       if (this.uploadedFile && this.uploadedFile.size > 10 * 1024 * 1024) {
         await Swal.fire({
           icon: 'error',
@@ -603,15 +585,36 @@ export default {
       }
 
       try {
+        // Validate track if provided
+        const validTracks = ['SPJ', 'BEC', 'SPA'];
+        const track = this.AcademicTrack && validTracks.includes(this.AcademicTrack) 
+          ? this.AcademicTrack 
+          : null;
+
+        // Validate curriculum if provided
+        const validCurriculums = ['JHS', 'SHS'];
+        const curriculum = this.Curriculum && validCurriculums.includes(this.Curriculum)
+          ? this.Curriculum
+          : null;
+
+        // Validate birthdate if provided
+        let birthdate = null;
+        if (this.birthdate) {
+          const date = new Date(this.birthdate);
+          if (!isNaN(date.getTime())) {
+            birthdate = this.birthdate;
+          }
+        }
+
         const studentData = {
-          lrn: this.lrn,
-          name: this.Name,
-          track: this.AcademicTrack,
-          batch: this.syBatch,
-          curriculum: this.Curriculum,
-          status: this.uploadedFile ? 'Unreleased' : 'No Document',
-          faculty_name: this.FacultyName,
-          birthdate: this.birthdate,
+          lrn: this.lrn || null,
+          name: this.Name || null,
+          track: track,
+          batch: this.syBatch || null,
+          curriculum: curriculum,
+          status: this.uploadedFile ? 'Unreleased' : 'Not-Applicable',
+          faculty_name: this.FacultyName || null,
+          birthdate: birthdate,
           pdfFile: this.uploadedFile || null,
         };
 
@@ -620,6 +623,13 @@ export default {
 
         const response = await MasterlistService.addStudent(studentData);
         console.log('Server response:', response);
+        
+        await Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Student added successfully',
+          confirmButtonColor: '#295f98'
+        });
         
         this.closeModal();
         this.$emit("student-saved");
