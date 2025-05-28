@@ -130,24 +130,25 @@
   <!-- Release Modal -->
   <div v-if="showreleasedModal" class="modal-overlay">
     <div class="modal-content">
-      <div class="student-file-upload-released" @click="triggerFileInput">
-      <label for="fileInput" class="upload-box">
-        <p><i class="fas fa-upload"></i></p>
-        <p v-if="!uploadedFile">Upload CSV File (CSV Only)</p>
-        <p v-else>
-          {{ uploadedFile.name }}
-          <button @click.stop="removeFile" class="remove-btn">✕</button>
-        </p>
-
-      </label>
-      <input
-        type="file"
-        id="fileInput"
-        accept=".csv"
-        ref="fileInput"
-        @change="handleFileUpload"
-        hidden
-      />
+      <div class="student-file-upload-released" @click="!hasStampedPdf && triggerFileInput" :class="{ 'disabled-upload': hasStampedPdf }">
+        <label for="fileInput" class="upload-box">
+          <p><i class="fas fa-upload"></i></p>
+          <p v-if="!uploadedFile && !hasStampedPdf">Upload PDF File (PDF Only)</p>
+          <p v-else-if="hasStampedPdf">Document Already Furnished</p>
+          <p v-else>
+            {{ uploadedFile.name }}
+            <button @click.stop="removeFile" class="remove-btn">✕</button>
+          </p>
+        </label>
+        <input
+          type="file"
+          id="fileInput"
+          accept=".pdf"
+          ref="fileInput"
+          @change="handleFileUpload"
+          hidden
+          :disabled="hasStampedPdf"
+        />
 
         <div v-if="pdfUrl" class="pdf-preview">
           <embed
@@ -316,38 +317,19 @@
           <input type="text" v-model="DateAdded" placeholder="" readonly />
         </div>
         <div class="furnished">
-          <!-- Apply Copy Furnished Button -->
           <button
             class="apply-button"
-            :disabled="isProcessing"
+            :disabled="isProcessing || hasStampedPdf"
             :style="{
-              backgroundColor: isApplied ? '#fff' : '#0c5a48',
-              color: isApplied ? '#0c5a48' : '#fff',
+              backgroundColor: isApplied || hasStampedPdf ? '#fff' : '#0c5a48',
+              color: isApplied || hasStampedPdf ? '#0c5a48' : '#fff',
             }"
             @click="toggleApplyStatus"
           >
             <p>
               <span v-if="isProcessing" class="loading-spinner"></span>
-              <font-awesome-icon v-if="isApplied" icon="check" class="mr-1" />
-              {{ isProcessing ? 'Processing...' : (isApplied ? "Copy Furnished Applied" : "Apply Copy Furnished") }}
-            </p>
-          </button>
-
-          <!-- Copy Furnished Applied Button (Hidden initially, will be swapped dynamically) -->
-          <button
-            class="status-apply"
-            :style="{
-              backgroundColor: isApplied ? '#0c5a48' : '#fff',
-              color: isApplied ? '#fff' : '#0c5a48',
-            }"
-            style="display: none"
-            @click="toggleApplyStatus"
-          >
-            <p>
-              <font-awesome-icon v-if="!isApplied" icon="check" class="mr-1" />
-              {{
-                isApplied ? "Apply Copy Furnished" : "Copy Furnished Applied"
-              }}
+              <font-awesome-icon v-if="isApplied || hasStampedPdf" icon="check" class="mr-1" />
+              {{ isProcessing ? 'Processing...' : (isApplied || hasStampedPdf ? "Copy Furnished Applied" : "Apply Copy Furnished") }}
             </p>
           </button>
         </div>
@@ -401,6 +383,8 @@ export default {
       isProcessing: false,
       studentId: null,
       studentStatus: 'Not-Applicable',
+      hasStampedPdf: false,
+      stampedPdfPath: null,
     };
   },
   props: {
@@ -449,15 +433,22 @@ export default {
         this.FacultyName = student.faculty_name;
         this.DateAdded = student.created_at || new Date().toLocaleDateString();
 
-        // Fix PDF URL construction
-        if (student.pdf_storage) {
+        // Check for stamped PDF
+        if (student.stamped_pdf_storage) {
+          this.hasStampedPdf = true;
+          this.stampedPdfPath = student.stamped_pdf_storage;
+          const stampedPath = student.stamped_pdf_storage.replace('public/', '');
+          this.pdfUrl = `${PDF_BASE_URL}/${stampedPath}`;
+          this.isApplied = true;
+        } else if (student.pdf_storage) {
           let pdfPath = student.pdf_storage.replace('public/pdfs/public/pdfs/', 'public/pdfs/');
           if (!pdfPath.endsWith('.pdf')) pdfPath += '.pdf';
           
+          pdfPath = pdfPath.replace('public/', '');
           this.originalPdfUrl = `${PDF_BASE_URL}/${pdfPath}`;
           this.pdfUrl = this.originalPdfUrl;
-          console.log("Constructed PDF URL:", this.pdfUrl);
         }
+        
         this.updateStudentStatus();
       } catch (error) {
         console.error("Error:", error);
@@ -626,7 +617,8 @@ export default {
           
           if (response.success && response.stampedPdfPath) {
             // Update PDF URL to show the stamped version
-            this.pdfUrl = `${PDF_BASE_URL}/${response.stampedPdfPath}`;
+            const stampedPath = response.stampedPdfPath.replace('public/', '');
+            this.pdfUrl = `${PDF_BASE_URL}/${stampedPath}`;
             console.log("Updated PDF URL with stamped version:", this.pdfUrl);
           }
         } else {

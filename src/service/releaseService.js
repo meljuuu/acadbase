@@ -25,6 +25,21 @@ class ReleaseService {
             throw error.response?.data || error;
         }
     }
+
+    // Add new method to check stamped PDF status
+    async checkStampedPdfStatus(studentId) {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/pdf/check-stamped-status/${studentId}`);
+            return {
+                success: response.data.success,
+                hasStampedPdf: response.data.has_stamped_pdf,
+                stampedPdfPath: response.data.stamped_pdf_path
+            };
+        } catch (error) {
+            console.error('API Error:', error.response?.data || error);
+            throw error.response?.data || error;
+        }
+    }
 }
 
 export default new ReleaseService();
