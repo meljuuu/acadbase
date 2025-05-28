@@ -90,12 +90,32 @@ const parseExcel = (file) => {
       const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
       const jsonData = XLSX.utils.sheet_to_json(firstSheet);
       
-      // Force status to Not-Applicable for all rows
+      // Process and format the data
       const processedData = jsonData.map(row => {
-        // Remove any existing status field to ensure it's overwritten
-        const { status, ...rest } = row;
+        // Handle birthdate formatting
+        let birthdate = row.birthdate || row.birthday || row.birth_date;
+        if (birthdate) {
+          // If it's an Excel date number
+          if (typeof birthdate === 'number') {
+            const date = new Date(Math.round((birthdate - 25569) * 86400 * 1000));
+            birthdate = date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+          } else if (typeof birthdate === 'string') {
+            // Try to parse the string date
+            try {
+              const date = new Date(birthdate);
+              if (!isNaN(date.getTime())) {
+                birthdate = date.toISOString().split('T')[0];
+              }
+            } catch (e) {
+              console.error('Error parsing date:', e);
+              birthdate = null;
+            }
+          }
+        }
+
         return {
-          ...rest,
+          ...row,
+          birthdate: birthdate,
           status: 'Not-Applicable'
         };
       });

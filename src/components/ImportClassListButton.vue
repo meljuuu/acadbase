@@ -252,6 +252,12 @@ export default {
 
           emit('excelUploaded');
           closeImportModal();
+          
+          // Add page refresh after successful import
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
+          
         } catch (error) {
           // Show error message
           await Swal.fire({

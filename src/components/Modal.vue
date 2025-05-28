@@ -521,15 +521,28 @@ export default {
   },
   methods: {
     getFacultyName() {
-      const user = JSON.parse(localStorage.getItem("user"));
-      if (!user) return "";
+      try {
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (!user) {
+          console.log("No user found in localStorage");
+          return "";
+        }
 
-      const { FirstName, MiddleName, LastName } = user;
-      let fullName = FirstName || "";
-      if (MiddleName) fullName += ` ${MiddleName}`;
-      if (LastName) fullName += ` ${LastName}`;
+        // Match the actual data structure from localStorage
+        const { FirstName, MiddleName, LastName, Suffix } = user;
+        
+        // Build the full name with proper spacing
+        let fullName = FirstName || "";
+        if (MiddleName) fullName += ` ${MiddleName}`;
+        if (LastName) fullName += ` ${LastName}`;
+        if (Suffix) fullName += ` ${Suffix}`;
 
-      return fullName.trim();
+        console.log("Constructed faculty name:", fullName.trim());
+        return fullName.trim();
+      } catch (error) {
+        console.error("Error getting faculty name:", error);
+        return "";
+      }
     },
     async fetchStudentData(id) {
       if (!id) {
@@ -560,7 +573,6 @@ export default {
         this.syBatch = student.batch;
         this.Curriculum = student.curriculum;
         this.AcademicTrack = student.track;
-        this.FacultyName = student.faculty_name;
         this.DateAdded = student.created_at || new Date().toLocaleDateString();
 
         // Check for stamped PDF
@@ -610,6 +622,11 @@ export default {
       
       // Set new student ID and fetch data
       this.studentId = id;
+      
+      // Get faculty name from localStorage when modal opens
+      this.FacultyName = this.getFacultyName();
+      
+      // Fetch student data
       this.fetchStudentData(id);
       this.showunreleasedModal = true;
     },
@@ -1086,6 +1103,10 @@ export default {
   mounted() {
     this.checkPdfSupport();
     this.updateStudentStatus();
+    // Set faculty name when component is mounted
+    this.FacultyName = this.getFacultyName();
+    
+    // Log environment variables
     console.log('Environment Variables:', {
       VITE_API_URL: import.meta.env.VITE_API_URL,
       VITE_API_PDF: import.meta.env.VITE_API_PDF,
