@@ -14,11 +14,12 @@ class ReleaseService {
                 throw new Error(response.data.message || 'Failed to add image overlay');
             }
             
-            // Return both success status and the new stamped PDF path
             return {
                 success: response.data.success,
                 message: response.data.message,
-                stampedPdfPath: response.data.stamped_pdf_path
+                stampedPdfPath: response.data.stamped_pdf_path,
+                furnishedDate: response.data.furnished_date,
+                furnishedBy: response.data.furnished_by
             };
         } catch (error) {
             console.error('API Error:', error.response?.data || error);
@@ -33,7 +34,9 @@ class ReleaseService {
             return {
                 success: response.data.success,
                 hasStampedPdf: response.data.has_stamped_pdf,
-                stampedPdfPath: response.data.stamped_pdf_path
+                stampedPdfPath: response.data.stamped_pdf_path,
+                furnishedDate: response.data.furnished_date,
+                furnishedBy: response.data.furnished_by
             };
         } catch (error) {
             console.error('API Error:', error.response?.data || error);

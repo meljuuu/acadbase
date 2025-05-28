@@ -119,6 +119,15 @@
           <input type="text" v-model="DateAdded" placeholder="" readonly />
         </div>
 
+        <div class="input-group" v-if="furnishedDate">
+          <label>Document Furnished Date</label>
+          <input type="text" :value="formatDate(furnishedDate)" readonly />
+        </div>
+        <div class="input-group" v-if="furnishedBy">
+          <label>Furnished By</label>
+          <input type="text" :value="furnishedBy" readonly />
+        </div>
+
         <div class="modal-buttons">
           <button @click="closeModal" class="cancel">Cancel</button>
           <button @click="saveStudent" class="add">Add Student</button>
@@ -219,6 +228,15 @@
           <input type="text" v-model="DateAdded" placeholder="" readonly />
         </div>
 
+        <div class="input-group" v-if="furnishedDate">
+          <label>Document Furnished Date</label>
+          <input type="text" :value="formatDate(furnishedDate)" readonly />
+        </div>
+        <div class="input-group" v-if="furnishedBy">
+          <label>Furnished By</label>
+          <input type="text" :value="furnishedBy" readonly />
+        </div>
+
         <div class="modal-buttons">
           <button @click="closeReleasedModal" class="cancel">Back</button>
         </div>
@@ -316,6 +334,14 @@
           <label>Date of Released</label>
           <input type="text" v-model="DateAdded" placeholder="" readonly />
         </div>
+        <div class="input-group" v-if="furnishedDate">
+          <label>Document Furnished Date</label>
+          <input type="text" :value="formatDate(furnishedDate)" readonly />
+        </div>
+        <div class="input-group" v-if="furnishedBy">
+          <label>Furnished By</label>
+          <input type="text" :value="furnishedBy" readonly />
+        </div>
         <div class="furnished">
           <button
             class="apply-button"
@@ -385,6 +411,8 @@ export default {
       studentStatus: 'Not-Applicable',
       hasStampedPdf: false,
       stampedPdfPath: null,
+      furnishedDate: null,
+      furnishedBy: null,
     };
   },
   props: {
@@ -449,6 +477,8 @@ export default {
           const stampedPath = student.stamped_pdf_storage.replace('public/', '');
           this.pdfUrl = `${PDF_BASE_URL}/${stampedPath}`;
           this.isApplied = true;
+          this.furnishedDate = student.furnished_date;
+          this.furnishedBy = student.furnished_by;
           console.log('Student has stamped PDF:', this.stampedPdfPath);
         } else if (student.pdf_storage) {
           let pdfPath = student.pdf_storage.replace('public/pdfs/public/pdfs/', 'public/pdfs/');
@@ -650,6 +680,8 @@ export default {
           if (response.success && response.stampedPdfPath) {
             const stampedPath = response.stampedPdfPath.replace('public/', '');
             this.pdfUrl = `${PDF_BASE_URL}/${stampedPath}`;
+            this.furnishedDate = response.furnishedDate;
+            this.furnishedBy = response.furnishedBy;
           }
         } else {
           this.pdfUrl = this.originalPdfUrl;
@@ -802,6 +834,17 @@ export default {
         this.studentStatus = 'Not-Applicable';
       }
     },
+    formatDate(dateString) {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      return date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
   },
   computed: {
     isStudentInfoComplete() {
