@@ -10,34 +10,13 @@
 
         <Buttons @click="openaddModal" />
 
-        <ImportClassListButton @click="openImportModal" />
+        <ImportClassListButton @open-modal="openImportModal" />
 
 
 
         <Modal ref="addModalRef" />
 
-        <Modal ref="importModalRef">
-          <template #default>
-            <div class="import-container">
-              <input 
-                type="file" 
-                accept=".csv" 
-                @change="handleCsvUpload" 
-                class="file-input"
-              />
-              <div class="import-instructions">
-                <h3>CSV File Requirements:</h3>
-                <ul>
-                  <li>File must be in CSV format</li>
-                  <li>Required columns: LRN, Name, Track, Curriculum</li>
-                  <li>Optional columns: Batch or School Year (case-sensitive)</li>
-                  <li>Status will be set to "Unreleased" automatically</li>
-                </ul>
-              </div>
-              <button @click="processCsv" class="process-button">Process CSV</button>
-            </div>
-          </template>
-        </Modal>
+        <Modal ref="importModalRef" @csvUploaded="fetchStudents" />
       </div>
 
       <div class="filters">
@@ -102,11 +81,6 @@
 
     <Modal ref="unreleasedModalRef" />
     <EditModal ref="editModalRef" />
-
-    <p class="note">
-      *Note: Only 20 students are displayed in the table. Other students Name
-      are on the next page.*
-    </p>
 
     <div class="pagination">
       <button @click="prevPage" :disabled="currentPage === 1">

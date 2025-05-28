@@ -127,67 +127,7 @@
     </div>
   </div>
 
-  <!-- ImportClassList Modal for CSV Upload -->
-<div v-if="showImportModal" class="modal-overlay">
-  <div class="modal-content">
-    <!-- File Upload Box for CSV -->
-    <div class="file-upload" @click="triggerFileInput">
-      <label for="fileInput" class="upload-box">
-        <p><i class="fas fa-upload"></i></p>
-        <p v-if="!uploadedFile">Upload CSV File (CSV Only)</p>
-        <p v-else>
-          {{ uploadedFile.name }}
-          <button @click.stop="removeFile" class="remove-btn">✕</button>
-        </p>
-
-      </label>
-      <input
-        type="file"
-        id="fileInput"
-        accept=".csv"
-        ref="fileInput"
-        @change="handleFileUpload"
-        hidden
-      />
-
-      <!-- CSV Preview Section -->
-      <div v-if="csvPreview.length">
-        <h5>CSV Data Preview:</h5>
-        <table class="csv-preview">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>LRN</th>
-              <th>Birthdate</th>
-              <th>S.Y Batch</th>
-              <th>Curriculum</th>
-              <th>Academic Track</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(student, index) in csvPreview" :key="index">
-              <td>{{ student.Name }}</td>
-              <td>{{ student.LRN }}</td>
-              <td>{{ student.Birthdate }}</td>
-              <td>{{ student.syBatch }}</td>
-              <td>{{ student.Curriculum }}</td>
-              <td>{{ student.AcademicTrack }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="modal-buttons">
-      <button @click="closeImportModal" class="cancel">Cancel</button>
-      <button @click="uploadCSV" class="upload">Upload CSV</button>
-    </div>
-  </div>
-</div>
-
-
-
-<!-- Release Modal -->
+  <!-- Release Modal -->
   <div v-if="showreleasedModal" class="modal-overlay">
     <div class="modal-content">
       <div class="student-file-upload-released" @click="triggerFileInput">
@@ -430,14 +370,13 @@ const PDF_BASE_URL = import.meta.env.VITE_API_PDF || `${API_BASE_URL}/storage`;
 
 export default {
   name: "Modal",
+  emits: ['student-saved'],
   data() {
     return {
       showModal: false,
       showreleasedModal: false,
       showunreleasedModal: false,
-      showImportModal: false,
       uploadedFile: null,
-      csvPreview: [],
       pdfUrl: null,
       Name: "",
       lrn: "",
@@ -451,15 +390,9 @@ export default {
       isPdfLoaded: false,
       pdfLoadFailed: false,
       academicYears: [
-  "2025-2026", // Current year (auto-populated)
-  "2024-2025", // Previous year
-  "2023-2024",
-  "2022-2023",
-  "2021-2022",
-  "2020-2021",
-  "2019-2020",
-]
-
+        "2025-2026", "2024-2025", "2023-2024", 
+        "2022-2023", "2021-2022", "2020-2021", "2019-2020"
+      ]
     };
   },
   props: {
@@ -554,10 +487,10 @@ export default {
           track: this.AcademicTrack,
           batch: this.syBatch,
           curriculum: this.Curriculum,
-          status: this.uploadedFile ? 'Unreleased' : 'Not-Applicable',
+          status: this.uploadedFile ? 'Unreleased' : 'Not Applicable',
           faculty_name: this.FacultyName,
           birthdate: this.birthdate,
-          ...(this.uploadedFile && { pdfFile: this.uploadedFile }),
+          pdfFile: this.uploadedFile,
         };
 
         console.log('Submitting student data:', studentData);
@@ -568,14 +501,6 @@ export default {
         console.error("Error saving student:", error.response?.data || error.message);
         alert(`Failed to save student: ${error.response?.data?.message || error.message}`);
       }
-    },
-
-    openImportModal() {
-      this.showImportModal = true;  // Show the modal when this method is called
-    },
-    closeImportModal() {
-      this.showImportModal = false;  // Close the modal
-      this.removeFile();  // Optionally remove file when modal is closed
     },
     triggerFileInput() {
       if (!this.isStudentInfoComplete) {
@@ -595,45 +520,11 @@ export default {
         }
       }
     },
-    readCSV(file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const contents = reader.result;
-        const parsedData = this.parseCSV(contents);
-        this.csvPreview = parsedData;
-      };
-      reader.readAsText(file);
-    },
-    parseCSV(csvContent) {
-      const lines = csvContent.split("\n");
-      const result = [];
-      const headers = lines[0].split(",");
-
-      for (let i = 1; i < lines.length; i++) {
-        const currentLine = lines[i].split(",");
-        if (currentLine.length === headers.length) {
-          let student = {};
-          for (let j = 0; j < headers.length; j++) {
-            student[headers[j].trim()] = currentLine[j].trim();
-          }
-          result.push(student);
-        }
-      }
-      return result;
-    },
     removeFile() {
       this.uploadedFile = null;
       this.pdfUrl = null;
       if (this.$refs.fileInput) {
         this.$refs.fileInput.value = "";
-      }
-    },
-    uploadCSV() {
-      if (this.csvPreview.length) {
-        console.log("Uploading CSV data:", this.csvPreview);
-        this.closeImportModal();
-      } else {
-        alert("Please upload a CSV file.");
       }
     },
     toggleApplyStatus() {
