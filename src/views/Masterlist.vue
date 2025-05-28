@@ -83,7 +83,7 @@
           <tr
             v-for="(student, index) in students"
             :key="student.id"
-            @click="showUnReleasedModal"
+            @click="showUnReleasedModal(student.id)"
           >
             <td>{{ student.lrn }}</td>
             <td>{{ student.name }}</td>
@@ -274,8 +274,8 @@ export default {
     openaddModal() {
       this.$refs.addModalRef.openaddModal();
     },
-    showUnReleasedModal() {
-      this.$refs.unreleasedModalRef.showUnReleasedModal();
+    showUnReleasedModal(id) {
+      this.$refs.unreleasedModalRef.showUnReleasedModal(id);
     },
     toggleDropdown(index) {
       this.activeDropdown = this.activeDropdown === index ? null : index;

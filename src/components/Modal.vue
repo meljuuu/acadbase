@@ -19,17 +19,17 @@
         />
 
         <div v-if="pdfUrl" class="pdf-preview">
-          <object
-            :data="pdfUrl"
+          <embed
+            :src="pdfUrl"
+            @error="handlePdfError"
             type="application/pdf"
             width="100%"
             height="500px"
-          >
-            <p>
-              Your browser does not support PDFs.
-              <a :href="pdfUrl" target="_blank">Download PDF</a>
-            </p>
-          </object>
+          />
+          <p v-if="pdfLoadFailed">
+            PDF failed to load. 
+            <a :href="pdfUrl" target="_blank">Download instead</a>.
+          </p>
           <button @click.stop="removeFile" class="remove-btn">Remove</button>
         </div>
       </div>
@@ -194,17 +194,17 @@
       />
 
         <div v-if="pdfUrl" class="pdf-preview">
-          <object
-            :data="pdfUrl"
+          <embed
+            :src="pdfUrl"
+            @error="handlePdfError"
             type="application/pdf"
             width="100%"
             height="500px"
-          >
-            <p>
-              Your browser does not support PDFs.
-              <a :href="pdfUrl" target="_blank">Download PDF</a>
-            </p>
-          </object>
+          />
+          <p v-if="pdfLoadFailed">
+            PDF failed to load. 
+            <a :href="pdfUrl" target="_blank">Download instead</a>.
+          </p>
           <button @click.stop="removeFile" class="remove-btn">Remove</button>
         </div>
       </div>
@@ -293,17 +293,17 @@
       />
 
         <div v-if="pdfUrl" class="pdf-preview">
-          <object
-            :data="pdfUrl"
+          <embed
+            :src="pdfUrl"
+            @error="handlePdfError"
             type="application/pdf"
             width="100%"
             height="500px"
-          >
-            <p>
-              Your browser does not support PDFs.
-              <a :href="pdfUrl" target="_blank">Download PDF</a>
-            </p>
-          </object>
+          />
+          <p v-if="pdfLoadFailed">
+            PDF failed to load. 
+            <a :href="pdfUrl" target="_blank">Download instead</a>.
+          </p>
           <button @click.stop="removeFile" class="remove-btn">Remove</button>
         </div>
       </div>
@@ -409,6 +409,10 @@
 
 <script>
 import MasterlistService from '../service/MasterlistService';
+
+// Define API_URL (use the same value as in MasterlistService.js)
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 export default {
   name: "Modal",
   data() {
@@ -429,6 +433,8 @@ export default {
       FacultyName: this.getFacultyName(),
       DateAdded: new Date().toLocaleDateString(),
       isApplied: false,
+      isPdfLoaded: false,
+      pdfLoadFailed: false,
     };
   },
   props: {
@@ -454,7 +460,36 @@ export default {
 
       return fullName.trim();
     },
-    showUnReleasedModal() {
+    async fetchStudentData(id) {
+      if (!id) {
+        console.error("Invalid student ID:", id);
+        alert("Invalid student ID. Please try again.");
+        return;
+      }
+
+      try {
+        const student = await MasterlistService.getStudent(id);
+        this.Name = student.name;
+        this.lrn = student.lrn;
+        this.birthdate = student.birthdate || '';
+        this.syBatch = student.batch;
+        this.Curriculum = student.curriculum;
+        this.AcademicTrack = student.track;
+        this.FacultyName = student.faculty_name;
+        this.DateAdded = student.created_at || new Date().toLocaleDateString();
+
+        // Construct the correct backend URL for the PDF
+        if (student.pdf_storage) {
+          this.pdfUrl = `http://localhost:8000/storage/${student.pdf_storage.replace('public/', '')}`;
+          console.log("PDF URL:", this.pdfUrl); // Debug
+        }
+      } catch (error) {
+        console.error("Error fetching student data:", error);
+        alert("Failed to fetch student data. Please try again.");
+      }
+    },
+    showUnReleasedModal(id) {
+      this.fetchStudentData(id); // Fetch data when modal is opened
       this.showunreleasedModal = true;
     },
     closeUnReleasedModal() {
@@ -585,7 +620,7 @@ export default {
       // Remove any non-numeric characters
       this.lrn = this.lrn.replace(/[^0-9]/g, '');
     },
-    validateSyBatch(event) {
+    validateSyBatch() {
       // Format: YYYY-YYYY
       let value = this.syBatch.replace(/[^0-9-]/g, '');
       
@@ -601,11 +636,21 @@ export default {
       
       this.syBatch = value;
     },
+    checkPdfSupport() {
+      // Simple check for PDF support (modern browsers support PDF embedding)
+      this.isPdfLoaded = !!document.createElement('embed').type;
+    },
+    handlePdfError() {
+      this.pdfLoadFailed = true;
+    },
   },
   computed: {
     isStudentInfoComplete() {
       return this.Name && this.lrn && this.AcademicTrack && this.syBatch && this.Curriculum;
     },
+  },
+  mounted() {
+    this.checkPdfSupport();
   },
 };
 </script>
@@ -811,5 +856,20 @@ select {
 select:focus {
   border-color: #295f9852;
   box-shadow: 0 0 3px rgba(41, 95, 152, 0.5);
+}
+
+.pdf-embed {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.pdf-fallback {
+  color: #d32f2f;
+  margin-top: 10px;
+}
+
+.pdf-download {
+  color: #295f98;
+  text-decoration: underline;
 }
 </style>

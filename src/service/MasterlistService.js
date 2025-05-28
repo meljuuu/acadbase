@@ -46,9 +46,11 @@ class MasterlistService {
     // Get single student
     async getStudent(id) {
         try {
+            console.log(`Fetching student with ID: ${id}`); // Debug log
             const response = await axios.get(`${API_URL}/masterlist/${id}`);
             return response.data;
         } catch (error) {
+            console.error("API Error:", error.response?.data || error.message);
             throw error;
         }
     }
