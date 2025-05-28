@@ -57,7 +57,7 @@
       class="filter-dropdown"
       @change="$emit('update:selectedType', selectedType)"
     >
-      <option disabled value="">Download Report</option>
+      <option disabled value="">Download CSV</option>
       <option v-for="type in types" :key="type">
         {{ type }}
       </option>
@@ -102,7 +102,7 @@ const curriculums = [
 const years = ["2024 - 2025", "2023 - 2024", "2022 - 2023"];
 const batchs = ["All", "S.Y 2020 - 2021", "S.Y 2021 - 2022", "S.Y 2022 - 2023", "S.Y 2023 - 2024", "S.Y 2024 - 2025"];
 const tracks = ["All", "TVL - IEM", "HUMSS", "SPJ", "SPA", "BEC"];
-const types = [".csv", ".pdf"];
+const types = [".csv"];
 const statuses = ["All", "Dropped-Out", "Not-Applicable", "Released", "Unreleased"]; 
 
 const selectedCurriculum = ref("");

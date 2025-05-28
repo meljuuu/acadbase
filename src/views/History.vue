@@ -21,16 +21,13 @@
         
       </div>
 
-      <button class="reset-button" @click="resetFilters" title="Reset Filters">
+      <div class="filter-actions">
+        <button class="download-button" @click="downloadCSV" title="Download CSV">
+          <i class="fas fa-download"></i> Download CSV
+        </button>
+        <button class="reset-button" @click="resetFilters" title="Reset Filters">
           <i class="fas fa-sync-alt"></i>
         </button>
-
-      <div class="filter-actions">
-        <Dropdown
-          :showType="true"
-          @update:selectedType="selectedType = $event"
-        />
-
       </div>
     </div>
 
@@ -134,7 +131,9 @@ export default {
       this.handleFilterChange();
     },
     selectedType() {
-      this.handleFilterChange();
+      if (this.selectedType === '.csv') {
+        this.downloadCSV();
+      }
     }
   },
   methods: {
@@ -193,6 +192,57 @@ export default {
       if (!status) return '';
       // Convert status to lowercase and replace spaces with hyphens
       return status.toLowerCase().replace(/\s+/g, '-');
+    },
+    async downloadCSV() {
+      try {
+        // Get the current filtered data from the table
+        const students = this.paginatedStudents;
+
+        if (!students || students.length === 0) {
+          this.error = 'No data available to download';
+          return;
+        }
+
+        // Helper function to escape CSV values
+        const escapeCSV = (value) => {
+          if (value === null || value === undefined) return '';
+          const stringValue = String(value);
+          if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+            return `"${stringValue.replace(/"/g, '""')}"`;
+          }
+          return stringValue;
+        };
+
+        // Create CSV content with proper escaping
+        const headers = ['LRN', 'STUDENT NAME', 'S.Y. BATCH', 'CURRICULUM', 'ACADEMIC TRACK', 'PROCESSOR', 'STATUS'];
+        const csvContent = [
+          headers.map(escapeCSV).join(','),
+          ...students.map(student => [
+            escapeCSV(student.lrn),
+            escapeCSV(student.name),
+            escapeCSV(student.batch),
+            escapeCSV(student.curriculum),
+            escapeCSV(student.track),
+            escapeCSV(student.faculty_name),
+            escapeCSV(student.status)
+          ].join(','))
+        ].join('\n');
+
+        // Create and trigger download
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `student_records_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+      } catch (error) {
+        console.error('Error downloading CSV:', error);
+        this.error = 'Failed to download CSV. Please try again.';
+      }
     }
   },
   mounted() {
@@ -510,5 +560,27 @@ tr:hover {
 
 .error-message button:hover {
   background: #b71c1c;
+}
+
+.download-button {
+  background: #295f98;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.download-button:hover {
+  background: #1a3f66;
+}
+
+.download-button i {
+  font-size: 14px;
 }
 </style>
