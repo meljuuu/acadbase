@@ -65,7 +65,7 @@
           <input
             type="text"
             v-model="syBatch"
-            placeholder="Enter S.Y Batch"
+            placeholder="YYYY-YYYY"
             @input="validateSyBatch"
             required
           />
@@ -73,21 +73,20 @@
 
         <div class="input-group">
           <label>Curriculum</label>
-          <input
-            type="text"
-            v-model="Curriculum"
-            placeholder="Enter Curriculum"
-            required
-          />
+          <select v-model="Curriculum" required>
+            <option value="">Select Curriculum</option>
+            <option value="JHS">JHS</option>
+            <option value="SHS">SHS</option>
+          </select>
         </div>
         <div class="input-group">
           <label>Academic Track</label>
-          <input
-            type="text"
-            v-model="AcademicTrack"
-            placeholder="Enter Academic Track"
-            required
-          />
+          <select v-model="AcademicTrack" required>
+            <option value="">Select Track</option>
+            <option value="SPJ">SPJ</option>
+            <option value="BEC">BEC</option>
+            <option value="SPA">SPA</option>
+          </select>
         </div>
         <h5>Processor Information</h5>
         <div class="input-group">
@@ -582,6 +581,26 @@ export default {
       applyButton.style.display = this.isApplied ? "none" : "block";
       statusButton.style.display = this.isApplied ? "block" : "none";
     },
+    validateLRN(event) {
+      // Remove any non-numeric characters
+      this.lrn = this.lrn.replace(/[^0-9]/g, '');
+    },
+    validateSyBatch(event) {
+      // Format: YYYY-YYYY
+      let value = this.syBatch.replace(/[^0-9-]/g, '');
+      
+      // Ensure proper format
+      if (value.length > 9) {
+        value = value.slice(0, 9);
+      }
+      
+      // Add hyphen after 4 digits if not present
+      if (value.length > 4 && !value.includes('-')) {
+        value = value.slice(0, 4) + '-' + value.slice(4);
+      }
+      
+      this.syBatch = value;
+    },
   },
   computed: {
     isStudentInfoComplete() {
@@ -777,5 +796,20 @@ export default {
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none; 
+}
+select {
+  width: 95%;
+  padding: 8px;
+  margin-top: -1px;
+  margin-bottom: 5px;
+  border: 1px solid #295f98;
+  outline: none;
+  border-radius: 5px;
+  background-color: white;
+}
+
+select:focus {
+  border-color: #295f9852;
+  box-shadow: 0 0 3px rgba(41, 95, 152, 0.5);
 }
 </style>
