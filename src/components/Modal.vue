@@ -225,7 +225,7 @@
         </div>
         <div class="input-group">
           <label>Date of Released</label>
-          <input type="text" v-model="DateAdded" placeholder="" readonly />
+          <input type="text" :value="formatDate(DateAdded)" placeholder="" readonly />
         </div>
 
         <div class="input-group" v-if="furnishedDate">
@@ -332,7 +332,7 @@
         </div>
         <div class="input-group">
           <label>Date of Released</label>
-          <input type="text" v-model="DateAdded" placeholder="" readonly />
+          <input type="text" :value="formatDate(DateAdded)" placeholder="" readonly />
         </div>
         <div class="input-group" v-if="furnishedDate">
           <label>Document Furnished Date</label>
@@ -876,7 +876,8 @@ export default {
         month: 'long',
         day: 'numeric',
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
+        hour12: true
       });
     },
     async downloadStampedPdf() {
