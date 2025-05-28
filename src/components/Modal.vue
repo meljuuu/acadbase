@@ -325,32 +325,45 @@
         </div>
         <div class="input-group">
           <label>S.Y Batch</label>
-          <input
-            type="text"
+          <select 
             v-model="syBatch"
-            :readonly="!isEditMode"
+            :disabled="!isEditMode"
             :class="{ 'editable': isEditMode }"
-            placeholder="YYYY-YYYY"
-            @input="validateSyBatch"
-          />
+          >
+            <option value="">Select Year</option>
+            <option 
+              v-for="year in academicYears" 
+              :key="year" 
+              :value="year"
+            >
+              {{ year }}
+            </option>
+          </select>
         </div>
         <div class="input-group">
           <label>Curriculum</label>
-          <input
-            type="text"
+          <select 
             v-model="Curriculum"
-            :readonly="!isEditMode"
+            :disabled="!isEditMode"
             :class="{ 'editable': isEditMode }"
-          />
+          >
+            <option value="">Select Curriculum</option>
+            <option value="JHS">JHS</option>
+            <option value="SHS">SHS</option>
+          </select>
         </div>
         <div class="input-group">
           <label>Academic Track</label>
-          <input
-            type="text"
+          <select 
             v-model="AcademicTrack"
-            :readonly="!isEditMode"
+            :disabled="!isEditMode"
             :class="{ 'editable': isEditMode }"
-          />
+          >
+            <option value="">Select Track</option>
+            <option value="SPJ">SPJ</option>
+            <option value="BEC">BEC</option>
+            <option value="SPA">SPA</option>
+          </select>
         </div>
         <h5>Processor Information</h5>
         <div class="input-group">
@@ -904,6 +917,7 @@ export default {
       }
 
       try {
+        // Update student status before saving
         this.updateStudentStatus();
 
         const studentData = {
@@ -927,9 +941,18 @@ export default {
             text: 'Student information updated successfully',
             confirmButtonColor: '#295f98'
           });
-          this.isEditMode = false; // Exit edit mode after successful save
+          
+          // Exit edit mode after successful save
+          this.isEditMode = false;
+          
+          // Close modal and emit event to refresh the list
           this.closeUnReleasedModal();
           this.$emit('student-saved');
+          
+          // Refresh the page after a short delay
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
         } else {
           throw new Error(response.message || 'Update failed');
         }
@@ -1283,6 +1306,17 @@ select {
   outline: none;
   border-radius: 5px;
   background-color: white;
+}
+
+select:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+select.editable {
+  background-color: #fff !important;
+  border-color: #295f98 !important;
+  cursor: pointer !important;
 }
 
 select:focus {

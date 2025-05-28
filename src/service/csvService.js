@@ -89,7 +89,18 @@ const parseExcel = (file) => {
       const workbook = XLSX.read(data, { type: 'array' });
       const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
       const jsonData = XLSX.utils.sheet_to_json(firstSheet);
-      resolve(jsonData);
+      
+      // Force status to Not-Applicable for all rows
+      const processedData = jsonData.map(row => {
+        // Remove any existing status field to ensure it's overwritten
+        const { status, ...rest } = row;
+        return {
+          ...rest,
+          status: 'Not-Applicable'
+        };
+      });
+      
+      resolve(processedData);
     };
     reader.onerror = reject;
     reader.readAsArrayBuffer(file);
@@ -99,7 +110,15 @@ const parseExcel = (file) => {
 const uploadCSV = async (file) => {
   try {
     const response = await MasterlistService.processCsvAndAddStudents(file);
-    return response.data;
+    // Ensure we return a properly structured response even if stats are missing
+    return {
+      stats: {
+        total: response.data?.stats?.total || 0,
+        imported: response.data?.stats?.imported || 0,
+        updated: response.data?.stats?.updated || 0,
+        skipped: response.data?.stats?.skipped || 0
+      }
+    };
   } catch (error) {
     if (error.response) {
       throw new Error(error.response.data.message || "Failed to upload file");
