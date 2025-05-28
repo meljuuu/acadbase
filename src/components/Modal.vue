@@ -543,13 +543,15 @@ export default {
             throw new Error('Student ID is missing');
           }
 
-          console.log('Sending student ID:', this.studentId); // Debug log
+          console.log('Sending student ID:', this.studentId);
           
           // Call the API to add the overlay
-          await ReleaseService.addImageOverlay(this.studentId);
+          const response = await ReleaseService.addImageOverlay(this.studentId);
           
-          // Refresh the PDF preview
-          await this.fetchStudentData(this.studentId);
+          if (response.success && response.stampedPdfPath) {
+            // Update PDF URL to show the stamped version
+            this.pdfUrl = `${PDF_BASE_URL}/${response.stampedPdfPath}`;
+          }
         }
         
         this.isApplied = !this.isApplied;
