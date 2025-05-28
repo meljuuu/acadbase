@@ -18,8 +18,24 @@
 
         <Modal ref="importModalRef">
           <template #default>
-            <input type="file" accept=".pdf" @change="handlePdfUpload" />
-            <button @click="processPdf">Process PDF</button>
+            <div class="import-container">
+              <input 
+                type="file" 
+                accept=".csv" 
+                @change="handleCsvUpload" 
+                class="file-input"
+              />
+              <div class="import-instructions">
+                <h3>CSV File Requirements:</h3>
+                <ul>
+                  <li>File must be in CSV format</li>
+                  <li>Required columns: LRN, Name, Track, Curriculum</li>
+                  <li>Optional columns: Batch or School Year (case-sensitive)</li>
+                  <li>Status will be set to "Unreleased" automatically</li>
+                </ul>
+              </div>
+              <button @click="processCsv" class="process-button">Process CSV</button>
+            </div>
           </template>
         </Modal>
       </div>
@@ -295,21 +311,28 @@ export default {
       this.currentPage = 1;
       this.fetchStudents();
     },
-    async handlePdfUpload(event) {
+    async handleCsvUpload(event) {
+      console.log('Uploaded file:', event.target.files[0]); // Debug
       this.uploadedFile = event.target.files[0];
     },
-    async processPdf() {
+    async processCsv() {
+      console.log('processCsv called'); // Debug
       if (!this.uploadedFile) {
-        this.error = 'No PDF file uploaded.';
+        console.error('No file uploaded'); // Debug
+        this.error = 'No CSV file uploaded.';
         return;
       }
 
       try {
-        await MasterlistService.processPdfAndAddStudent(this.uploadedFile);
+        console.log('Processing CSV file:', this.uploadedFile.name); // Debug log
+        const response = await MasterlistService.processCsvAndAddStudents(this.uploadedFile);
+        console.log('CSV processed successfully:', response); // Debug log
         await this.fetchStudents(); // Refresh the list
         this.$refs.importModalRef.closeModal(); // Close the modal on success
+        this.error = null; // Clear any previous errors
       } catch (error) {
-        this.error = 'Failed to process PDF: ' + error.message;
+        console.error('CSV processing error:', error); // Debug log
+        this.error = error.message;
       }
     },
     parsePdfText(text) {
@@ -615,5 +638,47 @@ tr:hover {
 
 .reset-button:hover {
   background: #1a3f66;
+}
+
+.import-container {
+  padding: 20px;
+  text-align: center;
+}
+
+.file-input {
+  margin-bottom: 20px;
+}
+
+.import-instructions {
+  text-align: left;
+  margin: 20px 0;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+}
+
+.import-instructions h3 {
+  color: #295f98;
+  margin-bottom: 10px;
+}
+
+.import-instructions ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.process-button {
+  background: #295f98;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s ease;
+}
+
+.process-button:hover {
+  background: #1f4b79;
 }
 </style>

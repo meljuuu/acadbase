@@ -179,6 +179,79 @@ class MasterlistService {
         await worker.terminate();
         return data.text;
     }
+
+    /**
+     * Process a CSV file and add multiple students
+     * @param {File} csvFile - The uploaded CSV file
+     * @returns {Promise<Object>} - The result of the import operation
+     */
+    async processCsvAndAddStudents(csvFile) {
+        try {
+            console.log('Reading CSV file:', csvFile.name); // Debug log
+            if (!csvFile.name.toLowerCase().endsWith('.csv')) {
+                throw new Error('Invalid file format. Please upload a CSV file.');
+            }
+
+            const text = await csvFile.text();
+            console.log('CSV content:', text); // Debug log
+            const rows = text.split('\n');
+            
+            const headers = rows[0].split(',').map(h => h.trim());
+            console.log('CSV headers:', headers); // Debug log
+            const requiredHeaders = ['lrn', 'name', 'track', 'curriculum'];
+            const batchHeaders = ['batch', 'school year'];
+            const missingHeaders = requiredHeaders.filter(h => !headers.some(header => header.toLowerCase() === h.toLowerCase()));
+            
+            if (missingHeaders.length > 0) {
+                throw new Error(`Missing required columns: ${missingHeaders.join(', ')}`);
+            }
+
+            const students = [];
+            const errors = [];
+            
+            for (let i = 1; i < rows.length; i++) {
+                if (!rows[i].trim()) continue;
+                
+                const values = rows[i].split(',').map(v => v.trim());
+                if (values.length !== headers.length) {
+                    errors.push(`Row ${i + 1}: Invalid number of columns`);
+                    continue;
+                }
+
+                const student = {
+                    lrn: values[headers.indexOf('lrn')],
+                    name: values[headers.indexOf('name')],
+                    track: values[headers.indexOf('track')],
+                    curriculum: values[headers.indexOf('curriculum')],
+                    batch: values[headers.findIndex(header => batchHeaders.includes(header.toLowerCase()))] || '',
+                    status: 'Unreleased' // Default status (no need to include in CSV)
+                };
+
+                if (!student.lrn || !student.name) {
+                    errors.push(`Row ${i + 1}: Missing required fields (LRN and Name are required)`);
+                    continue;
+                }
+
+                students.push(student);
+            }
+
+            if (errors.length > 0) {
+                throw new Error(`CSV validation errors:\n${errors.join('\n')}`);
+            }
+
+            if (students.length === 0) {
+                throw new Error('No valid student records found in the CSV file');
+            }
+
+            console.log('Sending students to backend:', students); // Debug log
+            const response = await axios.post(`${API_URL}/masterlist/bulk`, { students });
+            return response.data;
+
+        } catch (error) {
+            console.error('CSV processing error:', error); // Debug log
+            throw error;
+        }
+    }
 }
 
 export default new MasterlistService();
