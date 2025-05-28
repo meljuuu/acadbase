@@ -70,9 +70,9 @@
             <td>{{ student.curriculum }}</td>
             <td>{{ student.batch }}</td>
             <td>
-              <span :class="['status', student.status.toLowerCase()]">{{
-                student.status
-              }}</span>
+              <span :class="['status', student.status.toLowerCase()]">
+                {{ formattedStatus(student.status) }}
+              </span>
             </td>
           </tr>
         </tbody>
@@ -152,6 +152,15 @@ export default {
       }
       return Math.ceil(this.total / this.itemsPerPage);
     },
+    formattedStatus() {
+      return (status) => {
+        // Convert camelCase or snake_case to Title Case with spaces
+        return status
+          .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+          .replace(/^./, str => str.toUpperCase()) // Capitalize first letter
+          .trim(); // Remove leading/trailing spaces
+      };
+    }
   },
   watch: {
     selectedStatus() {

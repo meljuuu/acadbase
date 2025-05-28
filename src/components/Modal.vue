@@ -743,23 +743,48 @@ export default {
       }
 
       try {
-        const response = await MasterlistService.updateStudentStatus(this.studentId, 'Drop Out');
-        if (response.success) {
-          await Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: 'Student status updated to Drop Out',
-            confirmButtonColor: '#295f98'
-          });
-          this.closeUnReleasedModal();
-          this.$emit('student-saved');
+        // Show confirmation dialog
+        const result = await Swal.fire({
+          icon: 'warning',
+          title: 'Confirm Drop Out',
+          text: 'Are you sure you want to mark this student as dropped out?',
+          showCancelButton: true,
+          confirmButtonColor: '#dc3545',
+          cancelButtonColor: '#6c757d',
+          confirmButtonText: 'Yes, mark as dropped out',
+          cancelButtonText: 'Cancel'
+        });
+
+        if (result.isConfirmed) {
+          // Use "Dropped-Out" to match the database value
+          const response = await ReleaseService.updateStatus(this.studentId, 'Dropped-Out');
+          
+          if (response.success) {
+            await Swal.fire({
+              icon: 'success',
+              title: 'Success',
+              text: 'Student status updated to Dropped Out',
+              confirmButtonColor: '#295f98'
+            });
+
+            // Close the modal
+            this.closeUnReleasedModal();
+            
+            // Emit event to refresh the list
+            this.$emit('student-saved');
+            
+            // Refresh the page after a short delay
+            setTimeout(() => {
+              window.location.reload();
+            }, 500);
+          }
         }
       } catch (error) {
         console.error('Error updating student status:', error);
         await Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'Failed to update student status',
+          text: 'Failed to update student status: ' + (error.response?.data?.message || error.message),
           confirmButtonColor: '#295f98'
         });
       }
@@ -877,33 +902,26 @@ export default {
 
       try {
         this.isDownloading = true;
-        const response = await axios.get(`${API_BASE_URL}/pdf/download-stamped/${this.studentId}`, {
-          responseType: 'blob'
-        });
-
-        // Create a blob URL from the response
-        const blob = new Blob([response.data], { type: 'application/pdf' });
-        const url = window.URL.createObjectURL(blob);
-        
-        // Create a temporary link element
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `stamped_document_${this.studentId}.pdf`;
-        
-        // Append to body, click, and remove
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        // Clean up the blob URL
-        window.URL.revokeObjectURL(url);
+        const response = await ReleaseService.downloadStampedPdf(this.studentId);
 
         await Swal.fire({
           icon: 'success',
           title: 'Success',
-          text: 'Document downloaded successfully',
+          text: 'Document downloaded successfully and status updated to Released',
           confirmButtonColor: '#295f98'
         });
+
+        // Close the modal
+        this.closeUnReleasedModal();
+        
+        // Emit event to refresh the list
+        this.$emit('student-saved');
+        
+        // Refresh the page after a short delay
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+
       } catch (error) {
         console.error('Download error:', error);
         await Swal.fire({
@@ -967,7 +985,7 @@ export default {
   background: white;
   padding: 20px 0;
   border-radius: 10px;
-  width: 750px;
+  width: 850px;
   gap: 20px;
   justify-content: center;
   align-items: center;

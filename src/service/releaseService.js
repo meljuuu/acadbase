@@ -68,12 +68,35 @@ class ReleaseService {
             // Clean up the blob URL
             window.URL.revokeObjectURL(url);
             
+            // Update student status to Released
+            await axios.post(`${API_BASE_URL}/pdf/update-status/${studentId}`, {
+                status: 'Released'
+            });
+            
             return {
                 success: true,
-                message: 'PDF downloaded successfully'
+                message: 'PDF downloaded successfully and status updated to Released'
             };
         } catch (error) {
             console.error('Download Error:', error.response?.data || error);
+            throw error.response?.data || error;
+        }
+    }
+
+    // Add this new method to the ReleaseService class
+    async updateStatus(studentId, status) {
+        try {
+            const response = await axios.post(`${API_BASE_URL}/pdf/update-status/${studentId}`, {
+                status: status
+            });
+            
+            return {
+                success: response.data.success,
+                message: response.data.message,
+                status: response.data.status
+            };
+        } catch (error) {
+            console.error('Update Status Error:', error.response?.data || error);
             throw error.response?.data || error;
         }
     }
