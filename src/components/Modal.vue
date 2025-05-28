@@ -554,10 +554,10 @@ export default {
           track: this.AcademicTrack,
           batch: this.syBatch,
           curriculum: this.Curriculum,
-          status: 'Unreleased',
+          status: this.uploadedFile ? 'Unreleased' : 'Not-Applicable',
           faculty_name: this.FacultyName,
           birthdate: this.birthdate,
-          pdfFile: this.uploadedFile,
+          ...(this.uploadedFile && { pdfFile: this.uploadedFile }),
         };
 
         console.log('Submitting student data:', studentData);
