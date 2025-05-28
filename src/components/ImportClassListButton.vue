@@ -62,7 +62,7 @@
               <input
                 type="file"
                 id="fileInput"
-                accept=".csv"
+                accept=".csv,.xlsx"
                 ref="fileInput"
                 @change="handleFileUpload"
                 hidden
@@ -164,16 +164,60 @@ export default {
       processFile(file);
     };
 
-    const processFile = (file) => {
-      if (file && file.type === "text/csv") {
+    const processFile = async (file) => {
+      if (file && (file.type === "text/csv" || file.name.endsWith('.xlsx'))) {
         if (file.size > 10 * 1024 * 1024) {
           alert("File size exceeds 10MB limit");
           return;
         }
         uploadedFile.value = file;
-        csvService.parseCSV(file).then(data => csvPreview.value = data);
+
+        try {
+          // Parse file
+          const data = file.name.endsWith('.xlsx') 
+            ? await csvService.parseExcel(file) 
+            : await csvService.parseCSV(file);
+
+          // Normalize headers to lowercase (Excel only)
+          const normalizeKey = (key) => key.toLowerCase().replace(/\s+/g, '_');
+          const normalizedData = file.name.endsWith('.xlsx')
+            ? data.map(row => {
+                const normalizedRow = {};
+                for (const key in row) {
+                  normalizedRow[normalizeKey(key)] = row[key];
+                }
+                return normalizedRow;
+              })
+            : data;
+
+          // Map data to preview structure
+          csvPreview.value = normalizedData.map(row => {
+            // Format birthdate (Excel serial number → "MM/DD/YYYY")
+            let birthdate = '-';
+            if (row.birthday || row.birthdate || row.birth_date) {
+              const rawDate = row.birthday || row.birthdate || row.birth_date;
+              if (typeof rawDate === 'number') {
+                const date = new Date((rawDate - 25569) * 86400 * 1000);
+                birthdate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+              } else {
+                birthdate = rawDate;
+              }
+            }
+
+            return {
+              Name: row.student_name || row.name || '-',
+              LRN: row.lrn || '-',
+              Birthdate: birthdate,
+              syBatch: row.batch || row.sy_batch || row.school_year || '-',
+              Curriculum: row.curriculum || '-',
+              AcademicTrack: row.track || row.academic_track || row.academic_track_ || '-',
+            };
+          });
+        } catch (error) {
+          alert("Failed to parse file: " + error.message);
+        }
       } else {
-        alert("Please select a valid CSV file");
+        alert("Please select a valid CSV or Excel file");
       }
     };
 
