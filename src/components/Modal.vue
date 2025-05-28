@@ -370,7 +370,7 @@ const PDF_BASE_URL = import.meta.env.VITE_API_PDF || `${API_BASE_URL}/storage`;
 
 export default {
   name: "Modal",
-  emits: ['student-saved'],
+  emits: ['student-saved', 'csvUploaded'],
   data() {
     return {
       showModal: false,

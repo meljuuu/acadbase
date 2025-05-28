@@ -197,10 +197,12 @@ class MasterlistService {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
+                transformRequest: (data) => data, // Prevent axios from modifying FormData
             });
+            
             return response.data;
         } catch (error) {
-            console.error('CSV processing error:', error);
+            console.error('CSV Error:', error.response?.data || error.message);
             throw error;
         }
     }
