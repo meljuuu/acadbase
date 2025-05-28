@@ -4,17 +4,17 @@
       <span>Import Class List</span>
     </button>
 
-    <!-- Modal for CSV Upload -->
+    <!-- Modal for Excel Upload -->
     <div v-if="showImportModal" class="modal-overlay" @click.self="closeImportModal">
       <div class="modal-content">
         <div class="modal-header">
           <div class="header-content">
             <div class="header-icon">
-              <i class="fas fa-file-import"></i>
+              <i class="fas fa-file-excel"></i>
             </div>
             <div>
               <h3>Import Class List</h3>
-              <p class="header-subtitle">Upload a CSV file to import student data</p>
+              <p class="header-subtitle">Upload an Excel file to import student data</p>
             </div>
           </div>
           <button @click="closeImportModal" class="close-btn">
@@ -32,11 +32,10 @@
                    @drop.prevent="handleFileDrop">
                 <div class="upload-content">
                   <div class="upload-icon">
-                    <i class="fas fa-cloud-upload-alt" v-if="!uploadedFile"></i>
-                    <i class="fas fa-file-csv" v-else></i>
+                    <i class="fas fa-file-excel"></i>
                   </div>
                   <div v-if="!uploadedFile" class="upload-text">
-                    <h4>Drop your CSV file here</h4>
+                    <h4>Drop your Excel file here</h4>
                     <p>or <span class="link-text">browse</span> to choose a file</p>
                   </div>
                   <div v-else class="file-info">
@@ -51,7 +50,7 @@
                 <div class="file-requirements">
                   <div class="requirement-item">
                     <i class="fas fa-check-circle"></i>
-                    <span>CSV format only</span>
+                    <span>Excel (.xlsx) format only</span>
                   </div>
                   <div class="requirement-item">
                     <i class="fas fa-check-circle"></i>
@@ -62,7 +61,7 @@
               <input
                 type="file"
                 id="fileInput"
-                accept=".csv,.xlsx"
+                accept=".xlsx"
                 ref="fileInput"
                 @change="handleFileUpload"
                 hidden
@@ -116,13 +115,13 @@
             Cancel
           </button>
           <button 
-            @click="uploadCSV" 
+            @click="uploadExcel"
             class="btn btn-primary"
             :disabled="!csvPreview.length || isUploading"
           >
             <i class="fas fa-spinner fa-spin" v-if="isUploading"></i>
             <i class="fas fa-upload" v-else></i>
-            <span>{{ isUploading ? 'Uploading...' : 'Import Data' }}</span>
+            <span>{{ isUploading ? 'Uploading...' : 'Import Excel Data' }}</span>
           </button>
         </div>
       </div>
@@ -136,7 +135,7 @@ import csvService from '../service/csvService';
 
 export default {
   name: "ImportClassListButton",
-  emits: ['csvUploaded'],
+  emits: ['excelUploaded'],
   setup(props, { emit }) {
     const showImportModal = ref(false);
     const uploadedFile = ref(null);
@@ -165,7 +164,7 @@ export default {
     };
 
     const processFile = async (file) => {
-      if (file && (file.type === "text/csv" || file.name.endsWith('.xlsx'))) {
+      if (file && file.name.endsWith('.xlsx')) {
         if (file.size > 10 * 1024 * 1024) {
           alert("File size exceeds 10MB limit");
           return;
@@ -173,33 +172,33 @@ export default {
         uploadedFile.value = file;
 
         try {
-          // Parse file
-          const data = file.name.endsWith('.xlsx') 
-            ? await csvService.parseExcel(file) 
-            : await csvService.parseCSV(file);
-
-          // Normalize headers to lowercase (Excel only)
-          const normalizeKey = (key) => key.toLowerCase().replace(/\s+/g, '_');
-          const normalizedData = file.name.endsWith('.xlsx')
-            ? data.map(row => {
-                const normalizedRow = {};
-                for (const key in row) {
-                  normalizedRow[normalizeKey(key)] = row[key];
-                }
-                return normalizedRow;
-              })
-            : data;
+          const data = await csvService.parseExcel(file);
+          
+          // Normalize headers to lowercase
+          const normalizedData = data.map(row => {
+            const normalizedRow = {};
+            for (const key in row) {
+              normalizedRow[key.toLowerCase().replace(/\s+/g, '_')] = row[key];
+            }
+            return normalizedRow;
+          });
 
           // Map data to preview structure
           csvPreview.value = normalizedData.map(row => {
-            // Format birthdate (Excel serial number → "MM/DD/YYYY")
+            // Handle birthdate (Excel serial number → "MM/DD/YYYY")
             let birthdate = '-';
-            if (row.birthday || row.birthdate || row.birth_date) {
-              const rawDate = row.birthday || row.birthdate || row.birth_date;
+            const rawDate = row.birthday || row.birthdate || row.birth_date;
+            
+            if (rawDate) {
               if (typeof rawDate === 'number') {
-                const date = new Date((rawDate - 25569) * 86400 * 1000);
-                birthdate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
-              } else {
+                // Convert Excel serial number to date
+                const date = new Date(Math.round((rawDate - 25569) * 86400 * 1000));
+                const month = date.getMonth() + 1;
+                const day = date.getDate();
+                const year = date.getFullYear();
+                birthdate = `${month}/${day}/${year}`;
+              } else if (typeof rawDate === 'string') {
+                // Keep string dates as-is (e.g., "10/16/2002")
                 birthdate = rawDate;
               }
             }
@@ -210,14 +209,14 @@ export default {
               Birthdate: birthdate,
               syBatch: row.batch || row.sy_batch || row.school_year || '-',
               Curriculum: row.curriculum || '-',
-              AcademicTrack: row.track || row.academic_track || row.academic_track_ || '-',
+              AcademicTrack: row.track || row.academic_track || '-',
             };
           });
         } catch (error) {
-          alert("Failed to parse file: " + error.message);
+          alert("Failed to parse Excel file: " + error.message);
         }
       } else {
-        alert("Please select a valid CSV or Excel file");
+        alert("Please select a valid Excel (.xlsx) file");
       }
     };
 
@@ -235,15 +234,15 @@ export default {
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };
 
-    const uploadCSV = async () => {
+    const uploadExcel = async () => {
       if (csvPreview.value.length) {
         try {
           isUploading.value = true;
           await csvService.uploadCSV(uploadedFile.value);
-          emit('csvUploaded');
+          emit('excelUploaded');
           closeImportModal();
         } catch (error) {
-          alert("Failed to upload CSV: " + error.message);
+          alert("Failed to upload Excel file: " + error.message);
         } finally {
           isUploading.value = false;
         }
@@ -262,7 +261,7 @@ export default {
       handleFileUpload,
       handleFileDrop,
       removeFile,
-      uploadCSV,
+      uploadExcel,
       formatFileSize,
     };
   },
