@@ -772,6 +772,23 @@ export default {
             this.pdfUrl = `${PDF_BASE_URL}/${stampedPath}`;
             this.furnishedDate = response.furnishedDate;
             this.furnishedBy = response.furnishedBy;
+            
+            // Show success message
+            await Swal.fire({
+              icon: 'success',
+              title: 'Success',
+              text: 'Document furnished successfully',
+              confirmButtonColor: '#295f98'
+            });
+
+            // Close and reopen modal to refresh data
+            this.closeUnReleasedModal();
+            this.$emit('student-saved');
+            
+            // Reopen modal with updated data
+            setTimeout(() => {
+              this.showUnReleasedModal(this.studentId);
+            }, 500);
           }
         } else {
           this.pdfUrl = this.originalPdfUrl;
@@ -780,7 +797,12 @@ export default {
         this.isApplied = !this.isApplied;
       } catch (error) {
         console.error('Error applying copy furnished:', error);
-        alert('Failed to apply copy furnished. Please try again.');
+        await Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to furnish document. Please try again.',
+          confirmButtonColor: '#295f98'
+        });
       } finally {
         this.isProcessing = false;
       }

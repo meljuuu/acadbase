@@ -18,13 +18,19 @@
           :showTrack="true"
           @update:selectedTrack="selectedTrack = $event"
         />
+        
       </div>
 
-      <div>
+      <button class="reset-button" @click="resetFilters" title="Reset Filters">
+          <i class="fas fa-sync-alt"></i>
+        </button>
+
+      <div class="filter-actions">
         <Dropdown
           :showType="true"
           @update:selectedType="selectedType = $event"
         />
+
       </div>
     </div>
 
@@ -48,11 +54,11 @@
             <td>{{ student.batch }}</td>
             <td>{{ student.curriculum }}</td>
             <td>{{ student.track }}</td>
-            <td>{{ student.processor }}</td>
+            <td>{{ student.faculty_name }}</td>
             <td>
-              <span :class="['status', student.status.toLowerCase()]">{{
-                student.status
-              }}</span>
+              <span :class="['status', formatStatusClass(student.status)]">
+                {{ student.status }}
+              </span>
             </td>
           </tr>
         </tbody>
@@ -71,7 +77,7 @@
       <button
         v-for="page in totalPages"
         :key="page"
-        @click="currentPage = page"
+        @click="changePage(page)"
         :class="{ active: currentPage === page }"
       >
         {{ page }}
@@ -86,6 +92,7 @@
 <script>
 import Sidebar from "@/components/Sidebar.vue";
 import Dropdown from "@/components/Dropdown.vue";
+import MasterlistService from "@/service/MasterlistService";
 
 export default {
   name: "History",
@@ -98,312 +105,99 @@ export default {
       selectedBatch: "",
       selectedCurriculum: "",
       selectedTrack: "",
-      selectedFile: "",
-      searchQuery: "",
-      files: [".csv", ".pdf"],
-      students: [
-        {
-          lrn: "202110048",
-          name: "Bueno, Ryan Joshua E.",
-          track: "TVL - IEM",
-          batch: "S.Y 2020 - 2021",
-          curriculum: "Senior High School",
-          processor: "Galileo Galilei",
-          status: "Not-Applicable",
-        },
-        {
-          lrn: "202110049",
-          name: "Dela Cruz, Juan",
-          track: "HUMSS",
-          batch: "S.Y 2021 - 2022",
-          curriculum: "Senior High School",
-          processor: "Isaac Newton",
-          status: "Review",
-        },
-        {
-          lrn: "202110050",
-          name: "Reyes, Maria Clara",
-          track: "BEC",
-          batch: "S.Y 2020 - 2021",
-          curriculum: "JHS Grade 10",
-          processor: "Albert Einstein",
-          status: "Not-Applicable",
-        },
-        {
-          lrn: "202110051",
-          name: "Santos, Pedro P.",
-          track: "SPA",
-          batch: "S.Y 2022 - 2023",
-          curriculum: "SHS Grade 12",
-          processor: "Nikola Tesla",
-          status: "Revised",
-        },
-        {
-          lrn: "202110052",
-          name: "Gonzales, Angela R.",
-          track: "SPJ",
-          batch: "S.Y 2023 - 2024",
-          curriculum: "SHS Grade 11",
-          processor: "Marie Curie",
-          status: "Approved",
-        },
-        {
-          lrn: "202110053",
-          name: "Mendoza, Paul J.",
-          track: "TVL",
-          batch: "S.Y 2024 - 2025",
-          curriculum: "Senior High School",
-          processor: "Galileo Galilei",
-          status: "Review",
-        },
-        {
-          lrn: "202110054",
-          name: "Torres, Miguel A.",
-          track: "HUMSS",
-          batch: "S.Y 2021 - 2022",
-          curriculum: "SHS Grade 12",
-          processor: "Isaac Newton",
-          status: "Not-Applicable",
-        },
-        {
-          lrn: "202110055",
-          name: "Fernandez, Lucia M.",
-          track: "BEC",
-          batch: "S.Y 2020 - 2021",
-          curriculum: "JHS Grade 10",
-          processor: "Albert Einstein",
-          status: "Revised",
-        },
-        {
-          lrn: "202110056",
-          name: "Navarro, Crisostomo I.",
-          track: "SPA",
-          batch: "S.Y 2022 - 2023",
-          curriculum: "Senior High School",
-          processor: "Nikola Tesla",
-          status: "Approved",
-        },
-        {
-          lrn: "202110057",
-          name: "Luna, Antonio J.",
-          track: "SPJ",
-          batch: "S.Y 2023 - 2024",
-          curriculum: "SHS Grade 11",
-          processor: "Marie Curie",
-          status: "Review",
-        },
-        {
-          lrn: "202110058",
-          name: "Rizal, Jose P.",
-          track: "HUMSS",
-          batch: "S.Y 2020 - 2021",
-          curriculum: "Senior High School",
-          processor: "Galileo Galilei",
-          status: "Approved",
-        },
-        {
-          lrn: "202110059",
-          name: "Bonifacio, Andres",
-          track: "TVL",
-          batch: "S.Y 2021 - 2022",
-          curriculum: "SHS Grade 12",
-          processor: "Isaac Newton",
-          status: "Revised",
-        },
-        {
-          lrn: "202110060",
-          name: "Del Pilar, Marcelo",
-          track: "SPA",
-          batch: "S.Y 2022 - 2023",
-          curriculum: "JHS Grade 10",
-          processor: "Albert Einstein",
-          status: "Review",
-        },
-        {
-          lrn: "202110061",
-          name: "Aguinaldo, Emilio",
-          track: "SPJ",
-          batch: "S.Y 2023 - 2024",
-          curriculum: "Senior High School",
-          processor: "Nikola Tesla",
-          status: "Approved",
-        },
-        {
-          lrn: "202110062",
-          name: "Jacinto, Emilio",
-          track: "BEC",
-          batch: "S.Y 2024 - 2025",
-          curriculum: "SHS Grade 12",
-          processor: "Marie Curie",
-          status: "Review",
-        },
-        {
-          lrn: "202110063",
-          name: "Mabini, Apolinario",
-          track: "HUMSS",
-          batch: "S.Y 2021 - 2022",
-          curriculum: "Senior High School",
-          processor: "Galileo Galilei",
-          status: "Revised",
-        },
-        {
-          lrn: "202110064",
-          name: "Silang, Gabriela",
-          track: "TVL",
-          batch: "S.Y 2020 - 2021",
-          curriculum: "JHS Grade 10",
-          processor: "Isaac Newton",
-          status: "Approved",
-        },
-        {
-          lrn: "202110065",
-          name: "Lapu-Lapu, Datu",
-          track: "SPA",
-          batch: "S.Y 2022 - 2023",
-          curriculum: "SHS Grade 11",
-          processor: "Albert Einstein",
-          status: "Review",
-        },
-        {
-          lrn: "202110066",
-          name: "Tandang Sora, Melchora",
-          track: "SPJ",
-          batch: "S.Y 2023 - 2024",
-          curriculum: "Senior High School",
-          processor: "Nikola Tesla",
-          status: "Approved",
-        },
-        {
-          lrn: "202110067",
-          name: "Tandang Sora, Melody",
-          track: "SPS",
-          batch: "S.Y 2023 - 2024",
-          curriculum: "Senior High School",
-          processor: "Nikola Tesla",
-          status: "Approved",
-        },
-      ],
+      selectedType: "",
+      students: [],
       currentPage: 1,
       itemsPerPage: 20,
+      totalItems: 0,
+      loading: false,
+      error: null
     };
   },
-
   computed: {
-    filteredStudents() {
-      return this.students.filter((student) => {
-        return (
-          (this.selectedBatch === "" ||
-            this.selectedBatch === "All" ||
-            student.batch === this.selectedBatch) &&
-          (this.selectedCurriculum === "" ||
-            this.selectedCurriculum === "All" ||
-            student.curriculum === this.selectedCurriculum) &&
-          (this.selectedTrack === "" ||
-            this.selectedTrack === "All" ||
-            student.track === this.selectedTrack) &&
-          (!this.searchQuery ||
-            student.name
-              .toLowerCase()
-              .includes(this.searchQuery.toLowerCase()) ||
-            student.lrn.includes(this.searchQuery))
-        );
-      });
-    },
-
     totalPages() {
-      return Math.ceil(this.filteredStudents.length / this.itemsPerPage);
+      return Math.ceil(this.totalItems / this.itemsPerPage);
     },
-
     paginatedStudents() {
-      const start = (this.currentPage - 1) * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
-      return this.filteredStudents.slice(start, end);
-    },
+      return this.students;
+    }
   },
-
+  watch: {
+    // Add watchers for all filter changes
+    selectedBatch() {
+      this.handleFilterChange();
+    },
+    selectedCurriculum() {
+      this.handleFilterChange();
+    },
+    selectedTrack() {
+      this.handleFilterChange();
+    },
+    selectedType() {
+      this.handleFilterChange();
+    }
+  },
   methods: {
-    prevPage() {
+    async fetchStudents() {
+      try {
+        this.loading = true;
+        const filters = {
+          batch: this.selectedBatch,
+          curriculum: this.selectedCurriculum,
+          track: this.selectedTrack,
+          status: this.selectedType,
+          page: this.currentPage
+        };
+
+        const response = await MasterlistService.filterStudents(filters);
+        this.students = response.data;
+        this.totalItems = response.total;
+        this.currentPage = response.current_page;
+      } catch (error) {
+        console.error('Error fetching students:', error);
+        this.error = 'Failed to fetch students. Please try again.';
+      } finally {
+        this.loading = false;
+      }
+    },
+    handleFilterChange() {
+      this.currentPage = 1; // Reset to first page when filters change
+      this.fetchStudents();
+    },
+    resetFilters() {
+      // Reset all filters
+      this.selectedBatch = "";
+      this.selectedCurriculum = "";
+      this.selectedTrack = "";
+      this.selectedType = "";
+      this.currentPage = 1;
+      this.fetchStudents();
+    },
+    async changePage(page) {
+      this.currentPage = page;
+      await this.fetchStudents();
+    },
+    async prevPage() {
       if (this.currentPage > 1) {
         this.currentPage--;
+        await this.fetchStudents();
       }
     },
-    nextPage() {
+    async nextPage() {
       if (this.currentPage < this.totalPages) {
         this.currentPage++;
+        await this.fetchStudents();
       }
     },
-
-    handleDownload() {
-      if (this.selectedFile === "pdf") {
-        this.downloadPDF();
-      } else if (this.selectedFile === "csv") {
-        this.downloadCSV();
-      }
-      this.selectedFile = "";
-    },
-
-    downloadCSV() {
-      let csvContent = "data:text/csv;charset=utf-8,";
-      csvContent +=
-        "LRN,Student Name,S.Y. Batch,Curriculum,Track,Processor,Status\n"; // Headers
-
-      this.filteredStudents.forEach((student) => {
-        let row = `${student.lrn},${student.name},${student.batch},${student.curriculum},${student.track},${student.processor},${student.status}`;
-        csvContent += row + "\n";
-      });
-
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "students_report.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    },
-
-    downloadPDF() {
-      const doc = new jsPDF({
-        orientation: "landscape",
-        unit: "mm",
-        format: "a4",
-      });
-
-      doc.text("Student Report", 14, 10);
-
-      const headers = [
-        [
-          "LRN",
-          "Student Name",
-          "S.Y. Batch",
-          "Curriculum",
-          "Track",
-          "Processor",
-          "Status",
-        ],
-      ];
-      const data = this.filteredStudents.map((student) => [
-        student.lrn,
-        student.name,
-        student.batch,
-        student.curriculum,
-        student.track,
-        student.processor,
-        student.status,
-      ]);
-
-      autoTable(doc, {
-        head: headers,
-        body: data,
-        startY: 20,
-        styles: { fontSize: 10, cellPadding: 3 },
-        theme: "grid", // Can be "striped", "grid", or "plain"
-        headStyles: { fillColor: [22, 160, 133] }, // Customize header color
-        columnStyles: { 1: { cellWidth: "auto" } }, // Auto-adjust columns
-      });
-
-      doc.save("students_report.pdf");
-    },
+    formatStatusClass(status) {
+      if (!status) return '';
+      // Convert status to lowercase and replace spaces with hyphens
+      return status.toLowerCase().replace(/\s+/g, '-');
+    }
   },
+  mounted() {
+    this.fetchStudents();
+  }
 };
 </script>
 
@@ -441,6 +235,37 @@ export default {
   display: flex;
   gap: 10px;
 }
+
+.filter-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.reset-button {
+  background: #295f98;
+  color: #fff;
+  border: none;
+  padding: 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  transition: background-color 0.3s ease;
+}
+
+.reset-button:hover {
+  background: #1a3f66;
+}
+
+.reset-button i {
+  font-size: 14px;
+}
+
 .filter-dropdown {
   padding: 15px 20px;
   width: 160px;
@@ -561,37 +386,59 @@ tr:hover {
 .status {
   min-width: 70px;
   display: inline-block;
-}
-
-.status.approved {
-  background: #0c5a48;
-  color: white;
   padding: 5px 20px;
   border-radius: 5px;
   font-size: 12px;
+  font-weight: bold;
+  text-align: center;
 }
-.status.review {
+
+/* Released status - Green */
+.status.released {
+  background-color: #0c5a48;
+  color: white;
+}
+
+/* Unreleased status - Yellow */
+.status.unreleased {
   background-color: #fbdf5a;
-  color: white;
-  padding: 5px 20px;
-  border-radius: 5px;
-  font-size: 12px;
+  color: #000;
 }
 
-.status.revised {
-  background-color: #b32113;
-  color: white;
-  padding: 5px 20px;
-  border-radius: 5px;
-  font-size: 12px;
-}
-
+/* Not-Applicable status - Gray */
 .status.not-applicable {
   background-color: #7e7a79;
   color: white;
-  padding: 5px 20px;
-  border-radius: 5px;
-  font-size: 12px;
+}
+
+/* Dropped-Out status - Red */
+.status.dropped-out {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Review status - Orange */
+.status.review {
+  background-color: #fd7e14;
+  color: white;
+}
+
+/* Revised status - Purple */
+.status.revised {
+  background-color: #6f42c1;
+  color: white;
+}
+
+/* Add hover effect for better UX */
+.status:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+  transition: all 0.2s ease-in-out;
+}
+
+/* Add a subtle shadow to make status badges pop */
+.status {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .note {
@@ -632,5 +479,36 @@ tr:hover {
 .pagination button:disabled {
   cursor: not-allowed;
   opacity: 0.5;
+}
+
+/* Add loading state styles */
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Add error message styles */
+.error-message {
+  color: #d32f2f;
+  background-color: #ffebee;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.error-message button {
+  background: #d32f2f;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.error-message button:hover {
+  background: #b71c1c;
 }
 </style>

@@ -70,7 +70,7 @@
             <td>{{ student.curriculum || '-' }}</td>
             <td>{{ student.batch || '-' }}</td>
             <td>
-              <span :class="['status', (student.status || 'not-applicable').toLowerCase()]">
+              <span :class="['status', formatStatusClass(student.status || 'Not-Applicable')]">
                 {{ formattedStatus(student.status || 'Not-Applicable') }}
               </span>
             </td>
@@ -359,6 +359,11 @@ export default {
         batch: yearMatch ? yearMatch[1].trim() : '',
       };
     },
+    formatStatusClass(status) {
+      if (!status) return 'not-applicable';
+      // Convert status to lowercase and replace spaces with hyphens
+      return status.toLowerCase().replace(/\s+/g, '-');
+    }
   },
   mounted() {
     console.log('Component mounted, fetching students');
@@ -508,39 +513,57 @@ tr:hover {
 }
 
 .status {
-  width: 100px;
+  min-width: 70px;
   display: inline-block;
-}
-
-.status.released {
-  background: #0c5a48;
-  color: white;
   padding: 5px 20px;
   border-radius: 5px;
   font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+/* Released status - Green */
+.status.released {
+  background-color: #0c5a48;
+  color: white;
+}
+
+/* Unreleased status - Yellow */
 .status.unreleased {
   background-color: #fbdf5a;
-  color: white;
-  padding: 5px 20px;
-  border-radius: 5px;
-  font-size: 12px;
+  color: #000;
 }
 
-.status.dropped-out {
-  background-color: #b32113;
-  color: white;
-  padding: 5px 20px;
-  border-radius: 5px;
-  font-size: 12px;
-}
-
+/* Not-Applicable status - Gray */
 .status.not-applicable {
   background-color: #7e7a79;
   color: white;
-  padding: 5px 20px;
-  border-radius: 5px;
-  font-size: 12px;
+}
+
+/* Dropped-Out status - Red */
+.status.dropped-out {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Review status - Orange */
+.status.review {
+  background-color: #fd7e14;
+  color: white;
+}
+
+/* Revised status - Purple */
+.status.revised {
+  background-color: #6f42c1;
+  color: white;
+}
+
+/* Add hover effect for better UX */
+.status:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+  transition: all 0.2s ease-in-out;
 }
 
 .note {
