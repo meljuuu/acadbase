@@ -319,6 +319,7 @@
           <!-- Apply Copy Furnished Button -->
           <button
             class="apply-button"
+            :disabled="isProcessing"
             :style="{
               backgroundColor: isApplied ? '#fff' : '#0c5a48',
               color: isApplied ? '#0c5a48' : '#fff',
@@ -326,10 +327,9 @@
             @click="toggleApplyStatus"
           >
             <p>
+              <span v-if="isProcessing" class="loading-spinner"></span>
               <font-awesome-icon v-if="isApplied" icon="check" class="mr-1" />
-              {{
-                isApplied ? "Copy Furnished Applied" : "Apply Copy Furnished"
-              }}
+              {{ isProcessing ? 'Processing...' : (isApplied ? "Copy Furnished Applied" : "Apply Copy Furnished") }}
             </p>
           </button>
 
@@ -363,6 +363,7 @@
 
 <script>
 import MasterlistService from '../service/MasterlistService';
+import ReleaseService from '../service/releaseService';
 
 // Define API_BASE_URL (use the same value as in MasterlistService.js)
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -392,7 +393,9 @@ export default {
       academicYears: [
         "2025-2026", "2024-2025", "2023-2024", 
         "2022-2023", "2021-2022", "2020-2021", "2019-2020"
-      ]
+      ],
+      isProcessing: false,
+      studentId: null,
     };
   },
   props: {
@@ -438,7 +441,7 @@ export default {
 
         // Fix PDF URL construction
         if (student.pdf_storage) {
-          let pdfPath = student.pdf_storage.replace('public/', '');
+          let pdfPath = student.pdf_storage.replace('public/pdfs/public/pdfs/', 'public/pdfs/');
           if (!pdfPath.endsWith('.pdf')) pdfPath += '.pdf';
           
           this.pdfUrl = `${PDF_BASE_URL}/${pdfPath}`;
@@ -449,11 +452,13 @@ export default {
       }
     },
     showUnReleasedModal(id) {
-      this.fetchStudentData(id); // Fetch data when modal is opened
+      this.studentId = id;
+      this.fetchStudentData(id);
       this.showunreleasedModal = true;
     },
     closeUnReleasedModal() {
       this.showunreleasedModal = false;
+      this.studentId = null;
     },
     showReleasedModal() {
       this.showreleasedModal = true;
@@ -527,14 +532,41 @@ export default {
         this.$refs.fileInput.value = "";
       }
     },
-    toggleApplyStatus() {
-      this.isApplied = !this.isApplied;
+    async toggleApplyStatus() {
+      if (this.isProcessing) return;
+      
+      try {
+        this.isProcessing = true;
+        
+        if (!this.isApplied) {
+          if (!this.studentId) {
+            throw new Error('Student ID is missing');
+          }
 
-      const applyButton = document.querySelector(".apply-button");
-      const statusButton = document.querySelector(".status-apply");
-
-      applyButton.style.display = this.isApplied ? "none" : "block";
-      statusButton.style.display = this.isApplied ? "block" : "none";
+          console.log('Sending student ID:', this.studentId); // Debug log
+          
+          // Call the API to add the overlay
+          await ReleaseService.addImageOverlay(this.studentId);
+          
+          // Refresh the PDF preview
+          await this.fetchStudentData(this.studentId);
+        }
+        
+        this.isApplied = !this.isApplied;
+        
+        // Update button styles
+        const applyButton = document.querySelector(".apply-button");
+        const statusButton = document.querySelector(".status-apply");
+        
+        applyButton.style.display = this.isApplied ? "none" : "block";
+        statusButton.style.display = this.isApplied ? "block" : "none";
+        
+      } catch (error) {
+        console.error('Error applying copy furnished:', error);
+        alert('Failed to apply copy furnished. Please try again.');
+      } finally {
+        this.isProcessing = false;
+      }
     },
     validateLRN(event) {
       // Remove any non-numeric characters
@@ -744,27 +776,30 @@ export default {
   margin-top: 15px;
   gap: 10px;
 }
-.apply-button {
-  padding: 0px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 75%;
-  border: 1px solid #0c5a48;
+.apply-button, .status-apply {
+  position: relative;
 }
-.status-apply {
-  padding: 0px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 75%;
-  border: 1px solid #0c5a48;
+
+.apply-button:disabled, .status-apply:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
-.remove-btn {
-  background: none;
-  border: none;
-  color: red;
-  margin-left: 10px;
-  cursor: pointer;
-  font-size: 1rem;
+
+/* Add loading spinner styles */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #0c5a48;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 .student-file-upload.disabled-upload {
   opacity: 0.5;
