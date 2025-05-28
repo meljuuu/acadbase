@@ -67,7 +67,7 @@
             v-model="syBatch"
             placeholder="YYYY-YYYY"
             @input="validateSyBatch"
-            required
+            readonly
           />
         </div>
 
@@ -233,11 +233,10 @@
         <div class="input-group">
           <label>S.Y Batch</label>
           <input
-            type="number"
+            type="text"
             v-model="syBatch"
-            placeholder=""
-            @input="syBatch = syBatch < 0 ? '' : syBatch"
-            onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+            placeholder="YYYY-YYYY"
+            @input="validateSyBatch"
             readonly
           />
         </div>
@@ -332,11 +331,10 @@
         <div class="input-group">
           <label>S.Y Batch</label>
           <input
-            type="number"
+            type="text"
             v-model="syBatch"
-            placeholder=""
-            @input="syBatch = syBatch < 0 ? '' : syBatch"
-            onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+            placeholder="YYYY-YYYY"
+            @input="validateSyBatch"
             readonly
           />
         </div>
@@ -410,8 +408,9 @@
 <script>
 import MasterlistService from '../service/MasterlistService';
 
-// Define API_URL (use the same value as in MasterlistService.js)
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+// Define API_BASE_URL (use the same value as in MasterlistService.js)
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const PDF_BASE_URL = import.meta.env.VITE_API_PDF || `${API_BASE_URL}/storage`;
 
 export default {
   name: "Modal",
@@ -478,14 +477,16 @@ export default {
         this.FacultyName = student.faculty_name;
         this.DateAdded = student.created_at || new Date().toLocaleDateString();
 
-        // Construct the correct backend URL for the PDF
+        // Fix PDF URL construction
         if (student.pdf_storage) {
-          this.pdfUrl = `http://localhost:8000/storage/${student.pdf_storage.replace('public/', '')}`;
-          console.log("PDF URL:", this.pdfUrl); // Debug
+          let pdfPath = student.pdf_storage.replace('public/', '');
+          if (!pdfPath.endsWith('.pdf')) pdfPath += '.pdf';
+          
+          this.pdfUrl = `${PDF_BASE_URL}/${pdfPath}`;
+          console.log("Constructed PDF URL:", this.pdfUrl);
         }
       } catch (error) {
-        console.error("Error fetching student data:", error);
-        alert("Failed to fetch student data. Please try again.");
+        console.error("Error:", error);
       }
     },
     showUnReleasedModal(id) {
@@ -651,6 +652,11 @@ export default {
   },
   mounted() {
     this.checkPdfSupport();
+    console.log('Environment Variables:', {
+      VITE_API_URL: import.meta.env.VITE_API_URL,
+      VITE_API_PDF: import.meta.env.VITE_API_PDF,
+      ALL_ENV: import.meta.env
+    });
   },
 };
 </script>
