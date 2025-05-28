@@ -36,6 +36,7 @@
 
       <div class="student-processor-information">
         <h5>Student Information</h5>
+        
         <div class="input-group">
           <label>Student Name</label>
           <input
@@ -56,7 +57,10 @@
         </div>
         <div class="input-group">
           <label>Birthdate</label>
-          <input type="date" v-model="birthdate" />
+          <input 
+            type="date" 
+            v-model="birthdate"
+          />
         </div>
         <div class="input-group">
           <label>S.Y Batch</label>
@@ -84,7 +88,6 @@
             />
           </div>
         </div>
-
         <div class="input-group">
           <label>Curriculum</label>
           <select v-model="Curriculum">
@@ -276,69 +279,124 @@
             PDF failed to load. 
             <a :href="pdfUrl" target="_blank">Download instead</a>.
           </p>
-          <button @click.stop="removeFile" class="remove-btn">Remove</button>
         </div>
       </div>
 
       <div class="student-processor-information">
-        <h5>Student Information</h5>
+        <div class="header-actions">
+          <h5>Student Information</h5>
+          <button 
+            v-if="!isEditMode" 
+            @click="toggleEditMode" 
+            class="edit-button"
+          >
+            Edit
+          </button>
+        </div>
+        
         <div class="input-group">
           <label>Student Name</label>
-          <input type="text" v-model="Name" placeholder="" readonly />
+          <input
+            type="text"
+            v-model="Name"
+            :readonly="!isEditMode"
+            :class="{ 'editable': isEditMode }"
+          />
         </div>
         <div class="input-group">
           <label>LRN</label>
           <input
             type="text"
             v-model="lrn"
-            placeholder=""
+            :readonly="!isEditMode"
+            :class="{ 'editable': isEditMode }"
             maxlength="12"
             @input="validateLRN"
-            readonly
           />
         </div>
         <div class="input-group">
           <label>Birthdate</label>
-          <input type="date" v-model="birthdate" readonly />
+          <input 
+            type="date" 
+            v-model="birthdate"
+            :readonly="!isEditMode"
+            :class="{ 'editable': isEditMode }"
+          />
         </div>
         <div class="input-group">
           <label>S.Y Batch</label>
           <input
             type="text"
             v-model="syBatch"
+            :readonly="!isEditMode"
+            :class="{ 'editable': isEditMode }"
             placeholder="YYYY-YYYY"
             @input="validateSyBatch"
-            readonly
           />
         </div>
         <div class="input-group">
           <label>Curriculum</label>
-          <input type="text" v-model="Curriculum" placeholder="" readonly />
+          <input
+            type="text"
+            v-model="Curriculum"
+            :readonly="!isEditMode"
+            :class="{ 'editable': isEditMode }"
+          />
         </div>
         <div class="input-group">
           <label>Academic Track</label>
-          <input type="text" v-model="AcademicTrack" placeholder="" readonly />
+          <input
+            type="text"
+            v-model="AcademicTrack"
+            :readonly="!isEditMode"
+            :class="{ 'editable': isEditMode }"
+          />
         </div>
         <h5>Processor Information</h5>
         <div class="input-group">
           <label>Faculty Name</label>
-          <input type="text" v-model="FacultyName" placeholder="" readonly />
+          <input
+            type="text"
+            v-model="FacultyName"
+            :readonly="!isEditMode"
+            :class="{ 'editable': isEditMode }"
+          />
         </div>
         <div class="input-group">
           <label>Document Released</label>
-          <input type="text" v-model="FacultyName" placeholder="" readonly />
+          <input
+            type="text"
+            v-model="FacultyName"
+            :readonly="!isEditMode"
+            :class="{ 'editable': isEditMode }"
+          />
         </div>
         <div class="input-group">
           <label>Date of Released</label>
-          <input type="text" :value="formatDate(DateAdded)" placeholder="" readonly />
+          <input
+            type="text"
+            :value="formatDate(DateAdded)"
+            :readonly="!isEditMode"
+            :class="{ 'editable': isEditMode }"
+          />
         </div>
         <div class="input-group" v-if="furnishedDate">
           <label>Document Furnished Date</label>
-          <input type="text" :value="formatDate(furnishedDate)" readonly />
+          <input
+            type="text"
+            :value="formatDate(furnishedDate)"
+            :readonly="!isEditMode"
+            :class="{ 'editable': isEditMode }"
+          />
         </div>
         <div class="input-group" v-if="furnishedBy">
           <label>Furnished By</label>
-          <input type="text" :value="furnishedBy" readonly />
+          <input
+            type="text"
+            :value="furnishedBy"
+            :readonly="!isEditMode"
+            :class="{ 'editable': isEditMode }"
+          />
         </div>
         <div class="furnished">
           <button
@@ -361,8 +419,21 @@
 
         <div class="modal-buttons">
           <button @click="closeUnReleasedModal" class="cancel">Back</button>
+          <button 
+            v-if="isEditMode" 
+            @click="toggleEditMode" 
+            class="cancel"
+          >
+            Cancel Edit
+          </button>
+          <button 
+            v-if="isEditMode" 
+            @click="saveStudentInfo" 
+            class="save-button"
+          >
+            Save Changes
+          </button>
           <button @click="markAsDropOut" class="dropout-button">Drop Out</button>
-          <button @click="saveStudentInfo" class="save-button">Save</button>
           <button 
             @click="downloadStampedPdf" 
             class="released-button"
@@ -421,6 +492,7 @@ export default {
       furnishedDate: null,
       furnishedBy: null,
       isDownloading: false,
+      isEditMode: false,
     };
   },
   props: {
@@ -633,6 +705,12 @@ export default {
         
         this.closeModal();
         this.$emit("student-saved");
+        
+        // Add page refresh after successful save
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+
       } catch (error) {
         console.error("Error saving student:", error);
         
@@ -674,13 +752,6 @@ export default {
         } else {
           event.target.value = ""; // Clear the file input
         }
-      }
-    },
-    removeFile() {
-      this.uploadedFile = null;
-      this.pdfUrl = null;
-      if (this.$refs.fileInput) {
-        this.$refs.fileInput.value = "";
       }
     },
     async toggleApplyStatus() {
@@ -825,11 +896,6 @@ export default {
           pdfFile: this.uploadedFile || null
         };
 
-        console.log('Sending update data:', {
-          ...studentData,
-          pdfFile: studentData.pdfFile ? 'File present' : 'No file'
-        });
-
         const response = await MasterlistService.updateStudent(this.studentId, studentData);
         
         if (response.success) {
@@ -839,6 +905,7 @@ export default {
             text: 'Student information updated successfully',
             confirmButtonColor: '#295f98'
           });
+          this.isEditMode = false; // Exit edit mode after successful save
           this.closeUnReleasedModal();
           this.$emit('student-saved');
         } else {
@@ -869,11 +936,9 @@ export default {
       }
     },
     updateStudentStatus() {
-      // If all required fields are present and PDF is uploaded, set status to Unreleased
-      if (this.isStudentInfoComplete && this.uploadedFile) {
+      // If all required fields are present, set status to Unreleased
+      if (this.isStudentInfoComplete) {
         this.studentStatus = 'Unreleased';
-      } else if (this.isStudentInfoComplete) {
-        this.studentStatus = 'No Document';
       } else {
         this.studentStatus = 'Not-Applicable';
       }
@@ -944,6 +1009,24 @@ export default {
       } finally {
         this.isDownloading = false;
       }
+    },
+    toggleEditMode() {
+      this.isEditMode = !this.isEditMode;
+    },
+    removeFile() {
+      // Clear the file input
+      if (this.$refs.fileInput) {
+        this.$refs.fileInput.value = '';
+      }
+      
+      // Reset file-related states
+      this.uploadedFile = null;
+      this.pdfUrl = null;
+      this.originalPdfUrl = null;
+      this.pdfLoadFailed = false;
+      
+      // Update student status after removing file
+      this.updateStudentStatus();
     },
   },
   computed: {
@@ -1067,7 +1150,8 @@ export default {
   margin-bottom: -50px;
 }
 
-.modal-content input {
+.modal-content input,
+.modal-content select {
   width: 95%;
   padding: 8px;
   margin-top: -1px;
@@ -1075,6 +1159,7 @@ export default {
   border: 1px solid #295f98;
   outline: none;
   border-radius: 5px;
+  cursor: pointer;
 }
 
 .modal-content input::placeholder {
@@ -1082,7 +1167,8 @@ export default {
   color: #295f98;
 }
 
-.modal-content input:focus {
+.modal-content input:focus,
+.modal-content select:focus {
   border-color: #295f9852;
   box-shadow: 0 0 3px rgba(41, 95, 152, 0.5);
 }
@@ -1238,5 +1324,54 @@ select:focus {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.edit-button {
+  padding: 5px 15px;
+  background-color: #295f98;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.edit-button:hover {
+  background-color: #1e4b7a;
+}
+
+.editable {
+  background-color: #fff !important;
+  border-color: #295f98 !important;
+  cursor: pointer !important;
+}
+
+.editable:focus {
+  box-shadow: 0 0 3px rgba(41, 95, 152, 0.5);
+}
+
+/* Update existing input styles */
+.modal-content input:not(.editable) {
+  background-color: #f5f5f5;
+  cursor: pointer !important;
+}
+
+.modal-content select:not(.editable) {
+  background-color: #f5f5f5;
+  cursor: pointer !important;
+}
+
+/* Add hover effect for inputs in Add Student modal */
+.modal-content input:hover,
+.modal-content select:hover {
+  border-color: #1e4b7a;
+  box-shadow: 0 0 3px rgba(41, 95, 152, 0.3);
 }
 </style>
