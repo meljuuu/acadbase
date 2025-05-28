@@ -132,6 +132,7 @@
 <script>
 import { ref } from 'vue';
 import csvService from '../service/csvService';
+import Swal from 'sweetalert2';
 
 export default {
   name: "ImportClassListButton",
@@ -238,11 +239,35 @@ export default {
       if (csvPreview.value.length) {
         try {
           isUploading.value = true;
-          await csvService.uploadCSV(uploadedFile.value);
+          const result = await csvService.uploadCSV(uploadedFile.value);
+          
+          // Show success message with statistics
+          await Swal.fire({
+            icon: 'success',
+            title: 'Import Successful!',
+            html: `
+              <div class="text-left">
+                <p><strong>Total Records:</strong> ${result.stats.total}</p>
+                <p><strong>New Records:</strong> ${result.stats.imported}</p>
+                <p><strong>Updated Records:</strong> ${result.stats.updated}</p>
+                <p><strong>Skipped Records:</strong> ${result.stats.skipped}</p>
+              </div>
+            `,
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#2563eb'
+          });
+
           emit('excelUploaded');
           closeImportModal();
         } catch (error) {
-          alert("Failed to upload Excel file: " + error.message);
+          // Show error message
+          await Swal.fire({
+            icon: 'error',
+            title: 'Upload Failed',
+            text: error.message,
+            confirmButtonText: 'Try Again',
+            confirmButtonColor: '#dc2626'
+          });
         } finally {
           isUploading.value = false;
         }

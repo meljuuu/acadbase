@@ -98,9 +98,13 @@ const parseExcel = (file) => {
 
 const uploadCSV = async (file) => {
   try {
-    await MasterlistService.processCsvAndAddStudents(file);
+    const response = await MasterlistService.processCsvAndAddStudents(file);
+    return response.data;
   } catch (error) {
-    throw new Error("CSV upload failed: " + error.message);
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to upload file");
+    }
+    throw new Error("Network error occurred");
   }
 };
 
