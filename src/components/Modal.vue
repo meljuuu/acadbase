@@ -620,8 +620,9 @@ export default {
       this.uploadedFile = null;
       this.pdfLoadFailed = false;
       
-      // Set new student ID and fetch data
+      // Set new student ID first
       this.studentId = id;
+      console.log('Setting student ID:', id);
       
       // Get faculty name from localStorage when modal opens
       this.FacultyName = this.getFacultyName();
@@ -791,9 +792,16 @@ export default {
         this.isProcessing = true;
         
         if (!this.isApplied) {
+          // Add a small delay to ensure studentId is set
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
           if (!this.studentId) {
+            console.error('Student ID is missing:', this.studentId);
             throw new Error('Student ID is missing');
           }
+
+          // Log the student ID for debugging
+          console.log('Applying copy furnish for student ID:', this.studentId);
 
           const response = await ReleaseService.addImageOverlay(this.studentId);
           
@@ -811,13 +819,24 @@ export default {
               confirmButtonColor: '#295f98'
             });
 
-            // Close and reopen modal to refresh data
+            // First refresh
             this.closeUnReleasedModal();
             this.$emit('student-saved');
             
-            // Reopen modal with updated data
+            // First reopen after 500ms
             setTimeout(() => {
               this.showUnReleasedModal(this.studentId);
+              
+              // Second refresh after another 500ms
+              setTimeout(() => {
+                this.closeUnReleasedModal();
+                this.$emit('student-saved');
+                
+                // Final reopen after 500ms
+                setTimeout(() => {
+                  this.showUnReleasedModal(this.studentId);
+                }, 500);
+              }, 500);
             }, 500);
           }
         } else {

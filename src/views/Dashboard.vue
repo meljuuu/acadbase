@@ -4,7 +4,15 @@
       <h1>Dashboard</h1>
     </div>
 
-    <div class="dashboard-content">
+    <div v-if="loading" class="loading">
+      Loading dashboard data...
+    </div>
+
+    <div v-else-if="error" class="error">
+      {{ error }}
+    </div>
+
+    <div v-else class="dashboard-content">
       <div class="student-container">
         <div class="buttons">
           <Dropdown :showCurriculum="true" @update:selectedCurriculum="selectedCurriculum = $event" />
@@ -160,6 +168,9 @@
 <script>
 import Dropdown from "@/components/Dropdown.vue";
 import BarChart from "@/components/BarChart.vue";
+import DashboardService from "@/service/DashboardService";
+import MasterlistService from "@/service/MasterlistService";
+import ReleaseService from "@/service/releaseService";
 
 export default {
   name: "Dashboard",
@@ -174,71 +185,22 @@ export default {
       currentPage: 1,
       itemsPerPage: 10,
       selectedSYRecentAdded: "2024 - 2025",
-      studentsRecentAdded: [
-        { name: "John Doe", track: "TVL-ICT", school_year: "2023 - 2024", level: "SHS" },
-        { name: "Jane Smith", track: "HUMSS", school_year: "2023 - 2024", level: "SHS" },
-        { name: "Michael Johnson", track: "SPJ", school_year: "2024 - 2025", level: "SHS" },
-        { name: "Emily Davis", track: "BEC", school_year: "2024 - 2025", level: "JHS" },
-        { name: "Daniel Martinez", track: "TVL-HE", school_year: "2025 - 2026", level: "SHS" },
-        { name: "Sophia Garcia", track: "SPA", school_year: "2024 - 2025", level: "SHS" },
-        { name: "Christopher Wilson", track: "STEM", school_year: "2023 - 2024", level: "SHS" },
-        { name: "Olivia Brown", track: "ABM", school_year: "2022 - 2023", level: "SHS" },
-        { name: "Matthew Taylor", track: "BEC", school_year: "2021 - 2022", level: "JHS" },
-        { name: "Isabella Anderson", track: "GAS", school_year: "2021 - 2022", level: "SHS" }
-      ],
-      students: [
-        { lrn: "202110048", name: "Bueno, Ryan Joshua E.", track: "TVL", school_year: "2020 - 2021", curriculum: "Senior High School", processor: "Galileo Galilei", status: "Released", releaseDate: new Date() },
-        { lrn: "202110050", name: "Reyes, Maria Clara", track: "BEC", school_year: "2022 - 2023", curriculum: "JHS Grade 10", processor: "Albert Einstein", status: "Released", releaseDate: new Date() },
-        { lrn: "202110052", name: "Gonzales, Angela R.", track: "SPJ", school_year: "2024 - 2025", curriculum: "SHS Grade 11", processor: "Marie Curie", status: "Released", releaseDate: new Date() },
-        { lrn: "202110054", name: "Torres, Miguel A.", track: "HUMSS", school_year: "2025 - 2026", curriculum: "SHS Grade 12", processor: "Isaac Newton", status: "Released", releaseDate: new Date() },
-        { lrn: "202110056", name: "Navarro, Crisostomo I.", track: "SPA", school_year: "2021 - 2022", curriculum: "Senior High School", processor: "Nikola Tesla", status: "Released", releaseDate: new Date() },
-        { lrn: "202110058", name: "Rizal, Jose P.", track: "HUMSS", school_year: "2024 - 2025", curriculum: "Senior High School", processor: "Galileo Galilei", status: "Released", releaseDate: new Date() },
-        { lrn: "202110061", name: "Aguinaldo, Emilio", track: "SPJ", school_year: "2024 - 2025", curriculum: "Senior High School", processor: "Nikola Tesla", status: "Released", releaseDate: new Date() },
-        { lrn: "202110064", name: "Silang, Gabriela", track: "TVL", school_year: "2022 - 2023", curriculum: "JHS Grade 10", processor: "Isaac Newton", status: "Released", releaseDate: new Date() },
-        { lrn: "202110066", name: "Tandang Sora, Melchora", track: "SPJ", school_year: "2024 - 2025", curriculum: "Senior High School", processor: "Nikola Tesla", status: "Released", releaseDate: new Date() },
-        { lrn: "202110067", name: "Tandang Sora, Melody", track: "SPS", school_year: "2024 - 2025", curriculum: "Senior High School", processor: "Nikola Tesla", status: "Released", releaseDate: new Date() },
-      ],
-      selectedCurriculum: null,
-      selectedYear: null,
-      studentStats: {
-        "JHS Grade 7": [
-          { label: "SPJ Students", count: 300 },
-          { label: "BEC Students", count: 300 },
-          { label: "SPA Students", count: 300 },
-        ],
-        "JHS Grade 8": [
-          { label: "SPJ Students", count: 300 },
-          { label: "BEC Students", count: 300 },
-          { label: "SPA Students", count: 300 },
-        ],
-        "JHS Grade 9": [
-          { label: "SPJ Students", count: 300 },
-          { label: "BEC Students", count: 300 },
-          { label: "SPA Students", count: 300 },
-        ],
-        "JHS Grade 10": [
-          { label: "SPJ Students", count: 300 },
-          { label: "BEC Students", count: 300 },
-          { label: "SPA Students", count: 300 },
-        ],
-        "SHS Grade 11": [
-          { label: "HUMSS Grade 11 Students", count: 300 },
-          { label: "TVL - IEM Grade 11 Students", count: 300 },
-        ],
-        "SHS Grade 12": [
-          { label: "HUMSS Grade 12 Students", count: 300 },
-          { label: "TVL - IEM Grade 12 Students", count: 300 },
-        ],
-      },
-
+      studentsRecentAdded: [],
+      students: [],
+      studentStats: {},
       selectedYearDocs: "2024 - 2025",
       years: ["2022 - 2023", "2023 - 2024", "2024 - 2025"],
       data: {
-        "2023 - 2024": { releasedDocs: 3003, seniorHigh: 10000, juniorHigh: 10000 },
-        "2022 - 2023": { releasedDocs: 2800, seniorHigh: 9500, juniorHigh: 9700 },
-        "2024 - 2025": { releasedDocs: 3200, seniorHigh: 11000, juniorHigh: 10500 }
+        "2023 - 2024": { releasedDocs: 0, seniorHigh: 0, juniorHigh: 0 },
+        "2022 - 2023": { releasedDocs: 0, seniorHigh: 0, juniorHigh: 0 },
+        "2024 - 2025": { releasedDocs: 0, seniorHigh: 0, juniorHigh: 0 }
       },
+      loading: false,
+      error: null
     };
+  },
+  async created() {
+    await this.fetchDashboardData();
   },
   computed: {
     releasedStudents() {
@@ -280,6 +242,66 @@ export default {
     },
   
   methods: {
+    async fetchDashboardData() {
+      this.loading = true;
+      try {
+        // Fetch all required data in parallel
+        const [
+          studentStats,
+          latestStudents,
+          releasedDocsStats,
+          statusCounts
+        ] = await Promise.all([
+          DashboardService.getStudentStats(),
+          DashboardService.getLatestStudents(),
+          DashboardService.getReleasedDocsStats(),
+          DashboardService.getStudentStatusCounts()
+        ]);
+
+        // Update the data
+        this.studentsRecentAdded = latestStudents.map(student => ({
+          name: `${student.LastName}, ${student.FirstName}`,
+          track: student.Track,
+          school_year: student.batch,
+          level: student.Curriculum
+        }));
+
+        // Update student stats
+        this.studentStats = this.processStudentStats(studentStats);
+
+        // Update released docs data
+        this.data = this.processReleasedDocsData(releasedDocsStats);
+
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        this.error = 'Failed to load dashboard data';
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    processStudentStats(stats) {
+      return {
+        "JHS Grade 7": [
+          { label: "SPJ Students", count: stats.track_stats['SPJ'] || 0 },
+          { label: "BEC Students", count: stats.track_stats['BEC'] || 0 },
+          { label: "SPA Students", count: stats.track_stats['SPA'] || 0 },
+        ],
+        // Add other grade levels similarly
+      };
+    },
+
+    processReleasedDocsData(stats) {
+      return {
+        "2024 - 2025": {
+          releasedDocs: stats.released_docs['2024 - 2025'] || 0,
+          seniorHigh: stats.curriculum_stats['SHS'] || 0,
+          juniorHigh: stats.curriculum_stats['JHS'] || 0
+        },
+        // Add other years similarly
+      };
+    },
+
     formatDate(date) {
       return new Intl.DateTimeFormat("en-US", {
         year: "numeric",
@@ -291,21 +313,36 @@ export default {
         hour12: true
       }).format(new Date(date));
     },
+
     prevPage() {
       if (this.currentPage > 1) {
         this.currentPage--;
       }
     },
+
     nextPage() {
       if (this.currentPage < this.totalPages) {
         this.currentPage++;
       }
-    },
+    }
   }
 };
 </script>
 
 <style scoped>
+.loading {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.error {
+  text-align: center;
+  padding: 2rem;
+  color: #dc3545;
+  font-size: 1.2rem;
+}
 
 .total-students {
   width: 100%;
