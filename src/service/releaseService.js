@@ -43,6 +43,40 @@ class ReleaseService {
             throw error.response?.data || error;
         }
     }
+
+    // Add this new method to the ReleaseService class
+    async downloadStampedPdf(studentId) {
+        try {
+            const response = await axios.get(`${API_BASE_URL}/pdf/download-stamped/${studentId}`, {
+                responseType: 'blob' // Important for handling file downloads
+            });
+            
+            // Create a blob URL from the response
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
+            
+            // Create a temporary link element
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'stamped_document.pdf';
+            
+            // Append to body, click, and remove
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Clean up the blob URL
+            window.URL.revokeObjectURL(url);
+            
+            return {
+                success: true,
+                message: 'PDF downloaded successfully'
+            };
+        } catch (error) {
+            console.error('Download Error:', error.response?.data || error);
+            throw error.response?.data || error;
+        }
+    }
 }
 
 export default new ReleaseService();

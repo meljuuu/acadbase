@@ -364,7 +364,14 @@
           <button @click="closeUnReleasedModal" class="cancel">Back</button>
           <button @click="markAsDropOut" class="dropout-button">Drop Out</button>
           <button @click="saveStudentInfo" class="save-button">Save</button>
-          <button class="released-button">Released Documents</button>
+          <button 
+            @click="downloadStampedPdf" 
+            class="released-button"
+            :disabled="!hasStampedPdf || isDownloading"
+          >
+            <span v-if="isDownloading" class="loading-spinner"></span>
+            {{ isDownloading ? 'Downloading...' : 'Released Documents' }}
+          </button>
         </div>
       </div>
     </div>
@@ -375,6 +382,7 @@
 import MasterlistService from '../service/MasterlistService';
 import ReleaseService from '../service/releaseService';
 import Swal from 'sweetalert2';
+import axios from 'axios';
 
 // Define API_BASE_URL (use the same value as in MasterlistService.js)
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -413,6 +421,7 @@ export default {
       stampedPdfPath: null,
       furnishedDate: null,
       furnishedBy: null,
+      isDownloading: false,
     };
   },
   props: {
@@ -844,7 +853,69 @@ export default {
         hour: '2-digit',
         minute: '2-digit'
       });
-    }
+    },
+    async downloadStampedPdf() {
+      if (!this.studentId) {
+        await Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Student ID is missing',
+          confirmButtonColor: '#295f98'
+        });
+        return;
+      }
+
+      if (!this.hasStampedPdf) {
+        await Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No stamped document available for download',
+          confirmButtonColor: '#295f98'
+        });
+        return;
+      }
+
+      try {
+        this.isDownloading = true;
+        const response = await axios.get(`${API_BASE_URL}/pdf/download-stamped/${this.studentId}`, {
+          responseType: 'blob'
+        });
+
+        // Create a blob URL from the response
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        
+        // Create a temporary link element
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `stamped_document_${this.studentId}.pdf`;
+        
+        // Append to body, click, and remove
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Clean up the blob URL
+        window.URL.revokeObjectURL(url);
+
+        await Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Document downloaded successfully',
+          confirmButtonColor: '#295f98'
+        });
+      } catch (error) {
+        console.error('Download error:', error);
+        await Swal.fire({
+          icon: 'error',
+          title: 'Download Failed',
+          text: error.response?.data?.message || 'Failed to download the document',
+          confirmButtonColor: '#295f98'
+        });
+      } finally {
+        this.isDownloading = false;
+      }
+    },
   },
   computed: {
     isStudentInfoComplete() {
@@ -1105,5 +1176,38 @@ select:focus {
 .modal-buttons button.save-button {
   background: #28a745;
   color: white;
+}
+
+.released-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    background-color: #0c5a48;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.released-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.released-button .loading-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ffffff;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 </style>
