@@ -547,12 +547,12 @@ export default {
     async fetchStudentData(id) {
       if (!id) {
         console.error("Invalid student ID:", id);
-        await Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Invalid student ID. Please try again.',
-          confirmButtonColor: '#295f98'
-        });
+        // await Swal.fire({
+        //   icon: 'error',
+        //   title: 'Error',
+        //   text: 'Invalid student ID. Please try again.',
+        //   confirmButtonColor: '#295f98'
+        // });
         return;
       }
 
