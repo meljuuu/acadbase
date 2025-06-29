@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 class DashboardService {
     // Get student statistics
@@ -13,10 +13,31 @@ class DashboardService {
         }
     }
 
-    // Get student gender distribution
-    async getGenderDistribution() {
+        async getRecentStudents() {
         try {
-            const response = await axios.get(`${API_URL}/dashboard/students/gender-distribution`);
+            const response = await axios.get(`${API_URL}/dashboard/recent-accepted-students`);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Get student gender distribution
+    async getGenderDistribution(params = {}) {
+        try {
+            const response = await axios.get(`${API_URL}/dashboard/students/gender-distribution`, {
+                params
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Get available years for gender distribution
+    async getGenderDistributionYears() {
+        try {
+            const response = await axios.get(`${API_URL}/dashboard/students/gender-distribution-years`);
             return response.data;
         } catch (error) {
             throw error;

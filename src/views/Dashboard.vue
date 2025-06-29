@@ -39,16 +39,20 @@
               <h3>Total Students</h3>
             </div>
             <div className="filter">
-              <select>
-                <option value="2024 - 2025">2024 - 2025</option>
-                <option value="2023 - 2024">2023  2024</option>
-                <option value="2022 - 2023">2022 - 2023</option>
+              <select v-model="selectedYearBarChart">
+                <option value="">All</option>
+                <option
+                  v-for="year in years"
+                  :key="year"
+                  :value="year"
+                >
+                  {{ year.replace('-', ' - ') }}
+                </option>
               </select>
             </div>
           </div>
-
           <div className="chart-container">
-            <BarChart />
+            <BarChart :chart-data="barChartData" />
           </div>
         </div>
 
@@ -184,23 +188,35 @@ export default {
       selectedSY: "2024 - 2025",
       currentPage: 1,
       itemsPerPage: 10,
-      selectedSYRecentAdded: "2024 - 2025",
+      selectedSYRecentAdded: "", // default to "All" for recent added filter
       studentsRecentAdded: [],
       students: [],
       studentStats: {},
       selectedYearDocs: "2024 - 2025",
-      years: ["2022 - 2023", "2023 - 2024", "2024 - 2025"],
+      selectedYearBarChart: "",
+      years: [], // will be set dynamically from API
       data: {
         "2023 - 2024": { releasedDocs: 0, seniorHigh: 0, juniorHigh: 0 },
         "2022 - 2023": { releasedDocs: 0, seniorHigh: 0, juniorHigh: 0 },
         "2024 - 2025": { releasedDocs: 0, seniorHigh: 0, juniorHigh: 0 }
       },
       loading: false,
-      error: null
+      error: null,
+      genderDistribution: {},
     };
   },
   async created() {
     await this.fetchDashboardData();
+    await this.fetchAvailableGenderDistributionYears();
+    await this.fetchGenderDistribution();
+  },
+  watch: {
+    selectedYearBarChart: {
+      immediate: false,
+      handler(newVal) {
+        this.fetchGenderDistribution();
+      }
+    }
   },
   computed: {
     releasedStudents() {
@@ -238,39 +254,60 @@ export default {
       },
       filteredData() {
         return this.data[this.selectedYearDocs];
-      }
+      },
+      barChartData() {
+        // Use genderDistribution.data as per new response structure
+        const dist = (this.genderDistribution && this.genderDistribution.data) ? this.genderDistribution.data : {};
+        return {
+          labels: ['JHS Male', 'JHS Female', 'SHS Male', 'SHS Female'],
+          datasets: [
+            {
+              label: 'Total Students',
+              backgroundColor: ['#295f98', '#295f98', '#295f98', '#295f98'],
+              data: [
+                dist.JHS_M || 0,
+                dist.JHS_F || 0,
+                dist.SHS_M || 0,
+                dist.SHS_F || 0
+              ]
+            }
+          ]
+        };
+      },
     },
   
   methods: {
     async fetchDashboardData() {
       this.loading = true;
       try {
-        // Fetch all required data in parallel
         const [
           studentStats,
-          latestStudents,
+          recentStudents,
           releasedDocsStats,
           statusCounts
         ] = await Promise.all([
           DashboardService.getStudentStats(),
-          DashboardService.getLatestStudents(),
+          DashboardService.getRecentStudents(),
           DashboardService.getReleasedDocsStats(),
           DashboardService.getStudentStatusCounts()
         ]);
 
-        // Update the data
-        this.studentsRecentAdded = latestStudents.map(student => ({
-          name: `${student.LastName}, ${student.FirstName}`,
-          track: student.Track,
-          school_year: student.batch,
-          level: student.Curriculum
-        }));
+        this.studentsRecentAdded = Array.isArray(recentStudents.data)
+          ? recentStudents.data.map(student => ({
+              name: `${student.LastName}, ${student.FirstName}${student.Suffix ? ' ' + student.Suffix : ''}`,
+              track: student.Track,
+              school_year: student.Grade_Level,
+              lrn: student.LRN,
+              releaseDate: student.created_at // or another date field if needed
+            }))
+          : [];
 
-        // Update student stats
+        // For demo: show the same students in the table
+        this.students = this.studentsRecentAdded;
+
         this.studentStats = this.processStudentStats(studentStats);
-
-        // Update released docs data
         this.data = this.processReleasedDocsData(releasedDocsStats);
+        // this.genderDistribution = genderDistribution; // assign directly, not .data
 
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -279,7 +316,32 @@ export default {
         this.loading = false;
       }
     },
-
+    async fetchGenderDistribution() {
+      try {
+        // Always send sy_year in backend format (no spaces)
+        const params = this.selectedYearBarChart
+          ? { sy_year: this.selectedYearBarChart }
+          : {};
+        const genderDistribution = await DashboardService.getGenderDistribution(params);
+        this.genderDistribution = genderDistribution;
+      } catch (error) {
+        this.genderDistribution = {};
+      }
+    },
+    async fetchAvailableGenderDistributionYears() {
+      try {
+        // Fetch all available years for gender distribution
+        const response = await DashboardService.getGenderDistributionYears();
+        // Ensure response is an array of year strings, e.g. ["2022-2023", "2023-2024", "2024-2025"]
+        this.years = Array.isArray(response) ? response : [];
+        // Set default selected year if not set and years are available
+        if (!this.selectedYearBarChart && this.years.length > 0) {
+          this.selectedYearBarChart = "";
+        }
+      } catch (error) {
+        this.years = [];
+      }
+    },
     processStudentStats(stats) {
       return {
         "JHS Grade 7": [
@@ -614,10 +676,9 @@ select:focus {
   display: flex;
   justify-content: space-between;
   width: 100%; 
-
-  h3 {
-    margin: 0;
-  }
+}
+.content-title-docs h3 {
+  margin: 0;
 }
 
 .year-filter {

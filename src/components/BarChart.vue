@@ -3,33 +3,28 @@
 </template>
 
 <script>
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
 import Chart from "chart.js/auto";
 
 export default defineComponent({
-  setup() {
+  props: {
+    chartData: {
+      type: Object,
+      required: true,
+    },
+  },
+  setup(props) {
     const barChartCanvas = ref(null);
+    let chartInstance = null;
 
-    onMounted(() => {
-      if (barChartCanvas.value) {
-        new Chart(barChartCanvas.value, {
+    const renderChart = () => {
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+      if (barChartCanvas.value && props.chartData) {
+        chartInstance = new Chart(barChartCanvas.value, {
           type: "bar",
-          data: {
-            labels: [
-              "JHS Male Students",
-              "JHS Female Students",
-              "SHS Female Students",
-              "SHS Male Students",
-            ],
-            datasets: [
-              {
-                label: "Number of Students",
-                data: [80, 180, 140, 300],
-                backgroundColor: "#1E3A8A",
-                borderRadius: 5,
-              },
-            ],
-          },
+          data: props.chartData,
           options: {
             responsive: true,
             maintainAspectRatio: false,
@@ -39,13 +34,25 @@ export default defineComponent({
             scales: {
               y: {
                 beginAtZero: true,
-                ticks: { stepSize: 50 },
+                ticks: { stepSize: 1 },
               },
             },
           },
         });
       }
+    };
+
+    onMounted(() => {
+      renderChart();
     });
+
+    watch(
+      () => props.chartData,
+      () => {
+        renderChart();
+      },
+      { deep: true }
+    );
 
     return { barChartCanvas };
   },
@@ -59,7 +66,6 @@ export default defineComponent({
   height: 390px;
   margin: auto;
   border-radius: 8px;
-
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 .chart-title {
