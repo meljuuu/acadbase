@@ -130,7 +130,13 @@
             <div class="content-title-docs">
               <h3>Released Docs</h3>
               <select v-model="selectedYearDocs" class="year-filter">
-                <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
+                <option 
+                  v-for="year in Object.keys(data)" 
+                  :key="year" 
+                  :value="year"
+                >
+                  {{ year }}
+                </option>
               </select>
             </div>
           </div>
@@ -253,11 +259,10 @@ export default {
           : this.studentsRecentAdded;
       },
       filteredData() {
-        return this.data[this.selectedYearDocs];
+        return this.data[this.selectedYearDocs] || { releasedDocs: 0, seniorHigh: 0, juniorHigh: 0 };
       },
       barChartData() {
-        // Use genderDistribution.data as per new response structure
-        const dist = (this.genderDistribution && this.genderDistribution.data) ? this.genderDistribution.data : {};
+        const dist = this.genderDistribution || {};
         return {
           labels: ['JHS Male', 'JHS Female', 'SHS Male', 'SHS Female'],
           datasets: [
@@ -273,7 +278,7 @@ export default {
             }
           ]
         };
-      },
+      }
     },
   
   methods: {
@@ -292,23 +297,27 @@ export default {
           DashboardService.getStudentStatusCounts()
         ]);
 
-        this.studentsRecentAdded = Array.isArray(recentStudents.data)
-          ? recentStudents.data.map(student => ({
-              name: `${student.LastName}, ${student.FirstName}${student.Suffix ? ' ' + student.Suffix : ''}`,
-              track: student.Track,
-              school_year: student.Grade_Level,
-              lrn: student.LRN,
-              releaseDate: student.created_at // or another date field if needed
-            }))
-          : [];
+        this.studentsRecentAdded = Array.isArray(recentStudents)
+        ? recentStudents.map(student => ({
+            name: `${student.LastName}, ${student.FirstName}`,
+            track: student.Track,
+            school_year: student.Curriculum, // or use 'batch' if needed
+            lrn: student.Student_ID,
+            releaseDate: student.batch
+          }))
+        : [];
+
 
         // For demo: show the same students in the table
         this.students = this.studentsRecentAdded;
 
         this.studentStats = this.processStudentStats(studentStats);
         this.data = this.processReleasedDocsData(releasedDocsStats);
-        // this.genderDistribution = genderDistribution; // assign directly, not .data
-
+          const years = Object.keys(this.data);
+          if (years.length && !this.selectedYearDocs) {
+            this.selectedYearDocs = years[0];
+          }
+   
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
         this.error = 'Failed to load dashboard data';
@@ -354,15 +363,21 @@ export default {
     },
 
     processReleasedDocsData(stats) {
-      return {
-        "2024 - 2025": {
-          releasedDocs: stats.released_docs['2024 - 2025'] || 0,
-          seniorHigh: stats.curriculum_stats['SHS'] || 0,
-          juniorHigh: stats.curriculum_stats['JHS'] || 0
-        },
-        // Add other years similarly
-      };
+      const result = {};
+      const released = stats.released_docs || {};
+      const curriculum = stats.curriculum_stats || {};
+
+      Object.keys(released).forEach(year => {
+        result[year.replace('-', ' - ')] = {
+          releasedDocs: released[year],
+          seniorHigh: curriculum['SHS'] || 0,
+          juniorHigh: curriculum['JHS'] || 0
+        };
+      });
+
+      return result;
     },
+
 
     formatDate(date) {
       return new Intl.DateTimeFormat("en-US", {

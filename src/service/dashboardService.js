@@ -13,7 +13,7 @@ class DashboardService {
         }
     }
 
-        async getRecentStudents() {
+    async getRecentStudents() {
         try {
             const response = await axios.get(`${API_URL}/dashboard/recent-added`);
             return response.data;
