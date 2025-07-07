@@ -15,7 +15,7 @@ class DashboardService {
 
         async getRecentStudents() {
         try {
-            const response = await axios.get(`${API_URL}/dashboard/recent-accepted-students`);
+            const response = await axios.get(`${API_URL}/dashboard/recent-added`);
             return response.data;
         } catch (error) {
             throw error;
@@ -34,15 +34,15 @@ class DashboardService {
         }
     }
 
-    // Get available years for gender distribution
-    async getGenderDistributionYears() {
-        try {
-            const response = await axios.get(`${API_URL}/dashboard/students/gender-distribution-years`);
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    }
+    // // Get available years for gender distribution
+    // async getGenderDistributionYears() {
+    //     try {
+    //         const response = await axios.get(`${API_URL}/dashboard/students/gender-distribution-years`);
+    //         return response.data;
+    //     } catch (error) {
+    //         throw error;
+    //     }
+    // }
 
     // Get student grade distribution
     async getGradeDistribution() {
