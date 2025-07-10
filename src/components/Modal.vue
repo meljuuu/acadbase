@@ -937,8 +937,14 @@ export default {
       }
 
       try {
-        // Update student status before saving
-        this.updateStudentStatus();
+        // Fetch the current student data to check the previous status
+        const currentStudent = await MasterlistService.getStudent(this.studentId);
+        const previousStatus = currentStudent.status;
+
+        // Only update the status to "Unreleased" if the previous status was "Not-Applicable"
+        const newStatus = (previousStatus === 'Not-Applicable' && this.isStudentInfoComplete && (this.uploadedFile || this.pdfUrl)) 
+          ? 'Unreleased' 
+          : previousStatus;
 
         const studentData = {
           name: this.Name,
@@ -948,7 +954,7 @@ export default {
           curriculum: this.Curriculum,
           track: this.AcademicTrack,
           faculty_name: this.FacultyName,
-          status: this.studentStatus,
+          status: newStatus,
           pdfFile: this.uploadedFile || null,
           gender: this.gender,
         };
@@ -963,14 +969,9 @@ export default {
             confirmButtonColor: '#295f98'
           });
           
-          // Exit edit mode after successful save
-          // this.isEditMode = false; // Removed as per edit hint
-          
-          // Close modal and emit event to refresh the list
           this.closeUnReleasedModal();
           this.$emit('student-saved');
           
-          // Refresh the page after a short delay
           setTimeout(() => {
             window.location.reload();
           }, 500);
