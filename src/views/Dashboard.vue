@@ -18,18 +18,6 @@
           <Dropdown :showCurriculum="true" @update:selectedCurriculum="selectedCurriculum = $event" />
           <Dropdown :showYear="true" :yearOptions="availableYears" @update:selectedYear="selectedSY = $event" />
         </div>
-
-        <div class="stats-container" v-if="filteredStats.length">
-          <div v-for="(stat, index) in filteredStats" :key="index" class="stat-card">
-            <div class="stat-icon">
-              <font-awesome-icon icon="book-open" />
-            </div>
-            <div class="stat-info">
-              <h3>{{ stat.count }}</h3>
-              <p>{{ stat.label }}</p>
-            </div>
-          </div>
-        </div>
       </div>
 
       <div class="student-list-container">
@@ -60,11 +48,11 @@
               </div>
 
               <div class="filter-container-recent-added">
-                <select v-model="selectedSYRecentAdded" id="recentAddedFilter">
-                  <option value="">All</option>
-                  <option v-for="school_year in uniqueSYsRecentAdded" :key="school_year" :value="school_year">
-                    {{ school_year }}
-                  </option>
+                <!-- Only Curriculum Filter -->
+                <select v-model="selectedCurriculumRecentAdded" class="curriculum-filter">
+                  <option value="">All Curriculums</option>
+                  <option value="JHS">Junior High School</option>
+                  <option value="SHS">Senior High School</option>
                 </select>
               </div>
             </div>
@@ -181,9 +169,9 @@ export default {
       rawStudentStats: null, // <-- added to keep original stats
       currentPage: 1,
       itemsPerPage: 10,
-      selectedSYRecentAdded: "",
+      selectedCurriculumRecentAdded: "", // Keep this
       studentsRecentAdded: [],
-      students: [],
+      students: [], // Main student list (aligned with Masterlist.vue)
       studentStats: {},
       selectedYearDocs: "2020 - 2021",
       selectedYearBarChart: "",
@@ -200,7 +188,8 @@ export default {
     };
   },
   async created() {
-    await this.fetchDashboardData();
+    await this.fetchStudents(); // Use the same fetch method as Masterlist.vue
+    await this.fetchDashboardStats();
     await this.fetchAvailableGenderDistributionYears();
     await this.fetchGenderDistribution();
     await this.fetchLatestMasterlistStudents();
@@ -245,12 +234,12 @@ export default {
         : this.students;
     },
     filteredRecentAddedStudents() {
-      return this.selectedSYRecentAdded
-        ? this.studentsRecentAdded.filter(student => student.school_year === this.selectedSYRecentAdded)
-        : this.studentsRecentAdded;
-    },
-    uniqueSYsRecentAdded() {
-      return [...new Set(this.studentsRecentAdded.map(student => student.school_year))];
+      // Filter by curriculum only
+      return this.selectedCurriculumRecentAdded
+        ? this.students.filter(student => 
+            student.curriculum === this.selectedCurriculumRecentAdded
+          )
+        : this.students;
     },
     filteredData() {
       return this.data[this.selectedYearDocs] || { releasedDocs: 0, seniorHigh: 0, juniorHigh: 0 };
@@ -272,48 +261,49 @@ export default {
           }
         ]
       };
+    },
+    // Add unique curriculums for display (optional)
+    uniqueCurriculums() {
+      return [...new Set(this.studentsRecentAdded.map(student => student.curriculum))];
     }
   },
   methods: {
-    async fetchDashboardData() {
+    async fetchStudents() {
       this.loading = true;
       try {
-        const [
-          studentStats,
-          recentStudents,
-          releasedDocsStats,
-          allstsudents,
-          statusCounts
-        ] = await Promise.all([
+        const response = await MasterlistService.filterStudents({
+          // Use the same filters as Masterlist.vue (empty for all students)
+        });
+        
+        this.students = response.data.map(student => ({
+          ...student,
+          name: student.name || '-',
+          track: student.track || '-',
+          curriculum: student.curriculum || '-',
+          batch: student.batch || '-',
+          status: student.status || 'Not-Applicable'
+        }));
+      } catch (error) {
+        this.error = 'Failed to load students: ' + error.message;
+      } finally {
+        this.loading = false;
+      }
+    },
+    async fetchDashboardStats() {
+      // Fetch dashboard-specific stats (charts, etc.)
+      try {
+        const [studentStats, releasedDocsStats] = await Promise.all([
           DashboardService.getStudentStats(),
-          DashboardService.getRecentStudents(),
           DashboardService.getReleasedDocsStats(),
-          DashboardService.getStudentStatusCounts(),
-          MasterlistService.getAllStudents()
         ]);
-
-        this.studentsRecentAdded = Array.isArray(recentStudents)
-          ? recentStudents.map(student => ({
-            name: `${student.LastName}, ${student.FirstName}`,
-            track: student.Track,
-            school_year: student.Curriculum,
-            lrn: student.Student_ID,
-            releaseDate: student.batch
-          }))
-          : [];
-
-        this.students = this.studentsRecentAdded;
-
-        // Save and process student stats
+        // Process stats as before...
         this.rawStudentStats = studentStats;
         this.studentStats = this.processStudentStats(studentStats);
 
         this.data = this.processReleasedDocsData(releasedDocsStats);
 
         const trackStats = studentStats.track_stats || {};
-        // this.availableYears = Object.keys(trackStats).map(year => year.replace('-', ' - '));
         this.availableYears = Object.keys(trackStats);
-
 
         if (!this.selectedSY && this.availableYears.length) {
           this.selectedSY = this.availableYears[0];
@@ -325,10 +315,7 @@ export default {
         }
 
       } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-        this.error = 'Failed to load dashboard data';
-      } finally {
-        this.loading = false;
+        this.error = 'Failed to load dashboard stats';
       }
     },
     processStudentStats(stats) {
