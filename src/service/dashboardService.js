@@ -83,6 +83,14 @@ class DashboardService {
             throw error;
         }
     }
+    async getCurriculumBatchDistribution() {
+    try {
+        const response = await axios.get(`${API_URL}/dashboard/students/grade-distribution-SY`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
 }
 
 export default new DashboardService();

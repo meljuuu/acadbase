@@ -1,85 +1,86 @@
-<template>
-  <div class="dropdown-container">
+  <template>
+    <div class="dropdown-container">
+      <select
+        v-if="showCurriculum"
+        v-model="selectedCurriculum"
+        class="filter-dropdown"
+        @change="$emit('update:selectedCurriculum', selectedCurriculum)"
+      >
+        <option disabled value="">Curriculum</option>
+        <option v-for="curriculum in curriculums" :key="curriculum">
+          {{ curriculum }}
+        </option>
+      </select>
+
+      <select
+         v-if="showYear"
+  v-model="selectedYear"
+  class="filter-dropdown"
+  @change="$emit('update:selectedYear', selectedYear)"
+>
+  <option disabled value="">Year</option>
+  <option v-for="year in finalYearOptions" :key="year">
+  
+  {{ year }}
+</option>
+      </select>
+
+      <!-- DD Batch-->
+      <select
+        v-if="showBatch"
+        v-model="selectedBatch"
+        class="filter-dropdown"
+        @change="$emit('update:selectedBatch', selectedBatch)"
+      >
+        <option disabled value="">Batch</option>
+        <option v-for="batch in batchs" :key="batch">
+          {{ batch }}
+        </option>
+      </select>
+
+      <!-- DD track-->
+      <select
+        v-if="showTrack"
+        v-model="selectedTrack"
+        class="filter-dropdown"
+        @change="$emit('update:selectedTrack', selectedTrack)"
+      >
+        <option disabled value="">Track</option>
+        <option v-for="track in tracks" :key="track">
+          {{ track }}
+        </option>
+      </select>
+
+      <!-- DD type-->
+      <select
+        v-if="showType"
+        v-model="selectedType"
+        class="filter-dropdown"
+        @change="$emit('update:selectedType', selectedType)"
+      >
+        <option disabled value="">Download CSV</option>
+        <option v-for="type in types" :key="type">
+          {{ type }}
+        </option>
+      </select>
+    </div>
+
+  <!-- DD Status -->
     <select
-      v-if="showCurriculum"
-      v-model="selectedCurriculum"
+      v-if="showStatus"
+      v-model="selectedStatus"
       class="filter-dropdown"
-      @change="$emit('update:selectedCurriculum', selectedCurriculum)"
+      @change="$emit('update:selectedStatus', selectedStatus)"
     >
-      <option disabled value="">Curriculum</option>
-      <option v-for="curriculum in curriculums" :key="curriculum">
-        {{ curriculum }}
+      <option disabled value="">Status</option>
+      <option v-for="status in statuses" :key="status">
+        {{ status }}
       </option>
     </select>
+  </template>
 
-    <select
-      v-if="showYear"
-      v-model="selectedYear"
-      class="filter-dropdown"
-      @change="$emit('update:selectedYear', selectedYear)"
-    >
-      <option disabled value="">Year</option>
-      <option v-for="year in years" :key="year">
-        {{ year }}
-      </option>
-    </select>
-
-    <!-- DD Batch-->
-    <select
-      v-if="showBatch"
-      v-model="selectedBatch"
-      class="filter-dropdown"
-      @change="$emit('update:selectedBatch', selectedBatch)"
-    >
-      <option disabled value="">Batch</option>
-      <option v-for="batch in batchs" :key="batch">
-        {{ batch }}
-      </option>
-    </select>
-
-    <!-- DD track-->
-    <select
-      v-if="showTrack"
-      v-model="selectedTrack"
-      class="filter-dropdown"
-      @change="$emit('update:selectedTrack', selectedTrack)"
-    >
-      <option disabled value="">Track</option>
-      <option v-for="track in tracks" :key="track">
-        {{ track }}
-      </option>
-    </select>
-
-    <!-- DD type-->
-    <select
-      v-if="showType"
-      v-model="selectedType"
-      class="filter-dropdown"
-      @change="$emit('update:selectedType', selectedType)"
-    >
-      <option disabled value="">Download CSV</option>
-      <option v-for="type in types" :key="type">
-        {{ type }}
-      </option>
-    </select>
-  </div>
-
-<!-- DD Status -->
-  <select
-    v-if="showStatus"
-    v-model="selectedStatus"
-    class="filter-dropdown"
-    @change="$emit('update:selectedStatus', selectedStatus)"
-  >
-    <option disabled value="">Status</option>
-    <option v-for="status in statuses" :key="status">
-      {{ status }}
-    </option>
-  </select>
-</template>
-
-<script setup>
-import { ref, defineProps } from "vue";
+ <script setup>
+import { ref, defineProps, computed } from "vue";
 
 const props = defineProps({
   showCurriculum: { type: Boolean, default: false },
@@ -88,22 +89,9 @@ const props = defineProps({
   showTrack: { type: Boolean, default: false },
   showType: { type: Boolean, default: false },
   showStatus: { type: Boolean, default: false },
+  yearOptions: { type: Array, default: () => [] },
   hideAllOption: Boolean,
 });
-
-const curriculums = [
-  "JHS Grade 7",
-  "JHS Grade 8",
-  "JHS Grade 9",
-  "JHS Grade 10",
-  "SHS Grade 11",
-  "SHS Grade 12"
-];
-const years = ["2024 - 2025", "2023 - 2024", "2022 - 2023"];
-const batchs = ["All", "S.Y 2020 - 2021", "S.Y 2021 - 2022", "S.Y 2022 - 2023", "S.Y 2023 - 2024", "S.Y 2024 - 2025"];
-const tracks = ["All", "TVL - IEM", "HUMSS", "SPJ", "SPA", "BEC"];
-const types = [".csv"];
-const statuses = ["All", "Dropped-Out", "Not-Applicable", "Released", "Unreleased"]; 
 
 const selectedCurriculum = ref("");
 const selectedYear = ref("");
@@ -111,7 +99,23 @@ const selectedBatch = ref("");
 const selectedTrack = ref("");
 const selectedType = ref("");
 const selectedStatus = ref("");
+
+// For curriculum dropdown
+const curriculums = ["Junior High School", "Senior High School"];
+
+// For fallback dropdowns only (used if yearOptions not passed)
+const defaultYears = ["2025 - 2026", "2023 - 2024", "2026 - 2027"];
+const batchs = ["All", "S.Y 2020 - 2021", "S.Y 2021 - 2022", "S.Y 2022 - 2023", "S.Y 2023 - 2024", "S.Y 2024 - 2025"];
+const tracks = ["All", "Academic", "Technical Professional", "SPJ", "SPA", "BEC"];
+const types = [".csv"];
+const statuses = ["All", "Dropped-Out", "Not-Applicable", "Released", "Unreleased"];
+
+// Use yearOptions prop if provided; otherwise fallback to default
+const finalYearOptions = computed(() => {
+  return props.yearOptions.length ? props.yearOptions : defaultYears;
+});
 </script>
+
 
 <style scoped>
 .dropdown-container {
