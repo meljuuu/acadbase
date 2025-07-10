@@ -1,6 +1,6 @@
   <template>
     <div class="dropdown-container">
-      <select
+      <!-- <select
         v-if="showCurriculum"
         v-model="selectedCurriculum"
         class="filter-dropdown"
@@ -10,7 +10,7 @@
         <option v-for="curriculum in curriculums" :key="curriculum">
           {{ curriculum }}
         </option>
-      </select>
+      </select> -->
 
       <select
          v-if="showYear"
@@ -26,17 +26,6 @@
       </select>
 
       <!-- DD Batch-->
-      <select
-        v-if="showBatch"
-        v-model="selectedBatch"
-        class="filter-dropdown"
-        @change="$emit('update:selectedBatch', selectedBatch)"
-      >
-        <option disabled value="">Batch</option>
-        <option v-for="batch in batchs" :key="batch">
-          {{ batch }}
-        </option>
-      </select>
 
       <!-- DD track-->
       <select
@@ -106,9 +95,8 @@ const curriculums = ["Junior High School", "Senior High School"];
 // For fallback dropdowns only (used if yearOptions not passed)
 const defaultYears = ["2021 - 2026", "2023 - 2024", "2026 - 2027"];
 const batchs = ["All", "S.Y 2020 - 2021", "S.Y 2021 - 2022", "S.Y 2022 - 2023", "S.Y 2023 - 2024", "S.Y 2024 - 2025"];
-const tracks = ["All", "Academic", "Technical Professional", "SPJ", "SPA", "BEC"];
-const types = [".csv"];
-const statuses = ["All", "Dropped-Out", "Not-Applicable", "Released", "Unreleased"];
+const tracks = ["All", "SPJ", "SPA", "BEC"];
+const statuses = ["Dropped-Out", "Not-Applicable", "Released", "Unreleased"];
 
 // Use yearOptions prop if provided; otherwise fallback to default
 const finalYearOptions = computed(() => {

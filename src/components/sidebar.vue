@@ -23,12 +23,12 @@
           </li>
         </router-link>
 
-        <router-link to="/History" custom v-slot="{ navigate, isActive }">
+        <!-- <router-link to="/History" custom v-slot="{ navigate, isActive }">
           <li :class="['menu-item', { active: isActive }]" @click="navigate">
             <i class="fas fa-clock"></i>
             <span>History</span>
           </li>
-        </router-link>
+        </router-link> -->
       </ul>
 
       <button class="logout-btn" @click="openaddModal">

@@ -23,34 +23,53 @@
         <Dropdown
           :showStatus="true"
           :hideAllOption="true"
-          @update:selectedStatus="selectedStatus = $event"
+          v-model:selectedStatus="selectedStatus"
         />
+        <!-- Reset button moved here, right after status filter -->
+        <button class="reset-button" @click="resetFilters" title="Reset Filters">
+          <i class="fas fa-sync-alt" style="margin-right: 6px;"></i>
+          Reset
+        </button>
         <Dropdown
           :showBatch="true"
           :hideAllOption="true"
-          @update:selectedBatch="selectedBatch = $event"
+          v-model:selectedBatch="selectedBatch"
         />
         <Dropdown
           :showCurriculum="true"
           :hideAllOption="true"
-          @update:selectedCurriculum="selectedCurriculum = $event"
+          v-model:selectedCurriculum="selectedCurriculum"
         />
-        <Dropdown
-          :showTrack="true"
-          @update:selectedTrack="selectedTrack = $event"
-        />
+        <!-- School year dropdown removed -->
       </div>
 
-      <button class="reset-button" @click="resetFilters" title="Reset Filters">
-          <i class="fas fa-sync-alt"></i>
+      <div class="filter-actions">
+        <!-- Only the download button remains here, at the end -->
+        <button
+          class="download-btn"
+          @click.stop="downloadExcel"
+          title="Download as Excel"
+          style="display: flex; align-items: center; gap: 4px;"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M13 10V3H7v7H4l6 6 6-6h-3z"/>
+            <path d="M5 18h10v-2H5v2z"/>
+          </svg>
+          Download
         </button>
+      </div>
     </div>
+
+    
 
     <div class="table-container">
       <table>
         <thead>
           <tr>
-            <th>#</th> <!-- Index column -->
+            <th style="text-align: center; vertical-align: middle;">
+              <!-- Changed from download button to # -->
+              #
+            </th>
             <th>LRN</th>
             <th>STUDENT NAME</th>
             <th>GENDER</th>
@@ -66,7 +85,7 @@
             :key="student.id"
             @click="showUnReleasedModal(student.id)"
           >
-            <td>{{ index + 1 }}</td>
+            <td style="text-align: center;">{{ index + 1 }}</td>
             <td>{{ student.lrn || '-' }}</td>
             <td>{{ student.name || '-' }}</td>
             <td>{{ student.gender || '-' }}</td>
@@ -118,6 +137,8 @@ import ImportClassListButton from "../components/ImportClassListButton.vue";
 import EditModal from "@/components/EditModal.vue";
 import MasterlistService from "@/service/MasterlistService";
 import * as pdfjsLib from 'pdfjs-dist';
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 export default {
   name: "Masterlist",
@@ -143,7 +164,9 @@ export default {
       students: [],
       total: 0,
       loading: false,
-      error: null
+      error: null,
+      yearOptions: ['2021 - 2022', '2022 - 2023', '2023 - 2024'],
+      selectedYear: '',
     };
   },
   computed: {
@@ -191,6 +214,9 @@ export default {
     },
     searchQuery() {
       this.fetchStudents();
+    },
+    selectedYear(newYear) {
+      // filter your data here
     }
   },
   methods: {
@@ -199,10 +225,10 @@ export default {
       this.error = null;
       try {
         const filters = {
-          batch: this.selectedBatch || null,
-          curriculum: this.selectedCurriculum || null,
-          track: this.selectedTrack || null,
-          status: this.selectedStatus || null,
+          batch: this.selectedBatch && this.selectedBatch !== "All" ? this.selectedBatch : null,
+          curriculum: this.selectedCurriculum && this.selectedCurriculum !== "All" ? this.selectedCurriculum : null,
+          track: this.selectedTrack && this.selectedTrack !== "All" ? this.selectedTrack : null,
+          status: this.selectedStatus && this.selectedStatus !== "All" ? this.selectedStatus : null,
           search: this.searchQuery || null,
           page: this.currentPage
         };
@@ -367,6 +393,32 @@ export default {
       if (!status) return 'not-applicable';
       // Convert status to lowercase and replace spaces with hyphens
       return status.toLowerCase().replace(/\s+/g, '-');
+    },
+    downloadExcel() {
+      // Prepare data for Excel
+      const data = this.students.map((student, index) => ({
+        "#": index + 1,
+        "LRN": student.lrn || "-",
+        "STUDENT NAME": student.name || "-",
+        "GENDER": student.gender || "-",
+        "ACADEMIC TRACK": student.track || "-",
+        "CURRICULUM": student.curriculum || "-",
+        "SCHOOL YEAR": student.batch || "-",
+        "STATUS": this.formattedStatus(student.status || "Not-Applicable"),
+      }));
+
+      // Create worksheet and workbook
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Masterlist");
+
+      // Generate buffer and trigger download
+      const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+      saveAs(new Blob([wbout], { type: "application/octet-stream" }), "masterlist.xlsx");
+    },
+    onCurriculumChange(curriculum) {
+      this.selectedCurriculum = curriculum;
+      this.fetchStudents();
     }
   },
   mounted() {
@@ -406,9 +458,9 @@ export default {
 
 .filtering-section {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  gap: 10px;
+  gap: 20px; /* Adjust as needed */
+  justify-content: space-between; /* Or use space-evenly for equal spacing */
   background-color: #ffffff;
   padding: 10px 20px;
   border-radius: 8px;
@@ -655,15 +707,16 @@ tr:hover {
   background: #295f98;
   color: #fff;
   border: none;
-  padding: 8px;
+  padding: 8px 16px;
   border-radius: 3px;
   cursor: pointer;
   font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  gap: 6px;
+  height: 38px;
+  font-weight: bold;
 }
 
 .reset-button:hover {
@@ -721,5 +774,28 @@ td:empty::before {
   content: '-';
   color: #999;
   font-style: italic;
+}
+.download-btn {
+  background: #1d6f42;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.download-btn:hover {
+  background: #218838;
+}
+
+/* Add a wrapper for the buttons at the end for better alignment */
+.filter-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 </style>
