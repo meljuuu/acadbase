@@ -26,14 +26,7 @@
             <div className="content-title">
               <h3>Total Students</h3>
             </div>
-            <div className="filter">
-              <select v-model="selectedYearBarChart">
-                <option value="">All</option>
-                <option v-for="year in years" :key="year" :value="year">
-                  {{ year.replace('-', ' - ') }}
-                </option>
-              </select>
-            </div>
+
           </div>
           <div className="chart-container">
             <BarChart :chart-data="barChartData" />
