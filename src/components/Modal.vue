@@ -539,6 +539,9 @@ export default {
         this.AcademicTrack = student.track;
         this.DateAdded = student.created_at || new Date().toLocaleDateString();
 
+        // Set faculty name from the database, not from localStorage
+        this.FacultyName = student.faculty_name || "";
+
         // Check for stamped PDF
         if (student.stamped_pdf_storage) {
           this.hasStampedPdf = true;
@@ -617,6 +620,8 @@ export default {
     },
     openaddModal() {
       this.syBatch = this.currentAcademicYear; // Auto-populate with current year
+      // For adding, use the current user
+      this.FacultyName = this.getFacultyName();
       this.showModal = true;
     },
     closeModal() {
