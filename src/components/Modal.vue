@@ -221,10 +221,6 @@
           <input type="text" v-model="FacultyName" placeholder="" readonly />
         </div>
         <div class="input-group">
-          <label>Document Released</label>
-          <input type="text" v-model="FacultyName" placeholder="" readonly />
-        </div>
-        <div class="input-group">
           <label>Date of Released</label>
           <input type="text" :value="formatDate(DateAdded)" placeholder="" readonly />
         </div>
@@ -355,15 +351,7 @@
           <input
             type="text"
             v-model="FacultyName"
-            class="editable"
-          />
-        </div>
-        <div class="input-group">
-          <label>Document Released</label>
-          <input
-            type="text"
-            v-model="FacultyName"
-            class="editable"
+            readonly
           />
         </div>
         <div class="input-group">
@@ -371,7 +359,7 @@
           <input
             type="text"
             :value="formatDate(DateAdded)"
-            class="editable"
+            readonly
           />
         </div>
         <div class="input-group" v-if="furnishedDate">
@@ -379,7 +367,7 @@
           <input
             type="text"
             :value="formatDate(furnishedDate)"
-            class="editable"
+            readonly
           />
         </div>
         <div class="input-group" v-if="furnishedBy">
@@ -387,7 +375,7 @@
           <input
             type="text"
             :value="furnishedBy"
-            class="editable"
+            readonly
           />
         </div>
         <div class="furnished">
@@ -1408,12 +1396,12 @@ select:focus {
 /* Update existing input styles */
 .modal-content input:not(.editable) {
   background-color: #f5f5f5;
-  cursor: pointer !important;
+  cursor: default !important;
 }
 
 .modal-content select:not(.editable) {
   background-color: #f5f5f5;
-  cursor: pointer !important;
+  cursor: default !important;
 }
 
 /* Add hover effect for inputs in Add Student modal */
