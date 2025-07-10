@@ -84,7 +84,8 @@
               <tr>
                 <th>Name</th>
                 <th>Track</th>
-                <th>School Year</th>
+                <th>Curriculum</th>
+                <th>Gender</th> <!-- Added Gender column -->
                 <th>Release Date</th>
               </tr>
             </thead>
@@ -93,6 +94,7 @@
                 <td>{{ student.name }}</td>
                 <td>{{ student.track }}</td>
                 <td>{{ student.school_year }}</td>
+                <td>{{ student.gender || '-' }}</td> <!-- Display gender or placeholder -->
                 <td>{{ formatDate(student.releaseDate) }}</td>
               </tr>
             </tbody>
@@ -374,8 +376,11 @@ export default {
             track: student.track,
             school_year: student.curriculum,
             lrn: student.lrn,
-            releaseDate: student.created_at
+            releaseDate: student.created_at,
+            gender: student.gender, // Ensure gender is included
+            status: student.status // Ensure status is included
           }))
+          .filter(student => student.status === "Released") // Filter for "Released" status
           .sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate)); // sort by latest
       } catch (error) {
         console.error('Error fetching masterlist students:', error);
