@@ -13,6 +13,7 @@
         <table v-if="dropoutStudents.length">
           <thead>
             <tr>
+              <th>#</th> <!-- Index column -->
               <th>Name</th>
               <th>Curriculum</th>
               <th>School Year</th>
@@ -21,7 +22,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="student in dropoutStudents" :key="student.lrn">
+            <tr v-for="(student, idx) in paginatedDropoutStudents" :key="student.lrn">
+              <td>{{ (dropoutCurrentPage - 1) * dropoutItemsPerPage + idx + 1 }}</td>
               <td>{{ student.name }}</td>
               <td>{{ student.curriculum }}</td>
               <td>{{ student.batch || student.school_year }}</td>
@@ -32,6 +34,12 @@
         </table>
         <div v-else>
           No drop out students found.
+        </div>
+        <!-- Pagination Controls -->
+        <div v-if="dropoutStudents.length > dropoutItemsPerPage" style="margin-top: 16px; display: flex; justify-content: center; align-items: center; gap: 12px;">
+          <button @click="dropoutPrevPage" :disabled="dropoutCurrentPage === 1">Prev</button>
+          <span>Page {{ dropoutCurrentPage }} of {{ dropoutTotalPages }}</span>
+          <button @click="dropoutNextPage" :disabled="dropoutCurrentPage === dropoutTotalPages">Next</button>
         </div>
       </div>
     </div>
@@ -107,6 +115,7 @@
           <table>
             <thead>
               <tr>
+                <th>#</th> <!-- Index column -->
                 <th>Name</th>
                 <th>Track</th>
                 <th>Curriculum</th>
@@ -115,7 +124,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="student in filteredRecentReleasedStudents" :key="student.lrn">
+              <tr v-for="(student, idx) in filteredRecentReleasedStudents" :key="student.lrn">
+                <td>{{ idx + 1 }}</td>
                 <td>{{ student.name }}</td>
                 <td>{{ student.track }}</td>
                 <td>{{ student.curriculum }}</td> <!-- Show curriculum here -->
@@ -214,6 +224,8 @@ export default {
       genderDistribution: {},
       showDropoutModal: false,
       dropoutStudents: [],
+      dropoutCurrentPage: 1, // <-- Add this
+      dropoutItemsPerPage: 15, // <-- Add this
     };
   },
   async created() {
@@ -233,6 +245,7 @@ export default {
     showDropoutModal(newVal) {
       if (newVal) {
         this.fetchDropoutStudents();
+        this.dropoutCurrentPage = 1; // Reset to first page when modal opens
       }
     },
     selectedYearBarChart() {
@@ -308,6 +321,13 @@ export default {
           (student.school_year || '').replace(/\s+/g, '') === selectedYear
         )
         .slice(0, 10);
+    },
+    paginatedDropoutStudents() {
+      const start = (this.dropoutCurrentPage - 1) * this.dropoutItemsPerPage;
+      return this.dropoutStudents.slice(start, start + this.dropoutItemsPerPage);
+    },
+    dropoutTotalPages() {
+      return Math.ceil(this.dropoutStudents.length / this.dropoutItemsPerPage) || 1;
     }
   },
   methods: {
@@ -493,6 +513,16 @@ export default {
         nextYear = year + 1;
       }
       return `${year} - ${nextYear}`;
+    },
+    dropoutPrevPage() {
+      if (this.dropoutCurrentPage > 1) {
+        this.dropoutCurrentPage--;
+      }
+    },
+    dropoutNextPage() {
+      if (this.dropoutCurrentPage < this.dropoutTotalPages) {
+        this.dropoutCurrentPage++;
+      }
     }
   }
 };

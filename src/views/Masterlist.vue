@@ -50,6 +50,7 @@
       <table>
         <thead>
           <tr>
+            <th>#</th> <!-- Index column -->
             <th>LRN</th>
             <th>STUDENT NAME</th>
             <th>GENDER</th>
@@ -65,6 +66,7 @@
             :key="student.id"
             @click="showUnReleasedModal(student.id)"
           >
+            <td>{{ index + 1 }}</td>
             <td>{{ student.lrn || '-' }}</td>
             <td>{{ student.name || '-' }}</td>
             <td>{{ student.gender || '-' }}</td>
