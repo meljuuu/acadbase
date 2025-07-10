@@ -84,6 +84,7 @@
                     <tr>
                       <th>Name</th>
                       <th>LRN</th>
+                      <th>Gender</th>
                       <th>Birthdate</th>
                       <th>S.Y Batch</th>
                       <th>Curriculum</th>
@@ -94,6 +95,7 @@
                     <tr v-for="(student, index) in csvPreview.slice(0, 5)" :key="index">
                       <td>{{ student.Name || '-' }}</td>
                       <td>{{ student.LRN || '-' }}</td>
+                      <td>{{ student.Gender || '-' }}</td>
                       <td>{{ student.Birthdate || '-' }}</td>
                       <td>{{ student.syBatch || '-' }}</td>
                       <td>{{ student.Curriculum || '-' }}</td>
@@ -207,6 +209,7 @@ export default {
             return {
               Name: row.student_name || row.name || '-',
               LRN: row.lrn || '-',
+              Gender: row.gender || row.sex || '-',
               Birthdate: birthdate,
               syBatch: row.batch || row.sy_batch || row.school_year || '-',
               Curriculum: row.curriculum || '-',

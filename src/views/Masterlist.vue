@@ -52,6 +52,7 @@
           <tr>
             <th>LRN</th>
             <th>STUDENT NAME</th>
+            <th>GENDER</th>
             <th>ACADEMIC TRACK</th>
             <th>CURRICULUM</th>
             <th>SCHOOL YEAR</th>
@@ -66,6 +67,7 @@
           >
             <td>{{ student.lrn || '-' }}</td>
             <td>{{ student.name || '-' }}</td>
+            <td>{{ student.gender || '-' }}</td>
             <td>{{ student.track || '-' }}</td>
             <td>{{ student.curriculum || '-' }}</td>
             <td>{{ student.batch || '-' }}</td>

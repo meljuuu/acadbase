@@ -105,6 +105,14 @@
             <option value="SPA">SPA</option>
           </select>
         </div>
+        <div class="input-group">
+          <label>Gender</label>
+          <select v-model="gender">
+            <option value="">Select Gender</option>
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+          </select>
+        </div>
         <h5>Processor Information</h5>
         <div class="input-group">
           <label>Faculty Name</label>
@@ -345,6 +353,17 @@
             <option value="SPA">SPA</option>
           </select>
         </div>
+        <div class="input-group">
+          <label>Gender</label>
+          <select 
+            v-model="gender"
+            class="editable"
+          >
+            <option value="">Select Gender</option>
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+          </select>
+        </div>
         <h5>Processor Information</h5>
         <div class="input-group">
           <label>Faculty Name</label>
@@ -458,6 +477,7 @@ export default {
       furnishedDate: null,
       furnishedBy: null,
       isDownloading: false,
+      gender: "",
     };
   },
   props: {
@@ -526,6 +546,7 @@ export default {
         this.Curriculum = student.curriculum;
         this.AcademicTrack = student.track;
         this.DateAdded = student.created_at || new Date().toLocaleDateString();
+        this.gender = student.gender || ''; // Set gender from database
 
         // Set faculty name from the database, not from localStorage
         this.FacultyName = student.faculty_name || "";
@@ -676,6 +697,7 @@ export default {
           faculty_name: this.FacultyName || null,
           birthdate: birthdate,
           pdfFile: this.uploadedFile || null,
+          gender: this.gender || null,
         };
 
         // Log the data being sent for debugging
@@ -907,7 +929,8 @@ export default {
           track: this.AcademicTrack,
           faculty_name: this.FacultyName,
           status: this.studentStatus,
-          pdfFile: this.uploadedFile || null
+          pdfFile: this.uploadedFile || null,
+          gender: this.gender,
         };
 
         const response = await MasterlistService.updateStudent(this.studentId, studentData);
@@ -1078,7 +1101,8 @@ export default {
     syBatch: 'updateStudentStatus',
     Curriculum: 'updateStudentStatus',
     AcademicTrack: 'updateStudentStatus',
-    uploadedFile: 'updateStudentStatus'
+    uploadedFile: 'updateStudentStatus',
+    gender: 'updateStudentStatus',
   },
 };
 </script>

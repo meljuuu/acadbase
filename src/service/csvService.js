@@ -63,6 +63,10 @@ const parseCSV = (file) => {
             case 'birth_date':
               fieldName = 'Birthdate';
               break;
+            case 'gender':
+            case 'sex':
+              fieldName = 'Gender';
+              break;
           }
           
           student[fieldName] = value || '';
@@ -116,7 +120,8 @@ const parseExcel = (file) => {
         return {
           ...row,
           birthdate: birthdate,
-          status: 'Not-Applicable'
+          status: 'Not-Applicable',
+          gender: row.gender || row.sex || null
         };
       });
       
