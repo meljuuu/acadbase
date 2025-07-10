@@ -83,7 +83,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="student in latestMasterlistStudents.slice(0, 10)" :key="student.lrn">
+              <tr v-for="student in filteredRecentReleasedStudents" :key="student.lrn">
                 <td>{{ student.name }}</td>
                 <td>{{ student.track }}</td>
                 <td>{{ student.school_year }}</td>
@@ -260,6 +260,15 @@ export default {
     // Add unique curriculums for display (optional)
     uniqueCurriculums() {
       return [...new Set(this.studentsRecentAdded.map(student => student.curriculum))];
+    },
+    filteredRecentReleasedStudents() {
+      // Normalize both sides to ignore spaces
+      const selectedYear = (this.selectedYearDocs || '').replace(/\s+/g, '');
+      return this.latestMasterlistStudents
+        .filter(student => 
+          (student.school_year || '').replace(/\s+/g, '') === selectedYear
+        )
+        .slice(0, 10);
     }
   },
   methods: {
@@ -367,14 +376,14 @@ export default {
           .map(student => ({
             name: student.name,
             track: student.track,
-            school_year: student.curriculum,
+            school_year: student.batch, // <-- Use the correct year property here!
             lrn: student.lrn,
             releaseDate: student.created_at,
-            gender: student.gender, // Ensure gender is included
-            status: student.status // Ensure status is included
+            gender: student.gender,
+            status: student.status
           }))
-          .filter(student => student.status === "Released") // Filter for "Released" status
-          .sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate)); // sort by latest
+          .filter(student => student.status === "Released")
+          .sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate));
       } catch (error) {
         console.error('Error fetching masterlist students:', error);
         this.latestMasterlistStudents = [];
