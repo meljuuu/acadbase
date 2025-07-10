@@ -283,24 +283,13 @@
       </div>
 
       <div class="student-processor-information">
-        <div class="header-actions">
-          <h5>Student Information</h5>
-          <button 
-            v-if="!isEditMode" 
-            @click="toggleEditMode" 
-            class="edit-button"
-          >
-            Edit
-          </button>
-        </div>
-        
+        <h5>Student Information</h5>
         <div class="input-group">
           <label>Student Name</label>
           <input
             type="text"
             v-model="Name"
-            :readonly="!isEditMode"
-            :class="{ 'editable': isEditMode }"
+            class="editable"
           />
         </div>
         <div class="input-group">
@@ -308,8 +297,7 @@
           <input
             type="text"
             v-model="lrn"
-            :readonly="!isEditMode"
-            :class="{ 'editable': isEditMode }"
+            class="editable"
             maxlength="12"
             @input="validateLRN"
           />
@@ -319,16 +307,14 @@
           <input 
             type="date" 
             v-model="birthdate"
-            :readonly="!isEditMode"
-            :class="{ 'editable': isEditMode }"
+            class="editable"
           />
         </div>
         <div class="input-group">
           <label>S.Y Batch</label>
           <select 
             v-model="syBatch"
-            :disabled="!isEditMode"
-            :class="{ 'editable': isEditMode }"
+            class="editable"
           >
             <option value="">Select Year</option>
             <option 
@@ -344,8 +330,7 @@
           <label>Curriculum</label>
           <select 
             v-model="Curriculum"
-            :disabled="!isEditMode"
-            :class="{ 'editable': isEditMode }"
+            class="editable"
           >
             <option value="">Select Curriculum</option>
             <option value="JHS">JHS</option>
@@ -356,8 +341,7 @@
           <label>Academic Track</label>
           <select 
             v-model="AcademicTrack"
-            :disabled="!isEditMode"
-            :class="{ 'editable': isEditMode }"
+            class="editable"
           >
             <option value="">Select Track</option>
             <option value="SPJ">SPJ</option>
@@ -371,8 +355,7 @@
           <input
             type="text"
             v-model="FacultyName"
-            :readonly="!isEditMode"
-            :class="{ 'editable': isEditMode }"
+            class="editable"
           />
         </div>
         <div class="input-group">
@@ -380,8 +363,7 @@
           <input
             type="text"
             v-model="FacultyName"
-            :readonly="!isEditMode"
-            :class="{ 'editable': isEditMode }"
+            class="editable"
           />
         </div>
         <div class="input-group">
@@ -389,8 +371,7 @@
           <input
             type="text"
             :value="formatDate(DateAdded)"
-            :readonly="!isEditMode"
-            :class="{ 'editable': isEditMode }"
+            class="editable"
           />
         </div>
         <div class="input-group" v-if="furnishedDate">
@@ -398,8 +379,7 @@
           <input
             type="text"
             :value="formatDate(furnishedDate)"
-            :readonly="!isEditMode"
-            :class="{ 'editable': isEditMode }"
+            class="editable"
           />
         </div>
         <div class="input-group" v-if="furnishedBy">
@@ -407,8 +387,7 @@
           <input
             type="text"
             :value="furnishedBy"
-            :readonly="!isEditMode"
-            :class="{ 'editable': isEditMode }"
+            class="editable"
           />
         </div>
         <div class="furnished">
@@ -429,23 +408,9 @@
           </button>
           <p v-if="!originalPdfUrl" class="note">Upload a PDF document first to enable copy furnish</p>
         </div>
-
         <div class="modal-buttons">
           <button @click="closeUnReleasedModal" class="cancel">Back</button>
-          <button 
-            v-if="isEditMode" 
-            @click="toggleEditMode" 
-            class="cancel"
-          >
-            Cancel Edit
-          </button>
-          <button 
-            v-if="isEditMode" 
-            @click="saveStudentInfo" 
-            class="save-button"
-          >
-            Save Changes
-          </button>
+          <button @click="saveStudentInfo" class="save-button">Save Changes</button>
           <button @click="markAsDropOut" class="dropout-button">Drop Out</button>
           <button 
             @click="downloadStampedPdf" 
@@ -505,7 +470,6 @@ export default {
       furnishedDate: null,
       furnishedBy: null,
       isDownloading: false,
-      isEditMode: false,
     };
   },
   props: {
@@ -979,7 +943,7 @@ export default {
           });
           
           // Exit edit mode after successful save
-          this.isEditMode = false;
+          // this.isEditMode = false; // Removed as per edit hint
           
           // Close modal and emit event to refresh the list
           this.closeUnReleasedModal();
@@ -1017,8 +981,8 @@ export default {
       }
     },
     updateStudentStatus() {
-      // If all required fields are present, set status to Unreleased
-      if (this.isStudentInfoComplete) {
+      // If all required fields AND a PDF are present, set status to Unreleased
+      if (this.isStudentInfoComplete && (this.uploadedFile || this.pdfUrl)) {
         this.studentStatus = 'Unreleased';
       } else {
         this.studentStatus = 'Not-Applicable';
@@ -1090,9 +1054,6 @@ export default {
       } finally {
         this.isDownloading = false;
       }
-    },
-    toggleEditMode() {
-      this.isEditMode = !this.isEditMode;
     },
     removeFile() {
       // Clear the file input
