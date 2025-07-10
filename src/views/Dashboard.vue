@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="nav-title">
-      <h1>Dashboard</h1>
+      <h1 style="margin-bottom: 24px;">Dashboard</h1>
     </div>
 
     <div v-if="loading" class="loading">
@@ -13,12 +13,12 @@
     </div>
 
     <div v-else class="dashboard-content">
-      <div class="student-container">
+      <!-- <div class="student-container">
         <div class="buttons">
           <Dropdown :showCurriculum="true" @update:selectedCurriculum="selectedCurriculum = $event" />
           <Dropdown :showYear="true" :yearOptions="availableYears" @update:selectedYear="selectedSY = $event" />
         </div>
-      </div>
+      </div> -->
 
       <div class="student-list-container">
         <div className="total-students">
@@ -481,6 +481,7 @@ export default {
   font-size: 48px;
   padding: 0;
   margin: 0;
+  margin-bottom: 24px; /* <-- add this line */
 }
 
 .dashboard-content {
