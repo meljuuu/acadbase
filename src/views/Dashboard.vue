@@ -1,7 +1,39 @@
 <template>
   <div class="container">
     <div class="nav-title">
-      <h1 style="margin-bottom: 24px;">Dashboard</h1>
+      <h1>Dashboard</h1>
+      <button @click="showDropoutModal = true" class="dropout-btn">Drop-Outs</button>
+    </div>
+
+    <!-- Drop Out Modal -->
+    <div v-if="showDropoutModal" class="modal-overlay">
+      <div class="modal-content">
+        <h2>Drop Out Students</h2>
+        <button class="close-btn" @click="showDropoutModal = false">Close</button>
+        <table v-if="dropoutStudents.length">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Curriculum</th>
+              <th>School Year</th>
+              <th>Gender</th>
+              <th>Track</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="student in dropoutStudents" :key="student.lrn">
+              <td>{{ student.name }}</td>
+              <td>{{ student.curriculum }}</td>
+              <td>{{ student.batch || student.school_year }}</td>
+              <td>{{ student.gender }}</td>
+              <td>{{ student.track }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div v-else>
+          No drop out students found.
+        </div>
+      </div>
     </div>
 
     <div v-if="loading" class="loading">
@@ -180,6 +212,8 @@ export default {
       loading: false,
       error: null,
       genderDistribution: {},
+      showDropoutModal: false,
+      dropoutStudents: [],
     };
   },
   async created() {
@@ -194,6 +228,11 @@ export default {
     selectedSY(newVal) {
       if (this.rawStudentStats) {
         this.studentStats = this.processStudentStats(this.rawStudentStats);
+      }
+    },
+    showDropoutModal(newVal) {
+      if (newVal) {
+        this.fetchDropoutStudents();
       }
     },
     selectedYearBarChart() {
@@ -395,6 +434,22 @@ export default {
         this.latestMasterlistStudents = [];
       }
     },
+    async fetchDropoutStudents() {
+      try {
+        const response = await MasterlistService.filterStudents({ status: "Dropped-Out" });
+        // Map to ensure all fields are present for the table
+        this.dropoutStudents = (response.data || []).map(student => ({
+          name: student.name || '-',
+          curriculum: student.curriculum || '-',
+          batch: student.batch || student.school_year || '-',
+          gender: student.gender || '-',
+          track: student.track || '-',
+          lrn: student.lrn || student.id || Math.random()
+        }));
+      } catch (error) {
+        this.dropoutStudents = [];
+      }
+    },
 
     async fetchAvailableGenderDistributionYears() {
       try {
@@ -501,13 +556,18 @@ export default {
   box-sizing: border-box;
 }
 
+.nav-title {
+  display: flex;
+  justify-content: space-between; /* Pushes title left, button right */
+  align-items: center;            /* Vertically centers them */
+  margin-bottom: 24px;
+}
+
 .nav-title h1 {
   color: #295f98;
   font-weight: bold;
   font-size: 48px;
-  padding: 0;
   margin: 0;
-  margin-bottom: 24px; /* <-- add this line */
 }
 
 .dashboard-content {
@@ -846,5 +906,61 @@ td {
 th {
   background-color: #f4f4f4;
   font-weight: bold;
+}
+
+.dropout-btn {
+  background: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: 12px;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center
+}
+
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  position: relative;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #295f98;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.close-btn:hover {
+  background: #c82333;
 }
 </style>
