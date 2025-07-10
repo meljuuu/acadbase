@@ -786,22 +786,7 @@ export default {
             // First refresh
             this.closeUnReleasedModal();
             this.$emit('student-saved');
-            
-            // First reopen after 500ms
-            setTimeout(() => {
-              this.showUnReleasedModal(this.studentId);
-              
-              // Second refresh after another 500ms
-              setTimeout(() => {
-                this.closeUnReleasedModal();
-                this.$emit('student-saved');
-                
-                // Final reopen after 500ms
-                setTimeout(() => {
-                  this.showUnReleasedModal(this.studentId);
-                }, 500);
-              }, 500);
-            }, 500);
+            window.location.reload(); // <-- Add this for full reload
           }
         } else {
           this.pdfUrl = this.originalPdfUrl;
@@ -1364,9 +1349,10 @@ select:focus {
     gap: 8px;
 }
 
-.released-button:disabled {
+.released-button:disabled,
+.released-button[disabled] {
     opacity: 0.7;
-    cursor: not-allowed;
+    cursor: not-allowed !important;
 }
 
 .released-button .loading-spinner {
@@ -1431,4 +1417,15 @@ select:focus {
   border-color: #1e4b7a;
   box-shadow: 0 0 3px rgba(41, 95, 152, 0.3);
 }
+
+.apply-button {
+  cursor: pointer;
+}
+
+.apply-button:disabled,
+.apply-button[disabled] {
+  cursor: not-allowed !important;
+  opacity: 0.7;
+}
+
 </style>
