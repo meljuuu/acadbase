@@ -447,7 +447,7 @@ export default {
       isPdfLoaded: false,
       pdfLoadFailed: false,
       academicYears: [
-        "2025-2026", "2024-2025", "2023-2024", 
+        "2027-2028","2026-2027","2025-2026", "2024-2025", "2023-2024", 
         "2022-2023", "2021-2022", "2020-2021", "2019-2020"
       ],
       isProcessing: false,
