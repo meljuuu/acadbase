@@ -374,7 +374,7 @@
           />
         </div>
         <div class="input-group">
-          <label>Date of Released</label>
+          <label>Date Added</label>
           <input
             type="text"
             :value="formatDate(DateAdded)"
@@ -548,8 +548,22 @@ export default {
         this.DateAdded = student.created_at || new Date().toLocaleDateString();
         this.gender = student.gender || ''; // Set gender from database
 
-        // Set faculty name from the database, not from localStorage
-        this.FacultyName = student.faculty_name || "";
+        // Fetch the current user's name if faculty_name is null
+        if (!student.faculty_name) {
+            const user = JSON.parse(localStorage.getItem("user"));
+            if (user) {
+                const { FirstName, MiddleName, LastName, Suffix } = user;
+                let fullName = FirstName || "";
+                if (MiddleName) fullName += ` ${MiddleName}`;
+                if (LastName) fullName += ` ${LastName}`;
+                if (Suffix) fullName += ` ${Suffix}`;
+                this.FacultyName = fullName.trim();
+            } else {
+                this.FacultyName = "System";
+            }
+        } else {
+            this.FacultyName = student.faculty_name;
+        }
 
         // Check for stamped PDF
         if (student.stamped_pdf_storage) {
