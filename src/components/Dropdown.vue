@@ -104,7 +104,7 @@ const selectedStatus = ref("");
 const curriculums = ["Junior High School", "Senior High School"];
 
 // For fallback dropdowns only (used if yearOptions not passed)
-const defaultYears = ["2025 - 2026", "2023 - 2024", "2026 - 2027"];
+const defaultYears = ["2021 - 2026", "2023 - 2024", "2026 - 2027"];
 const batchs = ["All", "S.Y 2020 - 2021", "S.Y 2021 - 2022", "S.Y 2022 - 2023", "S.Y 2023 - 2024", "S.Y 2024 - 2025"];
 const tracks = ["All", "Academic", "Technical Professional", "SPJ", "SPA", "BEC"];
 const types = [".csv"];

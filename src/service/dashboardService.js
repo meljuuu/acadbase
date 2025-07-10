@@ -6,7 +6,7 @@ class DashboardService {
     // Get student statistics
     async getStudentStats() {
         try {
-            const response = await axios.get(`${API_URL}/dashboard/student-stats`);
+            const response = await axios.get(`${API_URL}/dashboard/students/Acadlist`);
             return response.data;
         } catch (error) {
             throw error;
@@ -25,7 +25,7 @@ class DashboardService {
     // Get student gender distribution
     async getGenderDistribution(params = {}) {
         try {
-            const response = await axios.get(`${API_URL}/dashboard/students/gender-distribution`, {
+            const response = await axios.get(`${API_URL}/dashboard/students/Grade-Gender`, {
                 params
             });
             return response.data;

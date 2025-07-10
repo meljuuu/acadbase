@@ -15,10 +15,10 @@
     <div v-else class="dashboard-content">
       <div class="student-container">
         <div class="buttons">
-<Dropdown :showCurriculum="true" @update:selectedCurriculum="selectedCurriculum = $event" />
-<Dropdown :showYear="true" :yearOptions="availableYears" @update:selectedYear="selectedSY = $event" />
+          <Dropdown :showCurriculum="true" @update:selectedCurriculum="selectedCurriculum = $event" />
+          <Dropdown :showYear="true" :yearOptions="availableYears" @update:selectedYear="selectedSY = $event" />
         </div>
-        
+
         <div class="stats-container" v-if="filteredStats.length">
           <div v-for="(stat, index) in filteredStats" :key="index" class="stat-card">
             <div class="stat-icon">
@@ -41,11 +41,7 @@
             <div className="filter">
               <select v-model="selectedYearBarChart">
                 <option value="">All</option>
-                <option
-                  v-for="year in years"
-                  :key="year"
-                  :value="year"
-                >
+                <option v-for="year in years" :key="year" :value="year">
                   {{ year.replace('-', ' - ') }}
                 </option>
               </select>
@@ -92,49 +88,37 @@
             <div class="content-title">
               <h3>Recent Released</h3>
             </div>
-            <div class="filter-container">
-              <select v-model="selectedSY" id="syFilter">
-                <option value="">All</option>
-                <option v-for="school_year in uniqueSYs" :key="school_year" :value="school_year">{{ school_year }}</option>
-              </select>
-            </div>
           </div>
+
 
           <table>
             <thead>
               <tr>
-                <!-- <th>#</th> -->
                 <th>Name</th>
                 <th>Track</th>
                 <th>School Year</th>
-                <th>Release Date & Time</th>
-                
+                <th>Release Date</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(student, index) in releasedStudents" :key="student.lrn">
-                <!-- <td>{{ index + 1 }}</td> -->
+              <tr v-for="student in latestMasterlistStudents.slice(0, 10)" :key="student.lrn">
                 <td>{{ student.name }}</td>
                 <td>{{ student.track }}</td>
                 <td>{{ student.school_year }}</td>
                 <td>{{ formatDate(student.releaseDate) }}</td>
-               
               </tr>
             </tbody>
           </table>
         </div>
 
-       
+
+
         <div class="released-docs">
           <div class="container-title">
             <div class="content-title-docs">
               <h3>Released Docs</h3>
               <select v-model="selectedYearDocs" class="year-filter">
-                <option 
-                  v-for="year in Object.keys(data)" 
-                  :key="year" 
-                  :value="year"
-                >
+                <option v-for="year in Object.keys(data)" :key="year" :value="year">
                   {{ year }}
                 </option>
               </select>
@@ -146,8 +130,8 @@
               <span class="doc-text">Released Documents</span>
             </div>
           </div>
-          
-          <div class="stats-doc"> 
+
+          <div class="stats-doc">
             <div class="stat-box-doc">
               <!-- <p class="stat-number-doc">{{ filteredData.seniorHigh }}</p> -->
               <div class="stat-label-container-doc">
@@ -190,9 +174,10 @@ export default {
   },
   data() {
     return {
+      latestMasterlistStudents: [],
       selectedCurriculum: "Junior High School",
       availableYears: [],
-      selectedSY: "2025-2026",
+      selectedSY: "2019-2020",
       rawStudentStats: null, // <-- added to keep original stats
       currentPage: 1,
       itemsPerPage: 10,
@@ -200,11 +185,12 @@ export default {
       studentsRecentAdded: [],
       students: [],
       studentStats: {},
-      selectedYearDocs: "2025 - 2026",
+      selectedYearDocs: "2020 - 2021",
       selectedYearBarChart: "",
       years: [],
       data: {
-        "2023 - 2024": { releasedDocs: 0, seniorHigh: 0, juniorHigh: 0 },
+        "2019 - 2020": { releasedDocs: 0, seniorHigh: 0, juniorHigh: 0 },
+        "2020 - 2021": { releasedDocs: 0, seniorHigh: 0, juniorHigh: 0 },
         "2026 - 2027": { releasedDocs: 0, seniorHigh: 0, juniorHigh: 0 },
         "2025 - 2026": { releasedDocs: 0, seniorHigh: 0, juniorHigh: 0 }
       },
@@ -217,6 +203,8 @@ export default {
     await this.fetchDashboardData();
     await this.fetchAvailableGenderDistributionYears();
     await this.fetchGenderDistribution();
+    await this.fetchLatestMasterlistStudents();
+
   },
   watch: {
     selectedSY(newVal) {
@@ -230,8 +218,8 @@ export default {
   },
   computed: {
     uniqueSYs() {
-        return [...new Set(this.students.map(student => student.school_year))];
-      },
+      return [...new Set(this.students.map(student => student.school_year))];
+    },
     releasedStudents() {
       let filtered = this.students;
       if (this.selectedSY) {
@@ -276,10 +264,10 @@ export default {
             label: 'Total Students',
             backgroundColor: ['#295f98', '#295f98', '#295f98', '#295f98'],
             data: [
-              dist.JHS_M || 0,
-              dist.JHS_F || 0,
-              dist.SHS_M || 0,
-              dist.SHS_F || 0
+              dist.JHS_Male || 0,
+              dist.JHS_Female || 0,
+              dist.SHS_Male || 0,
+              dist.SHS_Female || 0
             ]
           }
         ]
@@ -294,22 +282,24 @@ export default {
           studentStats,
           recentStudents,
           releasedDocsStats,
+          allstsudents,
           statusCounts
         ] = await Promise.all([
           DashboardService.getStudentStats(),
           DashboardService.getRecentStudents(),
           DashboardService.getReleasedDocsStats(),
-          DashboardService.getStudentStatusCounts()
+          DashboardService.getStudentStatusCounts(),
+          MasterlistService.getAllStudents()
         ]);
 
         this.studentsRecentAdded = Array.isArray(recentStudents)
           ? recentStudents.map(student => ({
-              name: `${student.LastName}, ${student.FirstName}`,
-              track: student.Track,
-              school_year: student.Curriculum,
-              lrn: student.Student_ID,
-              releaseDate: student.batch
-            }))
+            name: `${student.LastName}, ${student.FirstName}`,
+            track: student.Track,
+            school_year: student.Curriculum,
+            lrn: student.Student_ID,
+            releaseDate: student.batch
+          }))
           : [];
 
         this.students = this.studentsRecentAdded;
@@ -321,7 +311,9 @@ export default {
         this.data = this.processReleasedDocsData(releasedDocsStats);
 
         const trackStats = studentStats.track_stats || {};
-        this.availableYears = Object.keys(trackStats).map(year => year.replace('-', ' - '));
+        // this.availableYears = Object.keys(trackStats).map(year => year.replace('-', ' - '));
+        this.availableYears = Object.keys(trackStats);
+
 
         if (!this.selectedSY && this.availableYears.length) {
           this.selectedSY = this.availableYears[0];
@@ -340,7 +332,7 @@ export default {
       }
     },
     processStudentStats(stats) {
-      const selectedYear = this.selectedSY?.replace(' - ', '-') || '';
+      const selectedYear = this.selectedSY || '';
       const trackStats = stats.track_stats || {};
       const yearStats = trackStats[selectedYear] || {};
 
@@ -349,7 +341,7 @@ export default {
           { label: "BEC Students", count: yearStats['JHS']?.['BEC'] || 0 },
           { label: "SPA Students", count: yearStats['JHS']?.['SPA'] || 0 },
           { label: "SPJ Students", count: yearStats['JHS']?.['SPJ'] || 0 }
-         
+
         ].filter(item => item.count > 0),
 
         "Senior High School": [
@@ -384,6 +376,26 @@ export default {
         this.genderDistribution = {};
       }
     },
+    async fetchLatestMasterlistStudents() {
+      try {
+        const response = await MasterlistService.getAllStudents();
+        const students = response.data; // <-- this is the array of students from the paginated response
+
+        this.latestMasterlistStudents = students
+          .map(student => ({
+            name: student.name,
+            track: student.track,
+            school_year: student.curriculum,
+            lrn: student.lrn,
+            releaseDate: student.created_at
+          }))
+          .sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate)); // sort by latest
+      } catch (error) {
+        console.error('Error fetching masterlist students:', error);
+        this.latestMasterlistStudents = [];
+      }
+    },
+
     async fetchAvailableGenderDistributionYears() {
       try {
         const response = await DashboardService.getGenderDistributionYears();
@@ -465,7 +477,7 @@ export default {
 
 .chart-container {
   width: 100%;
-  height: 450px; 
+  height: 450px;
   display: flex;
   justify-content: center;
 }
@@ -582,10 +594,10 @@ export default {
 }
 
 .recent-added {
-  width: 300px; 
-  height: 550px; 
-  overflow-y: auto; 
-  border: 1px solid #ddd; 
+  width: 300px;
+  height: 550px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
   padding: 20px;
   background-color: #ffffff;
 }
@@ -593,14 +605,14 @@ export default {
 .title-filter-container {
   display: flex;
   align-items: center;
-  justify-content: space-between; 
+  justify-content: space-between;
   width: 100%;
 }
 
 .filter-container-recent-added select {
   padding: 15px 20px;
   font-size: 14px;
-  min-width: 150px; 
+  min-width: 150px;
 }
 
 .total-students {
@@ -697,16 +709,18 @@ select:focus {
 .recent-released {
   height: 600px;
 }
+
 .released-docs {
   height: 558px;
 }
 
 .content-title-docs {
-  align-items: center; 
+  align-items: center;
   display: flex;
   justify-content: space-between;
-  width: 100%; 
+  width: 100%;
 }
+
 .content-title-docs h3 {
   margin: 0;
 }
@@ -731,7 +745,8 @@ select:focus {
   border-radius: 50%;
   border: 20px solid #1E3A8A;
   display: flex;
-  flex-direction: column; /* Align items in a column */
+  flex-direction: column;
+  /* Align items in a column */
   align-items: center;
   justify-content: center;
   font-size: 20px;
@@ -748,14 +763,14 @@ select:focus {
 .doc-text {
   font-size: 16px;
   color: #666;
-  margin-top: 5px; 
+  margin-top: 5px;
 }
 
 .stats-doc {
   display: flex;
   justify-content: space-between;
   margin-top: 60px;
-  gap: 10px; 
+  gap: 10px;
 }
 
 .stat-box-doc {
@@ -782,11 +797,11 @@ select:focus {
 }
 
 .stat-icon-doc {
-  width: 10px; 
-  height: 40px; 
-  background-color: #1E3A8A; 
+  width: 10px;
+  height: 40px;
+  background-color: #1E3A8A;
   margin-right: 8px;
-  border-radius: 10px; 
+  border-radius: 10px;
 }
 
 .stat-label-doc {
@@ -805,7 +820,8 @@ table {
   border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
   padding: 10px;
   border: 1px solid #ddd;
   text-align: left;
