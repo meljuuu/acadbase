@@ -53,6 +53,7 @@
             placeholder="Enter LRN"
             maxlength="12"
             @input="validateLRN"
+            class="lrn-input"
           />
         </div>
         <div class="input-group">
@@ -148,6 +149,9 @@
   <!-- Release Modal -->
   <div v-if="showreleasedModal" class="modal-overlay">
     <div class="modal-content">
+      <!-- Add the cross button here -->
+      <button @click="closeReleasedModal" class="close-button">×</button>
+
       <div class="student-file-upload-released" @click="!hasStampedPdf && triggerFileInput" :class="{ 'disabled-upload': hasStampedPdf }">
         <label for="fileInput" class="upload-box">
           <p><i class="fas fa-upload"></i></p>
@@ -243,7 +247,7 @@
         </div>
 
         <div class="modal-buttons">
-          <button @click="closeReleasedModal" class="cancel">Back</button>
+          <!-- No "Back" button here anymore -->
         </div>
       </div>
     </div>
@@ -252,6 +256,9 @@
   <!-- Processing Modal -->
   <div v-if="showunreleasedModal" class="modal-overlay">
     <div class="modal-content">
+      <!-- Add the cross button here -->
+      <button @click="closeUnReleasedModal" class="close-button">×</button>
+
       <div class="student-file-upload-released" @click="triggerFileInput">
       <label for="fileInput" class="upload-box">
         <p><i class="fas fa-upload"></i></p>
@@ -416,7 +423,6 @@
           <p v-if="!originalPdfUrl" class="note">Upload a PDF document first to enable copy furnish</p>
         </div>
         <div class="modal-buttons">
-          <button @click="closeUnReleasedModal" class="cancel">Back</button>
           <button @click="saveStudentInfo" class="save-button">Save Changes</button>
           <button @click="markAsDropOut" class="dropout-button">Drop Out</button>
           <button 
@@ -1145,6 +1151,7 @@ export default {
   gap: 20px;
   justify-content: center;
   align-items: center;
+  position: relative; /* Ensure close button is positioned relative to this */
 }
 
 .modal-content h5 {
@@ -1459,4 +1466,26 @@ select:focus {
   opacity: 0.7;
 }
 
+/* Add cursor: pointer to the LRN input */
+.input-group input[type="text"][placeholder="Enter LRN"] {
+  cursor: pointer;
+}
+
+/* Add styles for the close (×) button */
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #64748b;
+  padding: 5px 10px;
+  transition: color 0.3s ease;
+}
+
+.close-button:hover {
+  color: #dc3545; /* Red color on hover */
+}
 </style>
