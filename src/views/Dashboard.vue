@@ -86,7 +86,7 @@
               <tr v-for="student in filteredRecentReleasedStudents" :key="student.lrn">
                 <td>{{ student.name }}</td>
                 <td>{{ student.track }}</td>
-                <td>{{ student.school_year }}</td>
+                <td>{{ student.curriculum }}</td> <!-- Show curriculum here -->
                 <td>{{ student.gender || '-' }}</td> <!-- Display gender or placeholder -->
                 <td>{{ formatDate(student.releaseDate) }}</td>
               </tr>
@@ -314,8 +314,13 @@ export default {
         }
 
         const years = Object.keys(this.data);
-        if (years.length && !this.selectedYearDocs) {
-          this.selectedYearDocs = years[0];
+        if (years.length) {
+          const currentSY = this.getCurrentSchoolYear();
+          if (years.includes(currentSY)) {
+            this.selectedYearDocs = currentSY;
+          } else {
+            this.selectedYearDocs = years[0];
+          }
         }
 
       } catch (error) {
@@ -377,6 +382,7 @@ export default {
             name: student.name,
             track: student.track,
             school_year: student.batch, // <-- Use the correct year property here!
+            curriculum: student.curriculum, // <-- add this line
             lrn: student.lrn,
             releaseDate: student.created_at,
             gender: student.gender,
@@ -421,6 +427,17 @@ export default {
       if (this.currentPage < this.totalPages) {
         this.currentPage++;
       }
+    },
+    getCurrentSchoolYear() {
+      const now = new Date();
+      let year = now.getFullYear();
+      let nextYear = year + 1;
+      // If before June, the school year is previousYear - currentYear
+      if (now.getMonth() < 5) { // Months are 0-indexed, so 5 = June
+        year = year - 1;
+        nextYear = year + 1;
+      }
+      return `${year} - ${nextYear}`;
     }
   }
 };
